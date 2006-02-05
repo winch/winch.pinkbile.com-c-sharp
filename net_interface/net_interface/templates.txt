@@ -1,0 +1,74 @@
+Templates can be used to add support for additional languages or can be edited to
+modify the output of existing languages.
+
+A template is just a text file in the template directory. The name displayed in the
+program will be the name of the text file with .txt stripped of the end.
+
+Templates are composed of tags and symbols.
+
+Tags are html style tags that enclose sections of text.
+Symbols can be included in the text sections and are replaced with the correct text
+when an output file is build.
+
+Example
+
+<namespacestart>%t
+namespace %n
+{
+</namespacestart>
+
+%t will increase the tab count so all text following this tag will have an extra tab inserted before it.
+%n will be replaced with the namespace name the user types in the namespace text box, in this
+example it is nSpace.
+
+When the program writes nameSpaceStart it will write
+"
+namespace nSpace
+{
+"
+
+Refrence
+
+Symbols
+
+%t = Increase tab count
+%n = namespace name
+%c = class name
+%d = dll name
+%e = entry point
+%f = function name
+%r = funtion return type
+%p = function parameters
+%a = parameter name
+%m = comment text
+
+%l = < character
+%g = > character
+
+Tags in the order they are processed when building output file
+
+<header>
+<nameSpaceStart>
+<classStart>
+<method>
+<classEnd>
+<nameSpaceEnd>
+<footer>
+
+Other tags
+
+<filter> = the filter text used in the build save dialog
+
+%r = return types
+<RZ> no return
+<RL> long
+<LD> dword
+<RF> float
+<RS> string
+
+%p = function parameters
+<Z> no parameters
+<L> long
+<D> dword
+<F> float
+<S> string

@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dark_injector", "dark_injector\dark_injector.csproj", "{2E3995D9-8593-40CD-A1F1-C8BCCA9652E9}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{2E3995D9-8593-40CD-A1F1-C8BCCA9652E9}.Debug.ActiveCfg = Debug|.NET
+		{2E3995D9-8593-40CD-A1F1-C8BCCA9652E9}.Debug.Build.0 = Debug|.NET
+		{2E3995D9-8593-40CD-A1F1-C8BCCA9652E9}.Release.ActiveCfg = Release|.NET
+		{2E3995D9-8593-40CD-A1F1-C8BCCA9652E9}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

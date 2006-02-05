@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shrinker", "shrinker\shrinker.csproj", "{0A85CE32-6EAF-40D0-ADF0-844241C17B44}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{0A85CE32-6EAF-40D0-ADF0-844241C17B44}.Debug.ActiveCfg = Debug|.NET
+		{0A85CE32-6EAF-40D0-ADF0-844241C17B44}.Debug.Build.0 = Debug|.NET
+		{0A85CE32-6EAF-40D0-ADF0-844241C17B44}.Release.ActiveCfg = Release|.NET
+		{0A85CE32-6EAF-40D0-ADF0-844241C17B44}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

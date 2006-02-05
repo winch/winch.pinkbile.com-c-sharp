@@ -1,0 +1,56 @@
+Version History
++++++++++++++++
+
+v0.14 04 April 2005
+- Copy list to clipboard now spaces out list and shows filesize
+- Added option to null resource sections of dlls. This makes it harder for people to use your dlls as the string table
+will be blank
+
+v0.13 18 February 2005
+- Improved dbpro exe loading so it works with FPSC (http://www.fpscreator.com) EA exes
+
+v0.12 07 November 2004
+- "Use upx on save" checkbox now unchecked by default
+- Added "Copy list to clipboard" to right-click menu which copies a list of the files in the listview to the clipboard
+
+v0.11 05 October 2004
+-Added option to run dlls through upx compressor on save. This can reduce the size the file size by quite a bit
+
+v0.10 29 September 2004
+- Now changes dialog initial directory to the loaded exe path if the exe was loaded after a drag & drop
+
+v0.9 09 September 2004
+- Fixed crash with "guess prefix" when trying to insert media from the same dir as the dbpro exe
+- Added ability to edit initial display width, height, depth and window mode which is stored within _virtual.dat
+
+v0.8 04 September 2004
+- Completly changed insert with wildcard, it is now a lot easier to add media
+
+v0.7 03 September 2004
+- Added insert with wildcard eg add all *.png file from a dir
+- Added buttons to move files up and down in list
+- Added extract option to right-click menu
+- Did some stuff I forgot
+
+v0.6 01 August 2004
+- Added drag & drop, drag a dbpro exe or pck onto the window and it will open it
+
+v0.5 18 July 2004
+- Improved dbpro exe loading to handle non-dbpro exes better
+
+V0.4 30 June 2004
+- Buttons and popup menu items now enable/desable themselves where appropriate
+- Added proper about dialog
+- Improved positioning of name editing dialog
+- Fixed odd problem with save exe dialog box
+
+0.3 28 June 2004
+- Improved exe/pck loading
+- Added save exe/pck
+- Added renaming file dialog box
+
+0.2
+- Added extract file(s)
+
+0.1 24 June 2004
+- First version

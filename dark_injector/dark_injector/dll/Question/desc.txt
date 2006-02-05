@@ -1,0 +1,5 @@
+Shows a message box asking if you want to continue running the exe.
+
+Answer No and the exe will silently exit.
+
+Answer Yes and the exe runs as normal.

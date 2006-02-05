@@ -1,0 +1,45 @@
+thewinch@gmail.com 17th April 2005
+http://winch.pinkbile.com
+
+Dbpro exes appear to be standard exes with files appended on the end.
+
+Attached files start emidiatly after "PADDINGXXPAD" section
+Find "PADDINGXXPAD" then keep reading until you read a byte not in "PADDINGXXPAD"
+The file up until the end of "PADDINGXXPAD" section is represented by "Standard Exe Header"
+If "PADDINGXXPAD" is not found I assume the appeded files start at byte 73,728.
+
+A more complicated but reliable way is to find the end of the exe and start reading from there.
+There are several descriptions of the pe format on wotsit.org that can be used to find the end of
+the exe where the attached files start.
+
+The attached files are in the format
+
+int namelength
+name
+int filelength
+filedata
+
+Included media files have a "media\" prefix to the filename.
+
+if the name length is long (>50) or 0 then I assume it isn't a file but a compressed block or the extra few bytes
+that are allways at the end of a dbpro exe. This is represented in the program by "Extra or Compressed block"
+A compressed block is the compressed data that is produced when you compile the exe with the "compress attached media"
+option.
+
+_virtual.dat format
+(thanks to Van B for this post http://forum.thegamecreators.com/?m=forum_view&t=38782&b=1)
+
+int window mode
+int display width
+int display height
+int display depth
+
+Window modes
+0 = hidden
+1 = windowed
+2 = windowed desktop
+3 = full exclusive
+4 = windowed fullscreen
+
+Information about the dbpro exe format can also be found here
+http://dbp-unchained.tk/

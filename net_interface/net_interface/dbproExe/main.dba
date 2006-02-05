@@ -1,0 +1,53 @@
+
+`call the plugin
+do_it
+
+function not_called()
+  `comment out any dlls not used by your plugin and compile the exe
+  `dbproanimationdebug.dll
+  load animation "", 1
+  `dbprobasic2ddebug.dll
+  ink 0,0
+  `dbprobasic2ddebug.dll
+  load object "", 1
+  `dbprobitmapdebug.dll
+  load bitmap "", 1
+  `dbprocameradebug.dll
+  autocam on
+  `dbprocore.dll
+  print ""
+  `dbprofiledebug.dll
+  close file 1
+  `dbproftpdebug.dll
+  ftp disconnect
+  `dbproimagedebug.dll
+  load image "",1
+  `dbproinputdebug.dll
+  change mouse 0
+  `dbprolightdebug.dll
+  delete light 0
+  `dbpromatrixdebug.dll
+  make matrix 0,0,0,0,0
+  `dbpromemblocks
+  delete memblock 0
+  `dbpromultiplayerdebug.dll
+  join net game 0,""
+  `dbpromusicdebug.dll
+  stop music 0
+  `dbproparticlesdebug.dll
+  delete particles 0
+  `dbprosetupdebug.dll
+  show window
+  `dbprosounddebug.dll
+  loop sound 0
+  `dbprospritesdebug.dll
+  delete sprite 0
+  `dbprosystemdebug.dll
+  empty checklist
+  `dbprotextdebug.dll
+  print chr$(0)
+  `dbprovectorsdebug.dll
+  add vector2 0,0,0
+  `dbproworld3ddebug.dll
+  delete bsp
+endfunction

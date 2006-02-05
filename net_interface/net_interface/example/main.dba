@@ -1,0 +1,8 @@
+box 0,0,32,32
+get image 1,0,0,32,32,1
+sprite 1,0,0,1
+
+do
+  wait 1500
+  do_it : `the tpc funtion
+loop

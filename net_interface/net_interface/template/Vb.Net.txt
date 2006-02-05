@@ -1,0 +1,37 @@
+<filter>VB.net Files (*.vb)|*.vb|All Files (*.*)|*.*</filter>
+
+<header>REM .net interface builder output file
+
+Imports System.Runtime.InteropServices
+
+</header>
+
+<namespacestart>namespace %n
+%t
+</namespacestart>
+
+<namespaceend>End namespace
+</namespaceend>
+
+<classstart>public class %c
+%t
+</classstart>
+
+<classend>End Class
+</classend>
+
+<method>%lDllImport("%d", EntryPoint := "%e", CallingConvention := CallingConvention.Cdecl)%g _
+Public Shared Sub %f(%p)%r
+End Sub
+
+</method>
+
+<rl> As Integer</rl>
+<rd> As Integer</rd>
+<rf> As Single</rf>
+<rs> As String</rs>
+
+<l>ByVal %a As Integer</l>
+<d>ByVal %a As Integer</d>
+<f>ByVal %a As Single</f>
+<s>ByVal %a As String</s>

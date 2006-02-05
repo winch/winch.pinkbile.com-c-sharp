@@ -1,0 +1,43 @@
+<filter>C# Files (*.cs)|*.cs|All Files (*.*)|*.*</filter>
+
+<comment>// %m
+</comment>
+
+<header>//.net interface builder output file
+
+using System.Runtime.InteropServices;
+</header>
+
+<namespacestart>%t
+namespace %n
+{
+</namespacestart>
+
+<namespaceend>
+}
+<namespaceend>
+
+<classstart>%t
+public class %c
+{
+
+</classstart>
+
+<classend>}
+</classend>
+
+<method>[DllImport("%d", EntryPoint="%e", CallingConvention = CallingConvention.Cdecl)]
+public static extern %r %f(%p);
+
+</method>
+
+<rz>void</rz>
+<rl>int</rl>
+<rd>int</rd>
+<rf>float</rf>
+<rs>string</rs>
+
+<l>int %a<l/>
+<d>int %a</d>
+<f>float %a</f>
+<s>string %a</s>

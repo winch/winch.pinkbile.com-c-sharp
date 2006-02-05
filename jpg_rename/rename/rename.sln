@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rename", "rename.csproj", "{EC116CE5-CFA3-455E-A26F-1292207FC170}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{EC116CE5-CFA3-455E-A26F-1292207FC170}.Debug.ActiveCfg = Debug|.NET
+		{EC116CE5-CFA3-455E-A26F-1292207FC170}.Debug.Build.0 = Debug|.NET
+		{EC116CE5-CFA3-455E-A26F-1292207FC170}.Release.ActiveCfg = Release|.NET
+		{EC116CE5-CFA3-455E-A26F-1292207FC170}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

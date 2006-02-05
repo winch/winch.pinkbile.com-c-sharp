@@ -1,0 +1,9 @@
+Checks if DirectX 9.0c or later is installed.
+
+If it is installed the exe runs as normal.
+
+If it is not installed the exe shows a message box before exiting. The messageBox contains the text,
+"DirectX 9.0c or later is required to run this program.
+
+The latest version of DirectX can be downloaded from
+http://www.microsoft.com/directx"

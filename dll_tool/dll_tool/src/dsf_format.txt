@@ -1,0 +1,13 @@
+string dllName
+int edit il checkbox
+int num of exports
+{
+string method
+string calling conv
+string name
+}
+int add string table checkbox
+int num of string table items
+{
+string str table item
+}

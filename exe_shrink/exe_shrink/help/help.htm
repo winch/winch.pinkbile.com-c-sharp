@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>the_winch lives here site stats</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<link href="style.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div><img src="image/01.png" alt="screen shot"></div>
+<div><br>Instructions<br><div>
+<div>
+<br>1. Load dbpro exe<br>
+<br>
+Click on the load button and select the dbpro exe you want to shrink.<br>
+The program will generate a list of all the files in the dbpro exe. It will try to guess which files belong in the internal list and which ones belong in the external list.<br>
+Internal files will be built into the mini exe so any files that are specific to your program should be in the internal list.<br>
+External files will be sourced from the [dbpro]\compiler\plugins, [dbpro]\compiler\plugins-user or [dbpro]\compiler\effects directories. All files that are not specific to your
+program and are located in those directories should be in the external files list.<br>
+A typical program with no compiled in media should look like the above screenshot.<br>
+You can move items from one list to the other by right-clicking the item and selecting move to Internal/External. If you move items to the internal list you need to make sure that you
+keep "&lt;Standard Head&gt;" as the first item and "&lt;Extra Data&gt;" as the last item.<br>
+The program will also generate an exe name by putting a "mini_" prefix on the loaded exe name. The exe name is the filename the mini exe will use to build the exe when it is run.<br>
+Click the Include checksums for external files checkbox and when the mini exe is build checksums for the external files will be added. Then when the mini exe is run it will check to
+see if the external files on the users computer match the checksum.<br>
+<br>
+2. Build expander exe<br>
+<br>
+Press the build button to build a mini exe. The program will check all the files in the external list are present in the
+dbpro]\compiler\plugins, [dbpro]\compiler\plugins-user or [dbpro]\compiler\effects directories. If a file is not found then it is proberly a file specific to your program so move the
+offending file into the internal list.<br>
+In order for another user to run your mini exe they must have dbpro installed and all the external files must be present.
+There is no version checking so attempting to run a mini exe on a system with a different dbpro version may cause problems.
+</div>
+</body>
+</html>

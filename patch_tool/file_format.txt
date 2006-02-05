@@ -1,0 +1,22 @@
+int lenght
+window caption
+
+int length
+filename
+byte md5 checksum 0=no 1=yes
+md5 checksum if required
+
+int length
+info
+
+byte num of files
+{
+byte action / 0=add/replace 1=remove
+
+int length
+filename
+
+if required
+int length
+int filedata
+}

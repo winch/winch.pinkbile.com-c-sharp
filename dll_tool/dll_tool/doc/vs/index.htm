@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<style type="text/css">
+@import url("../style.css");
+</style>
+<title>dll_tool Visual studio documentation</title>
+<script type="text/javascript" src="reply.js"></script>
+</head>
+<body>
+<table align="center"><tr><td>
+<div>Visual Studio .Net 2003 tutorial.</div>
+</td></tr></table>
+<br />
+<table align="center"><tr><td>
+<div align="center"><img src="image/1.png" alt="create a new project" /><br /><br /></div>
+<div>
+Create a new project by selecting File &gt; New &gt; Project from the menu.<br />
+Select class library and call it maths.<br />
+<br />
+Vb.net standard may not be able to create a class library. To get around this create a new project as a console application.<br />
+Close visual studio and open the projects .vbproj file in notepad. Change OutputType = "Exe" to OutputType = "Library".<br />
+Now start visual studio and reopen the project.
+</div>
+</td></tr></table>
+<br />
+<table align="center"><tr><td>
+<div align="center"><img src="image/2.png" alt="enter code" /><br /><br /></div>
+<div>
+Methods that you want to export should be public static in c# and public shared in vb.net.<br />
+We will export two methods add and subtract.<br />
+<br />
+c# code<br />
+<pre class="code">
+using System;
+namespace maths
+{
+	public class MyClass
+	{
+		public static int add(int a, int b)
+		{
+			return a + b;
+		}
+		public static int subtract(int a, int b)
+		{
+			return a - b;
+		}
+	}
+}
+</pre>
+<br />
+vb.net code<br />
+<pre class="code">
+Imports System
+Namespace maths
+
+	Public Class MyClass
+		Public Shared Function add(ByVal a As Integer, ByVal b As Integer) As Integer
+			Return a + b
+		End Function
+
+		Public Shared Function subtract(ByVal a As Integer, ByVal b As Integer) As Integer
+			Return a - b
+		End Function
+	End Class 
+End Namespace
+</pre>
+</div>
+</td></tr></table>
+<br />
+<table align="center"><tr><td>
+<div align="center"><img src="image/3.png" alt="build" /><br /><br /></div>
+<div>
+Change the build type to release and select build &gt; build solution from the menu to compile the dll.<br />
+You can find the dll in the projects bin\release directory.
+</div>
+</td></tr></table>
+<br />
+<table align="center"><tr><td>
+<div align="center"><img src="../image/1.png" alt="dll tool" /><br /><br /></div>
+<div>
+Start dll too and load the dll. The methods in the dll that can be exported are shown in the left hand methods list.<br />
+You can see the add and subtract methods we wrote there.
+</div>
+</td></tr></table>
+<br />
+<table align="center"><tr><td>
+<div align="center"><img src="../image/2.png" alt="dll tool ready for build" /><br /><br /></div>
+<div>
+Dbpro tpc(third party command) dlls use Cdecl as the calling convention so leave &quot;the Moved methods will be&quot;
+combo box as Cdecl.<br />
+Select both the add and subtract methods and click the &gt; button to move them to the exports list.<br />
+Double clicking an item in the exports list will show a dialog that allows you to edit the export name
+and calling convention.<br />
+<br />
+Check the &quot;Add string table&quot; checkbox. Dbpro uses the dll string table to find out about the commands contained
+within the dll.<br />
+Click the Generate button and the program will automatically produce a correct string table.<br />
+You can edit a string table item by double clicking it. Documentation on the string table can be found in the <br />
+technical documents &gt; third party commands section of the dbpro help.<br />
+<br />
+The dll is now ready to be build so click the build button to build it.<br />
+<br />
+If you are going to be working on the dll in the future you can save a .dsf (dll tool settings file) to make it less work.<br />
+A dsf file contains the filename of the dll and a list of exports and any string table items.<br />
+After you have made changes to the dll load the dsf file. The dll in the dsf file will automatically be loaded and any<br />
+methods that match the exports in the dsf file will be moved to the export list and the string table items added to the<br />
+string table list.
+</div>
+</td></tr></table>
+<br />
+<table align="center"><tr><td>
+<div align="center"><img src="../image/3.png" alt="Use the tpc in dbpro" /><br /><br /></div>
+<div>
+The built dll can now be moved to the Dbpro\Compiler\Plugins-user directory and the commands used in dbpro.<br />
+<br />
+dbpro code<br />
+<pre class="code">
+a as integer
+b as integer
+c as integer
+
+a = 50
+b = 100
+
+c = add(a,b)
+print c
+
+c = subtract(a,b)
+print c
+wait key
+</pre>
+</div>
+</td></tr></table>
+<br />
+</body>
+</html>
