@@ -120,11 +120,19 @@ class analyseDialog : Form
 					{
 						//files differ
 						newItem.SubItems[1].Text = "Yes";
+						for (int i = 0; i < newItem.SubItems.Count; i++)
+						{
+							newItem.SubItems[i].BackColor = Color.LightPink;
+						}
 					}
 					else
 					{
 						//files same
 						newItem.SubItems[1].Text = "No";
+						for (int i = 0; i < newItem.SubItems.Count; i++)
+						{
+							newItem.SubItems[i].BackColor = Color.LightGreen;
+						}
 					}
 				}
 			}
@@ -132,6 +140,10 @@ class analyseDialog : Form
 			{
 				//file not in oldexe
 				newItem.SubItems[1].Text = "Yes";
+				for (int i = 0; i < newItem.SubItems.Count; i++)
+				{
+					newItem.SubItems[i].BackColor = Color.LightPink;
+				}
 			}
 		}
 		newExe.EndUpdate();
@@ -143,6 +155,7 @@ class analyseDialog : Form
 		gbOld.Size = new Size((this.Width / 2) - 20, this.Height - 70);
 		gbNew.Size = gbOld.Size;
 		gbNew.Location = new Point((this.Width / 2) + 5,5);
+		oldExe.EndUpdate();
 	}
 
 	private void selectOldExe_Click(object sender, EventArgs e)
@@ -159,6 +172,10 @@ class analyseDialog : Form
 			oldExe.BeginUpdate();
 			oldExe.Items.Clear();
 			proExe.LoadExe(oldExe, false, ofd.FileName);
+			foreach (ListViewItem lvi in oldExe.Items)
+			{
+				lvi.UseItemStyleForSubItems = false;
+			}
 			oldExe.EndUpdate();
 			//analyse if required
 			if (newExeName != null)
@@ -182,6 +199,10 @@ class analyseDialog : Form
 			newExe.BeginUpdate();
 			newExe.Items.Clear();
 			proExe.LoadExe(newExe, true, ofd.FileName);
+			foreach (ListViewItem lvi in newExe.Items)
+			{
+				lvi.UseItemStyleForSubItems = false;
+			}
 			newExe.EndUpdate();
 			//analyse if required
 			if (oldExeName != null)
