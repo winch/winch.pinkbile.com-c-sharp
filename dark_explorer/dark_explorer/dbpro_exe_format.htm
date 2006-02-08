@@ -118,7 +118,8 @@ wait key
 <p>The above code will only let you view the contents of a normal dbpro exe, through the options in the IDE you can instruct the compiler to
 compile one of several different types of dbpro exe. For all of these types the standard exe section is identical. All types can also contain
 attached media files. Any media files will have a "media\" prefix on the filename. The dbpro media loading commands automatically
-check for attached media so you need to do to add media to an exe is append it to the exe.<p>
+check for attached media so you need to do to add media to an exe is append it to the exe. It is possible to change a compiled exe of one type
+into any of the other types.<p>
 <ol>
 <li>Normal Executable - The default option and by far the most popular, this is the format discussed above.</li>
 <li>Executable with .Pck file - Instead of being appended to the exe the files are placed into a .pck file.</li>
@@ -134,8 +135,9 @@ as the exe.</p>
 <h3>Executable with compressed data</h3>
 <p>With this format the attached files are compressed to reduce the size of the exe. Exes in this format consist of the standard exe section
 followed by compress.dll and then the compressed data. Compress.dll is used by the exe section to decompress the compressed data and is attached
-to the exe in the usual manor. To identify this type of exe check to see if the first attached file is compress.dll instead of _virtual.dat.
-The easiest way to work with these exes is to run the exe then grab the files from %TEMP%\dbpdata\ and use them to build a normal exe.</p>
+to the exe in the usual manor. To identify this type of exe check to see if the first attached file is compress.dll instead of _virtual.dat. The
+compression used is not terribly good and quite slow so these exes are rare.<br />
+</p>
 <h2>_virtual.dat</h2>
 <p>Other than the standard exe section which changes when you use a different icon or version information _virtual.dat is the only file
 that differs between dbpro exes. You can therefore conclude the compiled code and other settings are stored in the _virtual.dat file.</p>
@@ -146,7 +148,7 @@ displayWidth
 displayHeight
 displayDepth
 </pre>
-<p>The values of the width, height and depth are obvious, the displayMode uses this format.</p>
+<p>The values of the width, height and depth are obvious, the displayMode values are as follows.</p>
 <pre class="code">
 0 = hidden
 1 = windowed
