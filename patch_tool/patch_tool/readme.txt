@@ -16,10 +16,10 @@ Changes in v0.7
 +++++++++++++++
 
 Patcher
-No change since v0.6
+No changes.
 
 Builder
-Analyser dialog colours items depending on if they have changed or not.
+Analyser dialog, changed files are highlighted so it's easier to see which files have changed.
 
 Instructions
 ++++++++++++
