@@ -12,10 +12,10 @@ using Microsoft.Win32;
 class main : window
 {
 
-	string Loaded_ExeName = "";
-	string Plugins;
-	string Plugins_user;
-	string Effects;
+	public string Loaded_ExeName = "";
+	public string Plugins;
+	public string Plugins_user;
+	public string Effects;
 
 	public static void Main()
 	{
@@ -142,14 +142,11 @@ class main : window
 			MessageBox.Show("No exe loaded!","Error!",MessageBoxButtons.OK,MessageBoxIcon.Warning);
 			return;
 		}
-		if (exeType.SelectedIndex == 1)
+		if (exeType.SelectedIndex == 1 && Targetexe.Text == "")
 		{
-			//old type
-			if (Targetexe.Text == "")
-			{
-				MessageBox.Show("No exe name!","Error!",MessageBoxButtons.OK,MessageBoxIcon.Warning);
-				return;
-			}
+			//only show for old type
+			MessageBox.Show("No exe name!","Error!",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+			return;
 		}
 		//Check files in Extern exist in Plugins and Plugins_user and effects
 		bool found; //has the file been found
@@ -174,119 +171,13 @@ class main : window
 		dlg.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
 		if (dlg.ShowDialog() == DialogResult.OK)
 		{
-			FileStream fsIn = null;
-			BinaryReader brIn = null;
-			FileStream fsOut = null;
-			BinaryWriter bwOut = null;
-			FileStream fsExt = null;
-			BinaryReader brExt = null;
-			try
+			if (exeType.SelectedIndex == 1)
 			{
-				fsIn = new FileStream(Loaded_ExeName, FileMode.Open);
-				brIn = new BinaryReader(fsIn);
-				File.Copy(Application.StartupPath+"\\expander.dat",dlg.FileName, true);
-				fsOut = new FileStream(dlg.FileName, FileMode.Append);
-				bwOut = new BinaryWriter(fsOut);
-
-				//write exe name
-				bwOut.Write(Targetexe.Text.Length);
-				bwOut.Write(Encoding.ASCII.GetBytes(Targetexe.Text));
-
-				//write num of internal files
-				bwOut.Write((byte) Intern.Items.Count);
-
-				//write each internal file to patch
-				foreach (ListViewFileItem itm in Intern.Items)
-				{
-					//name
-					bwOut.Write(itm.Text.Length);
-					bwOut.Write(Encoding.ASCII.GetBytes(itm.Text));
-					//data
-					//check if file is in <exe> or not
-					if (itm.SubItems[1].Text == "<exe>")
-					{
-						//in <exe>
-						fsIn.Seek(itm.Offset, SeekOrigin.Begin);
-						//size
-						bwOut.Write(itm.Size);
-						//data
-						bwOut.Write(brIn.ReadBytes(itm.Size));
-					}
-					else
-					{
-						//external file
-						//filedata
-						fsExt = new FileStream(itm.SubItems[1].Text,FileMode.Open);
-						brExt = new BinaryReader(fsExt);
-						//size
-						bwOut.Write((int) fsExt.Length);
-						//data
-						bwOut.Write(brExt.ReadBytes((int) fsExt.Length));
-						brExt.Close();
-						fsExt.Close();
-					}
-				}
-
-				//use md5 checksums?
-				if (CheckSum.Checked == true)
-					bwOut.Write((byte) 1);
-				else
-					bwOut.Write((byte) 0);
-
-				//write num of External files
-				bwOut.Write((byte) Extern.Items.Count);
-				string checksum;
-
-				foreach (ListViewFileItem itm in Extern.Items)
-				{
-					//write name
-					bwOut.Write(itm.Text.Length);
-					bwOut.Write(Encoding.ASCII.GetBytes(itm.Text));
-					
-					//write md5 checksum string if needed
-					if (CheckSum.Checked == true)
-					{
-						found = false;
-						if (File.Exists(Plugins + itm.Text))
-						{
-							fsExt = new FileStream(Plugins + itm.Text,FileMode.Open);
-							found = true;
-						}
-						if (File.Exists(Plugins_user + itm.Text))
-						{
-							fsExt = new FileStream(Plugins_user + itm.Text,FileMode.Open);
-							found = true;
-						}
-						if (File.Exists(Effects + itm.Text))
-						{
-							fsExt = new FileStream(Effects + itm.Text,FileMode.Open);
-							found = true;
-						}
-						if (found == true)
-						{
-							//get md5 checksum
-							brExt = new BinaryReader(fsExt);
-							System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
-							byte[] result = md5.ComputeHash(brExt.ReadBytes((int)fsExt.Length));
-							checksum = BitConverter.ToString(result).Replace("-","").ToLower();
-							brExt.Close();
-							fsExt.Close();
-							//write md5 checksum
-							bwOut.Write(Encoding.ASCII.GetBytes(checksum));
-						}
-					}
-				}
+				Build.OldBuild(dlg.FileName, this);
 			}
-			catch (Exception ex)
+			else
 			{
-				MessageBox.Show(ex.ToString(),"Error!",MessageBoxButtons.OK,MessageBoxIcon.Warning);
-			}
-			finally
-			{
-				brIn.Close();
-				fsIn.Close();
-				bwOut.Close();
-				fsOut.Close();
+				Build.NewBuild(dlg.FileName, this);
 			}
 		}
 		dlg.Dispose();

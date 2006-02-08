@@ -159,7 +159,7 @@ class window : Form
 		exeType.Location = new Point(10, 15);
 		exeType.Width = 130;
 		exeType.DropDownStyle = ComboBoxStyle.DropDownList;
-		exeType.Items.Add("New style");
+		exeType.Items.Add("New style (compress.dll)");
 		exeType.Items.Add("Old style");
 		exeType.SelectedIndex = 0;
 		exeType.SelectedIndexChanged += new EventHandler(exeType_SelectedIndexChanged);
