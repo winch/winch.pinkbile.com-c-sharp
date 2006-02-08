@@ -172,10 +172,6 @@ class analyseDialog : Form
 			oldExe.BeginUpdate();
 			oldExe.Items.Clear();
 			proExe.LoadExe(oldExe, false, ofd.FileName);
-			foreach (ListViewItem lvi in oldExe.Items)
-			{
-				lvi.UseItemStyleForSubItems = false;
-			}
 			oldExe.EndUpdate();
 			//analyse if required
 			if (newExeName != null)
