@@ -9,7 +9,7 @@ using System.Text;
 
 class proExe
 {
-	private static void SkipExeSection(FileStream fs, BinaryReader br)
+	public static void SkipExeSection(FileStream fs, BinaryReader br)
 	{
 		//skips over the exe section of an exe
 		//skip dos stub
