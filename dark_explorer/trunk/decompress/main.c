@@ -17,10 +17,8 @@ void DLL_EXPORT decompress(char *oldExeName, int exeSection, int dataOffset, cha
     SIZE_T decompSize;
     long time;
     float seconds;
-    char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4E,
-                         0x61, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    char extra58[] = { 0x10, 0x01, 0x00 };
-    char extra59[] = { 0x50, 0x01, 0x00 };
+    char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                         0x4E, 0x61, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x00 };
     decomp = (void* (*)(void*, int)) GetProcAddress(lib, "decompress_block");
     void *buffer;
 
@@ -54,17 +52,9 @@ void DLL_EXPORT decompress(char *oldExeName, int exeSection, int dataOffset, cha
     GlobalUnlock((HGLOBAL) data);
 
     //write extra data
-    fwrite(extraData, 17, 1, newExe);
-    if (exeSection == 69632)
-    {
-        //5.8 exe
-        write(extra58, 3, 1, newExe);
-    }
-    else
-    {
-        //5.9 exe
-        fwrite(extra59, 3, 1, newExe);
-    }
+    fwrite(extraData, 16, 1, newExe);
+    //write exeSection size
+    fwrite(&exeSection, 4, 1, newExe);
 
     //show decompression stats message box
     char msg[255];
