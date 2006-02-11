@@ -55,9 +55,8 @@ function get_exe_size(fileName as string)
     inc size, pos
 endfunction size
 </pre>
-Dbpro appears to not use such a method but instead hardcodes the size of the exe section. This means that if you alter the exe section in anyway
-that causes its filesize to increase the exe will no longer work. Any modifications that make the exe smaller can be fixed by padding the file
-with nulls until it is the correct size.
+Dbpro does not use such a method. Instead it writes the lenght of the exe section as a 4 byte int at the very end of the exe. The method
+Dbpro uses can cause problems when you change the size of the exe, for instance when you change the exe icon.
 </p>
 <h2>Attached files</h2>
 <p>Now that we know the size of the exe section we can skip it to get straight to the appended data. The format used to append the files
@@ -113,7 +112,7 @@ close file 1
 sync
 wait key
 </pre>
-<p>Intrestingly after the files there is 20 bytes of data, I have no idea what it is for but it appears to be identical for all dbpro exes compiled with a particular dbpro version.</p>
+<p>After the files there is 20 bytes of extra data. The last 4 bytes of this extra data is the size of the exe section stored in a 4 byte int.</p>
 <h2>Variations</h2>
 <p>The above code will only let you view the contents of a normal dbpro exe, through the options in the IDE you can instruct the compiler to
 compile one of several different types of dbpro exe. For all of these types the standard exe section is identical. All types can also contain
@@ -129,14 +128,14 @@ into any of the other types.<p>
 <p>Almost all dbpro exes you find will be in this format as it's the default option and the most practical.</p>
 <h3>Executable with .Pck file</h3>
 <p>Instead of appending the files to the exe they are stored in a .pck file. The .pck file will have the same name as the program just
-with a .pck extension. Files are stored in the .pck file in the same format as they are appended to the exe. Pck files for whatever reason do
+with a .pck extension. Files are stored in the .pck file in the same format as they are appended to the exe. Pck files do
 not have the extra 20 bytes at the end. To identify this type of exe check for a pck file or see if the exe section is the same size
 as the exe.</p>
 <h3>Executable with compressed data</h3>
 <p>With this format the attached files are compressed to reduce the size of the exe. Exes in this format consist of the standard exe section
-followed by compress.dll and then the compressed data. Compress.dll is used by the exe section to decompress the compressed data and is attached
-to the exe in the usual manor. To identify this type of exe check to see if the first attached file is compress.dll instead of _virtual.dat. The
-compression used is not terribly good and quite slow so these exes are rare.<br />
+followed by compress.dll and then the compressed data followed by the 20 bytes of extra data. Compress.dll is used by the exe section to
+decompress the compressed data and is attached to the exe in the usual manor. To identify this type of exe check to see if the first attached
+file is compress.dll instead of _virtual.dat. The compression used is not terribly good and quite slow so these exes are rare.<br />
 </p>
 <h2>_virtual.dat</h2>
 <p>Other than the standard exe section which changes when you use a different icon or version information _virtual.dat is the only file
