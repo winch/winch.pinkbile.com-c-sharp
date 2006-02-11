@@ -4,6 +4,9 @@ A darkbasic professional exe explorer
 
 Requires .Net framework to run
 
+v0.6 11 Feb 2006
+- Made exe decompression more reliable.
+
 v0.5 28 Dec 2005
 - View item dialog now shows dll string tables.
 - View item dialog now shows _virual.dat display settings.
