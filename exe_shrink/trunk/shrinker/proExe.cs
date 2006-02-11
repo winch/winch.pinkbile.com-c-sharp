@@ -9,6 +9,36 @@ using System.Text;
 
 class proExe
 {
+	private static void SkipExeSection(FileStream fs, BinaryReader br)
+	{
+		//skips over the exe section of an exe
+		//skip dos stub
+		fs.Seek(60, SeekOrigin.Begin);
+		int e_lfanew = br.ReadInt32();
+		//MessageBox.Show(e_lfanew.ToString());
+		fs.Seek(e_lfanew + 4, SeekOrigin.Begin);
+		//IMAGE_FILE_HEADER
+		fs.Seek(2, SeekOrigin.Current);
+		int NumberOfSections = br.ReadInt16();
+		fs.Seek(16, SeekOrigin.Current);
+		//end of IMAGE_FILE_HEADER
+		//IMAGE_OPTIONAL_HEADER
+		fs.Seek(224, SeekOrigin.Current);
+		//end of IMAGE_OPTIONAL_HEADER
+		//section directories
+		int Size = 0; // size of section
+		int Pos = 0;  // position of section
+		for (int i=0; i<NumberOfSections; i++)
+		{
+			fs.Seek(16, SeekOrigin.Current);
+			Size = br.ReadInt32();
+			Pos = br.ReadInt32();
+			fs.Seek(16, SeekOrigin.Current);
+		}
+		//end of section directories
+		fs.Seek(Pos+Size, SeekOrigin.Begin);
+	}
+
 	public static void LoadExe(ListView contents, string fileName)
 	{
 		FileStream fs = null;
@@ -17,37 +47,13 @@ class proExe
 		{
 			fs = new FileStream(fileName, FileMode.Open);
 			br = new BinaryReader(fs);
-			//find size of exe header
-			//skip dos stub
-			fs.Seek(60, SeekOrigin.Current);
-			int e_lfanew = br.ReadInt32();
-			//MessageBox.Show(e_lfanew.ToString());
-			fs.Seek(e_lfanew + 4, SeekOrigin.Begin);
-			//IMAGE_FILE_HEADER
-			fs.Seek(2, SeekOrigin.Current);
-			int NumberOfSections = br.ReadInt16();
-			fs.Seek(16, SeekOrigin.Current);
-			//end of IMAGE_FILE_HEADER
-			//IMAGE_OPTIONAL_HEADER
-			fs.Seek(224, SeekOrigin.Current);
-			//end of IMAGE_OPTIONAL_HEADER
-			//section directories
-			int Size = 0; // size of section
-			int Pos = 0;  // position of section
-			for (int i=0; i<NumberOfSections; i++)
-			{
-				fs.Seek(16, SeekOrigin.Current);
-				Size = br.ReadInt32();
-				Pos = br.ReadInt32();
-				fs.Seek(16, SeekOrigin.Current);
-			}
-			//end of section directories
-			fs.Seek(Pos+Size, SeekOrigin.Begin);
+			//skip exe section
+			SkipExeSection(fs, br);
 			//add exe to listview
 			ListViewFileItem lvi = new ListViewFileItem();
 			lvi.Text = "<Standard Head>";
 			lvi.Offset = 0;
-			lvi.Size = Pos + Size;
+			lvi.Size = (int) fs.Position;
 			//lvi.SubItems.Add("No");
 			//lvi.SubItems.Add(lvi.Size.ToString());
 			lvi.SubItems.Add("<exe>");
