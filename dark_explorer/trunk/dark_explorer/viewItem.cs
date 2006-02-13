@@ -17,7 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 //
-//viewItem dialog, lets user view the contents of a ListViewFileItem
+//viewItem dialog, shows the contents of a ListViewFileItem
 //
 using System;
 using System.Text;
@@ -66,10 +66,11 @@ class viewItem : Form
 		itemType = new ComboBox();
 		itemType.Parent = this;
 		itemType.DropDownStyle = ComboBoxStyle.DropDownList;
-		itemType.Width = 100;
+		itemType.Width = 140;
 		itemType.Location = new Point(this.Width - itemType.Width - 15, 10);
 		itemType.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 		itemType.Items.Add("_virtual.dat");
+		itemType.Items.Add("Compressed or extra data");
 		itemType.Items.Add("dll");
 		itemType.Items.Add("Text");
 		itemType.Items.Add("Image");
@@ -147,6 +148,12 @@ class viewItem : Form
 			//_virtual.dat
 			textBox.Visible = true;
 			showVirtualDat();
+		}
+		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Compressed or extra data"))
+		{
+			//_virtual.dat
+			textBox.Visible = true;
+			showExtraData();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Hex"))
 		{
@@ -227,6 +234,42 @@ class viewItem : Form
 				fsOut.Close();
 		}
 		listBox.EndUpdate();
+	}
+
+	private void showExtraData()
+	{
+		//show size of exeSection in textbox
+		FileStream fs = null;
+		BinaryReader br = null;
+		try
+		{
+			if (item.SubItems[5].Text == "<exe>")
+			{
+				//internal file
+				fs = new FileStream(exeName, FileMode.Open);
+				br = new BinaryReader(fs);
+				fs.Seek(item.Offset, SeekOrigin.Current);
+			}
+			else
+			{
+				//external file
+				fs = new FileStream(item.SubItems[5].Text, FileMode.Open);
+				br = new BinaryReader(fs);
+			}
+			fs.Seek(fs.Length - 4, SeekOrigin.Begin);
+			textBox.Text = "Exe Section size = " + br.ReadInt32().ToString("n0");
+		}
+		catch (Exception ex)
+		{
+			MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+		}
+		finally
+		{
+			if (br != null)
+				br.Close();
+			if (fs != null)
+				fs.Close();
+		}
 	}
 
 	private void showVirtualDat()
@@ -435,10 +478,14 @@ class viewItem : Form
 			case ".tgs":
 			case ".dds":
 			case ".png":
+			case ".ico":
 				itemType.SelectedIndex = itemType.Items.IndexOf("Image");
 				break;
 			default:
-				itemType.SelectedIndex = itemType.Items.IndexOf("Hex");
+				if (item.SubItems[0].Text == "Compressed or extra data")
+					itemType.SelectedIndex = itemType.Items.IndexOf("Compressed or extra data");
+				else
+					itemType.SelectedIndex = itemType.Items.IndexOf("Hex");
 				break;
 		}
 	}

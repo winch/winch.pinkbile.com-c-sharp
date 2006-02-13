@@ -151,6 +151,7 @@ class proExe
 		FileStream fsExt = null;
 		BinaryReader brExt = null;
 		bool overWrite = false; //has oldName been overwritten
+		int exeSection = -1;    //size of exeSection
 		try
 		{
 			if (fileName == oldName)
@@ -181,6 +182,13 @@ class proExe
 						bwOut.Write(lvi.Text.Length);
 						bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
 					}
+					else
+					{
+						if (lvi.Text == "Exe section")
+						{
+							exeSection = lvi.Size;
+						}
+					}
 					//check for _virtual.dat
 					if (lvi.Text == "_virtual.dat")
 					{
@@ -198,7 +206,16 @@ class proExe
 					else
 					{
 						//write data
-						WriteData(fsIn, brIn, lvi, bwOut);
+						if (lvi.SubItems[1].Text == "No" && lvi.Text == "Compressed or extra data")
+						{
+							//write exeSection size at end of extra data
+							bwOut.Write(brIn.ReadBytes(lvi.Size - 4));
+							bwOut.Write(exeSection);
+						}
+						else
+						{
+							WriteData(fsIn, brIn, lvi, bwOut);
+						}
 					}
 				}
 				else
@@ -228,8 +245,17 @@ class proExe
 					}
 					else
 					{
-						//data
-						WriteData(fsExt, brExt, lvi, bwOut);
+						if (lvi.SubItems[1].Text == "No" && lvi.Text == "Compressed or extra data")
+						{
+							//write exeSection size at end of extra data
+							bwOut.Write(brExt.ReadBytes((int)fsExt.Length - 4));
+							bwOut.Write(exeSection);
+						}
+						else
+						{
+							//data
+							WriteData(fsExt, brExt, lvi, bwOut);
+						}
 					}
 				}
 			}
