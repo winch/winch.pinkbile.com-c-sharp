@@ -248,15 +248,15 @@ class viewItem : Form
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
 				br = new BinaryReader(fs);
-				fs.Seek(item.Offset, SeekOrigin.Current);
+				fs.Seek(item.Offset + item.Size - 4, SeekOrigin.Current);
 			}
 			else
 			{
 				//external file
 				fs = new FileStream(item.SubItems[5].Text, FileMode.Open);
 				br = new BinaryReader(fs);
+				fs.Seek(fs.Length - 4, SeekOrigin.Begin);
 			}
-			fs.Seek(fs.Length - 4, SeekOrigin.Begin);
 			textBox.Text = "Exe Section size = " + br.ReadInt32().ToString("n0");
 		}
 		catch (Exception ex)
