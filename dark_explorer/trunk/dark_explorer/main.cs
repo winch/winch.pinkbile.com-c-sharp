@@ -73,6 +73,7 @@ class window : Form
 		EventHandler mSave  = new EventHandler(mSaveOnClick);
 		EventHandler mInsert  = new EventHandler(mInsertOnClick);
 		EventHandler mRemove  = new EventHandler(mRemoveOnClick);
+		EventHandler mReplace  = new EventHandler(mReplaceOnClick);
 		EventHandler mExtract = new EventHandler(mExtractOnClick);
 		EventHandler mEdit = new EventHandler(mEditOnClick);
 		EventHandler mView = new EventHandler(mViewOnClick);
@@ -87,6 +88,7 @@ class window : Form
 							new MenuItem("-"),
 							new MenuItem("&Insert", mInsert),
 							new MenuItem("&Remove", mRemove),
+						    new MenuItem("Rep&lace", mReplace),
 							new MenuItem("&Extract", mExtract),
 							new MenuItem("E&dit", mEdit),
 						    new MenuItem("&View", mView),
@@ -100,10 +102,11 @@ class window : Form
 		contents.ContextMenu.MenuItems[0].Enabled = false; //Display
 		contents.ContextMenu.MenuItems[2].Enabled = false; //save
 		contents.ContextMenu.MenuItems[5].Enabled = false; //remove
-		contents.ContextMenu.MenuItems[6].Enabled = false; //extract
-		contents.ContextMenu.MenuItems[7].Enabled = false; //edit
-		contents.ContextMenu.MenuItems[8].Enabled = false; //view
-		contents.ContextMenu.MenuItems[10].MenuItems[0].Enabled = false; //decompress
+		contents.ContextMenu.MenuItems[6].Enabled = false; //replace
+		contents.ContextMenu.MenuItems[7].Enabled = false; //extract
+		contents.ContextMenu.MenuItems[8].Enabled = false; //edit
+		contents.ContextMenu.MenuItems[9].Enabled = false; //view
+		contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = false; //decompress
 
 		//double click edits item
 		contents.ItemActivate += mEdit;
@@ -250,6 +253,54 @@ class window : Form
 		}
 	}
 
+	private void mReplaceOnClick(object sender, EventArgs ea)
+	{
+		//replace selected items
+		OpenFileDialog ofd = new OpenFileDialog();
+		ofd.Filter = ofd.Filter = "All Files (*.*)|*.*|Dll Files (*.dll)|*.dll|Icon Files (*.ico)|*.ico";
+		foreach (ListViewFileItem lvi in contents.SelectedItems)
+		{
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				Cursor.Current = Cursors.WaitCursor;
+				FileInfo fi = new FileInfo(ofd.FileName);
+				lvi.SubItems[4].Text = fi.Length.ToString("n0");
+				lvi.Offset = 0;
+				lvi.Size = (int)fi.Length;
+				lvi.SubItems[5].Text = Path.GetFullPath(ofd.FileName);
+				//check for _virtual.dat
+				if (lvi.Text == "_virtual.dat")
+				{
+					//get display settings from _virtual.dat
+					FileStream fsIn = null;
+					BinaryReader brIn = null;
+					try
+					{
+						fsIn = new FileStream(ofd.FileName, FileMode.Open);
+						brIn = new BinaryReader(fsIn);
+						displayMode = brIn.ReadInt32();
+						displayWidth = brIn.ReadInt32();
+						displayHeight = brIn.ReadInt32();
+						displayDepth = brIn.ReadInt32();
+						contents.ContextMenu.MenuItems[0].Text = proExe.getDisplayString(displayWidth, displayHeight, displayDepth,
+																						 displayMode);
+						contents.ContextMenu.MenuItems[0].Enabled = true;
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.ToString(), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					}
+					finally
+					{
+						brIn.Close();
+						fsIn.Close();
+					}
+				}
+				Cursor.Current = Cursors.Default;
+			}
+		}
+	}
+
 	private void mExtractOnClick(object sender, EventArgs ea)
 	{
 		//extract file
@@ -358,7 +409,7 @@ class window : Form
 		proExe.LoadExe(contents, filename, this);
 		exeName.Text = filename;
 		contents.ContextMenu.MenuItems[2].Enabled = true; //save
-		contents.ContextMenu.MenuItems[10].MenuItems[0].Enabled = true; //decompress
+		contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = true; //decompress
 		contents.EndUpdate();
 		Cursor.Current = Cursors.Default;
 	}
@@ -395,23 +446,27 @@ class window : Form
 		{
 			//remove
 			contents.ContextMenu.MenuItems[5].Enabled = true;
-			//extract
+			//replace
 			contents.ContextMenu.MenuItems[6].Enabled = true;
-			//edit
+			//extract
 			contents.ContextMenu.MenuItems[7].Enabled = true;
-			//view
+			//edit
 			contents.ContextMenu.MenuItems[8].Enabled = true;
+			//view
+			contents.ContextMenu.MenuItems[9].Enabled = true;
 		}
 		else
 		{
 			//remove
 			contents.ContextMenu.MenuItems[5].Enabled = false;
-			//extract
+			//replace
 			contents.ContextMenu.MenuItems[6].Enabled = false;
-			//edit
+			//extract
 			contents.ContextMenu.MenuItems[7].Enabled = false;
-			//view
+			//edit
 			contents.ContextMenu.MenuItems[8].Enabled = false;
+			//view
+			contents.ContextMenu.MenuItems[9].Enabled = false;
 		}
 	}
 
