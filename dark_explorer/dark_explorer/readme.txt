@@ -4,6 +4,10 @@ A darkbasic professional exe explorer
 
 Requires .Net framework to run
 
+v0.8 18 Feb 2006
+- View item dialog now shows correct value when viewing "Compressed and extra data"
+- Added replace file menu item.
+
 v0.7 13 Feb 2006
 - On save the exe section size is saved in the extra data.
 - View item dialog now shows exe section size in "Compressed and extra data"

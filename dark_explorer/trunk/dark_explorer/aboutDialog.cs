@@ -29,7 +29,7 @@ using System.Drawing;
 class aboutDialog: Form
 {
 	string Version = "0.7";
-	string Date = "13 Feb 2006";
+	string Date = "18 Feb 2006";
 	string Ident = "dark_explorer";
 	int Build = 7;
 	public aboutDialog()
