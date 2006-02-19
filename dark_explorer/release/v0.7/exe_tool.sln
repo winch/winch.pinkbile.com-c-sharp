@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dark_explorer", "dark_explorer\dark_explorer.csproj", "{AC014D24-3C6E-47C4-B03B-899A22E00473}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{AC014D24-3C6E-47C4-B03B-899A22E00473}.Debug.ActiveCfg = Debug|.NET
+		{AC014D24-3C6E-47C4-B03B-899A22E00473}.Debug.Build.0 = Debug|.NET
+		{AC014D24-3C6E-47C4-B03B-899A22E00473}.Release.ActiveCfg = Release|.NET
+		{AC014D24-3C6E-47C4-B03B-899A22E00473}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
