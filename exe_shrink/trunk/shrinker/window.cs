@@ -21,7 +21,7 @@ class window : Form
 
 	public window()
 	{
-		Text = "Dbpro tiny exe tool";
+		Text = "Dbpro exe shrinker";
 		Width = 535;
 		Height = 565;
 
@@ -139,7 +139,7 @@ class window : Form
 		CheckSum = new CheckBox();
 		CheckSum.Parent = this;
 		CheckSum.Text = "Include checksums for external files";
-		CheckSum.Text += " (checksums generated from files in dbpro compiler dir not exe)";
+		//CheckSum.Text += " (checksums generated from files in dbpro compiler dir not exe)";
 		CheckSum.Location = new Point(10,430);
 		CheckSum.Width += 415;
 		CheckSum.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;

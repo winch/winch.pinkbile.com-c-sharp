@@ -177,7 +177,7 @@ class main : window
 			}
 			else
 			{
-				Build.NewBuild(dlg.FileName, this);
+				Build.NewBuild(dlg.FileName, Loaded_ExeName, Intern, Extern, CheckSum.Checked);
 			}
 		}
 		dlg.Dispose();
