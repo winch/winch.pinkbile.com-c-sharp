@@ -228,6 +228,13 @@ class proExe
 						bwOut.Write(lvi.Text.Length);
 						bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
 					}
+					else
+					{
+						if (lvi.Text == "Exe section")
+						{
+							exeSection = lvi.Size;
+						}
+					}
 					fsExt = new FileStream(lvi.SubItems[5].Text, FileMode.Open);
 					brExt = new BinaryReader(fsExt);
 					//check for _virtual.dat
