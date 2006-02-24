@@ -1,10 +1,31 @@
+expander_dll
+============
+
+{
+	byte namelength
+	name
+	int datalength
+	filedata
+}
+Null byte
+byte use md5 checksum? 0=no, 1=yes
+{
+	byte namelength
+	name
+	checksum
+}
+Null byte
+
+
+expander
+========
+
 long length
 exe filename
 byte num of files
 {
 	long length
 	filename
-	long uncompressed length
 	long length
 	filedata
 }
