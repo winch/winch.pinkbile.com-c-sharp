@@ -70,7 +70,14 @@ class proExe
 			if (fsDll != null)
 				fsDll.Close();
 		}
-		DecompressDll(oldExe, exeSection, dataOffset, newExe, compressDll);
+		try
+		{
+			DecompressDll(oldExe, exeSection, dataOffset, newExe, compressDll);
+		}
+		catch(Exception ex)
+		{
+			MessageBox.Show(ex.ToString(), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);			
+		}
 		if (File.Exists(compressDll))
 			File.Delete(compressDll);
 		if (File.Exists(tempExe))
