@@ -144,12 +144,12 @@ class proExe
 
 	public static void SaveExe(ListView contents, string fileName, string oldName, window win)
 	{
-		FileStream fsIn = null;
-		BinaryReader brIn = null;
-		FileStream fsOut = null;
+		FileStream fsExe = null;   //old dbpro exe
+		BinaryReader brExe = null;
+		FileStream fsOut = null;   //new dbpro exe
 		BinaryWriter bwOut = null;
-		FileStream fsExt = null;
-		BinaryReader brExt = null;
+		FileStream fsFile;         //current file being written
+		BinaryReader brFile;
 		bool overWrite = false; //has oldName been overwritten
 		int exeSection = -1;    //size of exeSection
 		try
@@ -163,9 +163,11 @@ class proExe
 			}
 			if (oldName != "")
 			{
-				fsIn = new FileStream(oldName, FileMode.Open);
-				brIn = new BinaryReader(fsIn);
+				//if there is an old dbpro exe load it
+				fsExe = new FileStream(oldName, FileMode.Open);
+				brExe = new BinaryReader(fsExe);
 			}
+			//open new exe
 			fsOut = new FileStream(fileName, FileMode.Create);
 			bwOut = new BinaryWriter(fsOut);
 			foreach (ListViewFileItem lvi in contents.Items)
@@ -173,96 +175,57 @@ class proExe
 				if (lvi.SubItems[5].Text == "<exe>")
 				{
 					//internal file
-					//seek to data start
-					fsIn.Seek(lvi.Offset, SeekOrigin.Begin);
-					//name
-					if (lvi.SubItems[1].Text == "Yes")
-					{
-						//is a normal file so write name and filedata length
-						bwOut.Write(lvi.Text.Length);
-						bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
-					}
-					else
-					{
-						if (lvi.Text == "Exe section")
-						{
-							exeSection = lvi.Size;
-						}
-					}
-					//check for _virtual.dat
-					if (lvi.Text == "_virtual.dat")
-					{
-						//size
-						bwOut.Write(lvi.Size);
-						//write display settings
-						bwOut.Write(win.displayMode);
-						bwOut.Write(win.displayWidth);
-						bwOut.Write(win.displayHeight);
-						bwOut.Write(win.displayDepth);
-						//write data
-						fsIn.Seek(16, SeekOrigin.Current);
-						bwOut.Write(brIn.ReadBytes(lvi.Size - 16));
-					}
-					else
-					{
-						//write data
-						if (lvi.SubItems[1].Text == "No" && lvi.Text == "Compressed or extra data")
-						{
-							//write exeSection size at end of extra data
-							bwOut.Write(brIn.ReadBytes(lvi.Size - 4));
-							bwOut.Write(exeSection);
-						}
-						else
-						{
-							WriteData(fsIn, brIn, lvi, bwOut);
-						}
-					}
+					fsFile = fsExe;
+					brFile = brExe;
 				}
 				else
 				{
-					//external files
-					//name
-					if (lvi.SubItems[1].Text == "Yes")
+					//external file
+					fsFile = new FileStream(lvi.SubItems[5].Text, FileMode.Open);
+					brFile = new BinaryReader(fsFile);
+				}
+				//seek to data start
+				fsFile.Seek(lvi.Offset, SeekOrigin.Begin);
+				//name
+				if (lvi.SubItems[1].Text == "Yes")
+				{
+					//is a normal file so write name and filedata length
+					bwOut.Write(lvi.Text.Length);
+					bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
+				}
+				else
+				{
+					if (lvi.Text == "Exe section")
 					{
-						//is a normal file so write name and filedata length
-						bwOut.Write(lvi.Text.Length);
-						bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
+						exeSection = lvi.Size;
+					}
+				}
+				//check for _virtual.dat
+				if (lvi.Text == "_virtual.dat")
+				{
+					//size
+					bwOut.Write(lvi.Size);
+					//write display settings
+					bwOut.Write(win.displayMode);
+					bwOut.Write(win.displayWidth);
+					bwOut.Write(win.displayHeight);
+					bwOut.Write(win.displayDepth);
+					//write data
+					fsFile.Seek(16, SeekOrigin.Current);
+					bwOut.Write(brFile.ReadBytes(lvi.Size - 16));
+				}
+				else
+				{
+					//write data
+					if (lvi.SubItems[1].Text == "No" && lvi.Text == "Compressed or extra data")
+					{
+						//write exeSection size at end of extra data
+						bwOut.Write(brFile.ReadBytes(lvi.Size - 4));
+						bwOut.Write(exeSection);
 					}
 					else
 					{
-						if (lvi.Text == "Exe section")
-						{
-							exeSection = lvi.Size;
-						}
-					}
-					fsExt = new FileStream(lvi.SubItems[5].Text, FileMode.Open);
-					brExt = new BinaryReader(fsExt);
-					//check for _virtual.dat
-					if (lvi.Text == "_virtual.dat")
-					{
-						//size
-						bwOut.Write((int) fsExt.Length);
-						//write display settings
-						bwOut.Write(win.displayMode);
-						bwOut.Write(win.displayWidth);
-						bwOut.Write(win.displayHeight);
-						bwOut.Write(win.displayDepth);
-						fsExt.Seek(16, SeekOrigin.Begin);
-						bwOut.Write(brExt.ReadBytes((int)fsExt.Length - 16));
-					}
-					else
-					{
-						if (lvi.SubItems[1].Text == "No" && lvi.Text == "Compressed or extra data")
-						{
-							//write exeSection size at end of extra data
-							bwOut.Write(brExt.ReadBytes((int)fsExt.Length - 4));
-							bwOut.Write(exeSection);
-						}
-						else
-						{
-							//data
-							WriteData(fsExt, brExt, lvi, bwOut);
-						}
+						WriteData(fsFile, brFile, lvi, bwOut);
 					}
 				}
 			}
@@ -273,18 +236,14 @@ class proExe
 		}
 		finally
 		{
-			if (brIn != null)
-				brIn.Close();
-			if (fsIn != null)
-				fsIn.Close();
+			if (brExe != null)
+				brExe.Close();
+			if (fsExe != null)
+				fsExe.Close();
 			if (bwOut != null)
 				bwOut.Close();
 			if (fsOut != null)
 				fsOut.Close();
-			if (brExt != null)
-				brExt.Close();
-			if (fsExt != null)
-				fsExt.Close();
 			//delete oldName in temp dir if required
 			if (overWrite == true)
 			{
