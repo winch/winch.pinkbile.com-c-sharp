@@ -42,7 +42,7 @@ license
 +++++++
 
 dark_explorer
-Copyright (C) 2005 the_winch
+Copyright (C) 2006 the_winch
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

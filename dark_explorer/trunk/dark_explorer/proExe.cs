@@ -35,7 +35,6 @@ class proExe
 		FileStream fsDll = null;
 		BinaryWriter bwDll = null;
 		int dataLength, exeSection = 0, dataOffset = 0;
-		ListViewFileItem lvi;
 		string compressDll = Path.GetTempFileName(); 
 		string tempExe = Path.GetTempFileName();
 		//save exe
@@ -97,10 +96,7 @@ class proExe
 		//IMAGE_FILE_HEADER
 		fs.Seek(2, SeekOrigin.Current);
 		int NumberOfSections = br.ReadInt16();
-		fs.Seek(16, SeekOrigin.Current);
-		//end of IMAGE_FILE_HEADER
-		//IMAGE_OPTIONAL_HEADER
-		fs.Seek(224, SeekOrigin.Current);
+		fs.Seek(240, SeekOrigin.Current);
 		//end of IMAGE_OPTIONAL_HEADER
 		//section directories
 		int Size = 0; // size of section
@@ -388,30 +384,31 @@ class proExe
 		return displaystring;
 	}
 
-	private static void WriteData(FileStream fsIn, BinaryReader brIn, ListViewFileItem lvi, BinaryWriter bwOut)
+	private static int WriteData(FileStream fsIn, BinaryReader brIn, ListViewFileItem lvi, BinaryWriter bwOut)
 	{
 		//writes filedata to file after modifing it if required (upx, string table null, etc)
 		if (lvi.SubItems[2].Text == "Yes")
 		{
 			//upx
 			MessageBox.Show("Sorry Upx support is not done yet");
+			return 0;
 		}
 		else if (lvi.SubItems[3].Text == "Yes")
 		{
 			//str table null
 			MessageBox.Show("Sorry null string tables not done yet.");
+			return 0;
 		}
-		else
-		{	
-			if (lvi.SubItems[1].Text == "Yes")
-			{
-				//data size
-				bwOut.Write(lvi.Size);
-			}
-			//data
-			fsIn.Seek(lvi.Offset, SeekOrigin.Begin);
-			bwOut.Write(brIn.ReadBytes(lvi.Size));
+		if (lvi.SubItems[1].Text == "Yes")
+		{
+			//attached file so writedata size
+			bwOut.Write(lvi.Size);
 		}
+		//data
+		fsIn.Seek(lvi.Offset, SeekOrigin.Begin);
+		bwOut.Write(brIn.ReadBytes(lvi.Size));
+		//return ammount of data written
+		return lvi.Size;
 	}
 
 }

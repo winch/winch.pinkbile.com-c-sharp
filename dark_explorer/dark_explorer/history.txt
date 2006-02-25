@@ -1,6 +1,12 @@
 Version history
 +++++++++++++++
 
+v0.9 25 Feb 2006
+- Correctly set exe section size in extra data when exe section is an external file.
+- Allow export of both internal and external files.
+- Fix crash when importing file.
+- minor code tweaks.
+
 v0.8 18 Feb 2006
 - View item dialog now shows correct value when viewing "Compressed and extra data"
 - Added replace file menu item.
