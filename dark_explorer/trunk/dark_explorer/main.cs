@@ -219,7 +219,7 @@ class window : Form
 		if (contents.Items.Count > 0)
 		{
 			contents.ContextMenu.MenuItems[2].Enabled = true; //save
-			contents.ContextMenu.MenuItems[10].MenuItems[0].Enabled = true; //decompress
+			contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = true; //decompress
 		}
 	}
 
@@ -309,17 +309,13 @@ class window : Form
 			SaveFileDialog sfd = new SaveFileDialog();
 			sfd.Title = "Extract file as";
 			sfd.Filter = "All Files (*.*)|*.*";
-			//check file in exe
-			if (lvi.SubItems[5].Text == "<exe>")
+			//extract file
+			sfd.FileName = Path.GetFileName(lvi.Text);
+			if (sfd.ShowDialog() == DialogResult.OK)
 			{
-				//extract file
-				sfd.FileName = Path.GetFileName(lvi.Text);
-				if (sfd.ShowDialog() == DialogResult.OK)
-				{
-					Cursor.Current = Cursors.WaitCursor;
-					proExe.ExtractFile(lvi, exeName.Text, sfd.FileName);
-					Cursor.Current = Cursors.Default;
-				}
+				Cursor.Current = Cursors.WaitCursor;
+				proExe.ExtractFile(lvi, exeName.Text, sfd.FileName);
+				Cursor.Current = Cursors.Default;
 			}
 			sfd.Dispose();
 		}

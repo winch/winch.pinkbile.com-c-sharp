@@ -118,8 +118,18 @@ class proExe
 		BinaryWriter bwOut = null;
 		try
 		{
-			fsIn = new FileStream(exeName, FileMode.Open);
-			brIn = new BinaryReader(fsIn);
+			if (lvi.SubItems[5].Text == "<exe>")
+			{
+				//internal file
+				fsIn = new FileStream(exeName, FileMode.Open);
+				brIn = new BinaryReader(fsIn);
+			}
+			else
+			{
+				//external file
+				fsIn = new FileStream(lvi.SubItems[5].Text, FileMode.Open);
+				brIn = new BinaryReader(fsIn);
+			}
 			fsOut = new FileStream(outName, FileMode.Create);
 			bwOut = new BinaryWriter(fsOut);
 			fsIn.Seek(lvi.Offset, SeekOrigin.Begin);
