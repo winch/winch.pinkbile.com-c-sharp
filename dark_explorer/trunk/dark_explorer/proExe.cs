@@ -241,6 +241,12 @@ class proExe
 						WriteData(fsFile, brFile, lvi, bwOut);
 					}
 				}
+				if (lvi.SubItems[5].Text != "<exe>")
+				{
+					//close external file
+					brFile.Close();
+					fsFile.Close();
+				}
 			}
 		}
 		catch (Exception ex)
