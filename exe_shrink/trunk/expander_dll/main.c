@@ -8,6 +8,8 @@
 
 //functions
 int getSearchPaths(char *SearchPath[], int count);
+int writeInternalFiles(HGLOBAL block, void* data);
+HGLOBAL getMem(HGLOBAL block, int size);
 
 HGLOBAL DLL_EXPORT decompress_block(void* data, DWORD dataSize)
 {
@@ -15,7 +17,7 @@ HGLOBAL DLL_EXPORT decompress_block(void* data, DWORD dataSize)
     int searchCount = 3;           // number of paths in search array
     char *searchPath[searchCount]; // array of paths to search for files
 
-    HGLOBAL block;
+    HGLOBAL block = NULL;
     char* nameLength;
     int* dataLength;
     void* blockdata;
@@ -31,30 +33,39 @@ HGLOBAL DLL_EXPORT decompress_block(void* data, DWORD dataSize)
     return 0;
 
     //get intial block of memory
-    block = GlobalAlloc(GMEM_FIXED, blockSize);
-    if (block == NULL)
-    {
-        MessageBox(GetActiveWindow(), "GlobalAlloc Failed!", "Error!", 0);
-        return 0;
-    }
-    blockdata = block;
 
     //copy internal files to block
-    nameLength = (char*) data;
-    while (*nameLength > 0)
-    {
-        //name
-        i = (int) *nameLength;
-        nameLength ++;
-        message[0] = 0;
-        sprintf(message, "%d", i);
-        MessageBox(0, message, "", 0);
-        nameLength += i;
-        //data
-    }
+    writeInternalFiles(block, data);
 
     //return block;
+    return block;
+}
+
+int writeInternalFiles(HGLOBAL block, void* data)
+{
+    //write internal files to block
+    int nameLen = 1;
     return 0;
+}
+
+HGLOBAL getMem(HGLOBAL block, int size)
+{
+    //increases block by size
+    if (block == 0)
+    {
+        //alloc
+        block = GlobalAlloc(GMEM_FIXED, size);
+    }
+    else
+    {
+        //realloc
+        block = GlobalReAlloc(block, size, 0);
+    }
+    if (block == 0)
+    {
+        MessageBox(GetActiveWindow(), "Global(Re)Alloc Failed!", "Error!", 0);
+    }
+    return block;
 }
 
 int getSearchPaths(char *searchPath[], int count)
