@@ -8,21 +8,25 @@
 
 //functions
 int getSearchPaths(char *SearchPath[], int count);
-int writeInternalFiles(HGLOBAL block, void* data);
+int internalFilesSize(void *data);
 HGLOBAL getMem(HGLOBAL block, int size);
+int useMd5(void *data);
 
-HGLOBAL DLL_EXPORT decompress_block(void* data, DWORD dataSize)
+void debug_num(char *text, int num)
 {
-    char *buffer;
+    char buffer[255];
+    buffer[0] = 0;
+    sprintf(buffer, "%s : %d", text, num);
+    MessageBox(GetActiveWindow(), buffer, "debug", 0);
+}
+
+HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
+{
     int searchCount = 3;           // number of paths in search array
     char *searchPath[searchCount]; // array of paths to search for files
+    int size, md5;
 
     HGLOBAL block = NULL;
-    char* nameLength;
-    int* dataLength;
-    void* blockdata;
-    int i;
-    char message[100];
 
     //fill searchPath array
     if (getSearchPaths(searchPath, searchCount) == 0)
@@ -30,22 +34,56 @@ HGLOBAL DLL_EXPORT decompress_block(void* data, DWORD dataSize)
         //error filling serachPath array
         return;
     }
-    return 0;
-
-    //get intial block of memory
 
     //copy internal files to block
-    writeInternalFiles(block, data);
+    size = internalFilesSize(data);
+    block = getMem(block, size);
+    CopyMemory(block, data, size);
+    //skip internal files and null byte
+    data += size + 1;
+
+    //use md5 checksums for external files?
+    md5 = useMd5(data);
+    data += 1;
+    debug_num("useMd5", md5);
+
+    //copy external files to block
 
     //return block;
     return block;
 }
 
-int writeInternalFiles(HGLOBAL block, void* data)
+int useMd5(void *data)
+{
+    //are external files useing checksums?
+    char* dataByte;
+    dataByte = data;
+    return *dataByte;
+}
+
+int internalFilesSize(void *data)
 {
     //write internal files to block
     int nameLen = 1;
-    return 0;
+    int dataLen;
+    int* dataInt;
+    void* dataStart = data;
+    //find size of all internal files
+    while (nameLen > 0)
+    {
+        //name
+        dataInt = data;
+        nameLen = *dataInt;
+        if (nameLen > 0)
+        {
+            data += 4 + nameLen;
+            //data
+            dataInt = data;
+            dataLen = *dataInt;
+            data += 4 + dataLen;
+        }
+    }
+    return data - dataStart;
 }
 
 HGLOBAL getMem(HGLOBAL block, int size)
