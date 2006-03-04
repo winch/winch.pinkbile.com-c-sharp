@@ -43,10 +43,10 @@ class Build
 			foreach (ListViewFileItem lvi in Intern.Items)
 			{
 				//ignore <Standard Head> and <Extra Data>
-				if (lvi.Text != "<Standard Head>" && lvi.Text != "<Extra Data>")
+				if (lvi.Text.StartsWith("<") == false)
 				{
 					//name
-					bwOut.Write((byte) lvi.Text.Length);
+					bwOut.Write(lvi.Text.Length);
 					bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
 					//data
 					if (lvi.SubItems[1].Text == "<exe>")
@@ -71,7 +71,7 @@ class Build
 			foreach (ListViewFileItem lvi in Extern.Items)
 			{
 				//ignore <Standard Head> and <Extra Data>
-				if (lvi.Text != "<Standard Head>" && lvi.Text != "<Extra Data>")
+				if (lvi.Text.StartsWith("<") == false)
 				{
 					//name
 					bwOut.Write((byte) lvi.Text.Length);

@@ -2,7 +2,7 @@ expander_dll
 ============
 
 {
-	byte namelength
+	int namelength
 	name
 	int datalength
 	filedata
