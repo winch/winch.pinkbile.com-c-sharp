@@ -7,7 +7,7 @@ expander_dll
 	int datalength
 	filedata
 }
-Null byte
+Null int
 byte use md5 checksum? 0=no, 1=yes
 {
 	byte namelength

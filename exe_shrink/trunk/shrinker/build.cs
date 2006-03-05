@@ -61,7 +61,8 @@ class Build
 					fsIn.Close();
 				}
 			}
-			bwOut.Write((byte) 0);
+			//end of internal files null int
+			bwOut.Write(0);
 			//Use checksums?
 			if (checkSums == true)
 				bwOut.Write((byte) 1);
