@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <stdio.h>
 
 #ifdef BUILD_DLL
     #define DLL_EXPORT __declspec(dllexport)
@@ -6,11 +7,14 @@
     #define DLL_EXPORT
 #endif
 
+#include "md5.h"
+
 //functions
 int getSearchPaths(char *SearchPath[], int count);
 int internalFilesSize(void *data);
-HGLOBAL getMem(HGLOBAL block, int size);
+int externalFilesSize(void *data, char *searchPath[], int searchCount);
 int useMd5(void *data);
+
 
 void debug_num(char *text, int num)
 {
@@ -20,11 +24,17 @@ void debug_num(char *text, int num)
     MessageBox(GetActiveWindow(), buffer, "debug", 0);
 }
 
+void debug_text(char *text)
+{
+    MessageBox(GetActiveWindow(), text, "debug", 0);
+}
+
 HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
 {
     int searchCount = 3;           // number of paths in search array
     char *searchPath[searchCount]; // array of paths to search for files
-    int size, md5;
+    int internalSize, externalSize, md5;
+    void *dataStart = data;
 
     HGLOBAL block = NULL;
 
@@ -35,22 +45,162 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
         return;
     }
 
-    //copy internal files to block
-    size = internalFilesSize(data);
-    block = getMem(block, size);
-    CopyMemory(block, data, size);
-    //skip internal files and null byte
-    data += size + 1;
+    //find size of internal files
+    internalSize = internalFilesSize(data);
+    //skip internal files an null int
+    data += internalSize + 4;
 
     //use md5 checksums for external files?
     md5 = useMd5(data);
     data += 1;
-    debug_num("useMd5", md5);
 
-    //copy external files to block
+    //find size of external files
+    externalSize = externalFilesSize(data, searchPath, searchCount);
 
-    //return block;
+    //get block
+    block = GlobalAlloc(GMEM_FIXED, internalSize + externalSize);
+    if (block == NULL)
+    {
+        MessageBox(GetActiveWindow(), "GlobalAlloc failed.", "Error!", 16);
+        return block;
+    }
+
+    //copy internal files to block
+    data = dataStart;
+    CopyMemory(block, data, internalSize);
+
+     //jump internal files + null int + useMd5 byte
+    data += internalSize + 5;
+
+    //copy external files to block;
+    if (writeExternalFiles(data, block + internalSize, searchPath, searchCount) == 0)
+    {
+        //error with external files
+        MessageBox(GetActiveWindow(), "Copy external files failed.", "Error!", 16);
+        return 0;
+    }
+
     return block;
+}
+
+int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int searchCount)
+{
+    //write exteral files to block
+    //returns 0 on failure > 0 on success
+    char *dataByte, *fullName;
+    char name[255];
+    int nameLen = 1;
+    int i;
+    int pos;
+    void *buffer;
+    FILE *f_in;
+    //loop through files
+    while (nameLen > 0)
+    {
+        dataByte = data;
+        nameLen = *dataByte;
+        if (nameLen > 0)
+        {
+            data += 1;
+            CopyMemory(name, data, nameLen);
+            name[nameLen] = 0;
+            data += nameLen;
+            //find file in search path
+            for (i = 0; i < searchCount; i++)
+            {
+                fullName = malloc(strlen(searchPath[i]) + strlen(name) + 1);
+                fullName[0] = 0;
+                sprintf(fullName, "%s%s", searchPath[i], name);
+                f_in = fopen(fullName, "rb");
+                if (f_in != NULL)
+                {
+                    break;
+                }
+            }
+            if (f_in != NULL)
+            {
+                //write file to block
+                fseek(f_in, 0, SEEK_END);
+                pos = ftell(f_in);
+                fseek(f_in, 0, SEEK_SET);
+                buffer = malloc(pos);
+                fread(buffer, pos, 1, f_in);
+                //write name
+                CopyMemory(block, &nameLen, 4);
+                block += 4;
+                CopyMemory(block, name, strlen(name));
+                block += strlen(name);
+                //write data
+                CopyMemory(block, &pos, 4);
+                block += 4;
+                CopyMemory(block, buffer, pos);
+                block += pos;
+                free(buffer);
+                fclose(f_in);
+            }
+            else
+            {
+                //file not found
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int externalFilesSize(void *data, char *searchPath[], int searchCount)
+{
+    //get size of external files
+    char *dataByte, *fullName;
+    char name[255];
+    int nameLen = 1;
+    int i, total;
+    DWORD fileSize;
+    OFSTRUCT los;
+    HFILE file;
+    total = 0;
+    //loop through files
+    while (nameLen > 0)
+    {
+        dataByte = data;
+        nameLen = *dataByte;
+        if (nameLen > 0)
+        {
+            data += 1;
+            CopyMemory(name, data, nameLen);
+            name[nameLen] = 0;
+            data += nameLen;
+            //find file in search path
+            for (i = 0; i < searchCount; i++)
+            {
+                fullName = malloc(strlen(searchPath[i]) + strlen(name) + 1);
+                fullName[0] = 0;
+                sprintf(fullName, "%s%s", searchPath[i], name);
+                file = OpenFile(fullName, &los, OF_READ);
+                free(fullName);
+                if (file != HFILE_ERROR)
+                {
+                    break;
+                }
+            }
+            if (file != 0)
+            {
+                fileSize = GetFileSize((HANDLE) file, NULL);
+                total += fileSize + 8 + strlen(name);
+                CloseHandle((HANDLE) file);
+            }
+            else
+            {
+                //file not found in searchPath[]
+                dataByte = malloc(255);
+                sprintf(dataByte, "%s not found in search paths.", name);
+                MessageBox(GetActiveWindow(), dataByte, "Error!", 16);
+                free(dataByte);
+                return 0;
+            }
+        }
+    }
+    return total;
 }
 
 int useMd5(void *data)
@@ -64,11 +214,11 @@ int useMd5(void *data)
 int internalFilesSize(void *data)
 {
     //write internal files to block
-    int nameLen = 1;
-    int dataLen;
-    int* dataInt;
-    void* dataStart = data;
+    int nameLen, dataLen;
+    int *dataInt;
+    void *dataStart = data;
     //find size of all internal files
+    nameLen = 1;
     while (nameLen > 0)
     {
         //name
@@ -84,26 +234,6 @@ int internalFilesSize(void *data)
         }
     }
     return data - dataStart;
-}
-
-HGLOBAL getMem(HGLOBAL block, int size)
-{
-    //increases block by size
-    if (block == 0)
-    {
-        //alloc
-        block = GlobalAlloc(GMEM_FIXED, size);
-    }
-    else
-    {
-        //realloc
-        block = GlobalReAlloc(block, size, 0);
-    }
-    if (block == 0)
-    {
-        MessageBox(GetActiveWindow(), "Global(Re)Alloc Failed!", "Error!", 0);
-    }
-    return block;
 }
 
 int getSearchPaths(char *searchPath[], int count)
