@@ -155,8 +155,8 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
                     if (strcmp(md5SumReq ,md5SumFile) != 0)
                     {
                         //checksums don't match !TODO!
-                        md5FailMsg = malloc(10);
-                        free(md5FailMsg);
+                        //md5FailMsg = malloc(10);
+                        //free(md5FailMsg);
                         free(buffer);
                         return 0;
                     }
@@ -295,30 +295,30 @@ int getSearchPaths(char *searchPath[], int count)
     ret = RegQueryValueEx(hKey, "INSTALL-PATH", NULL, NULL, (LPBYTE) buffer, &reglen);
     if (ret != ERROR_SUCCESS)
     {
-        MessageBox(GetActiveWindow(), "DarkBASIC pro location not found", "Error!", 16);
+        MessageBox(GetActiveWindow(), "DarkBASIC pro location not found.", "Error!", 16);
         return 0;
     }
     RegCloseKey(hKey);
-    //plugins
-    searchPath[0] = malloc(strlen(buffer)+21); //"\compiler\plugins\"
-    *searchPath[0] = 0x0;
-    strcat(searchPath[0], buffer);
-     strcat(searchPath[0], "\\compiler\\plugins\\");
-    //plugins-user
-    if (count > 1)
+    switch (count)
     {
-        searchPath[1] = malloc(strlen(buffer)+25); //"\plugins-user\"
-        *searchPath[1] = 0x0;
-        strcat(searchPath[1], buffer);
-        strcat(searchPath[1], "\\compiler\\plugins-user\\");
-    }
-    //effects
-    if (count > 2)
-    {
-        searchPath[2] = malloc(strlen(buffer) + 20); //"\effects\"
-        *searchPath[2] = 0x0;
-        strcat(searchPath[2], buffer);
-        strcat(searchPath[2], "\\compiler\\effects\\");
+        case 0:
+            //plugins
+            searchPath[count] = malloc(strlen(buffer)+21); //"\compiler\plugins\"
+            *searchPath[count] = 0;
+            sprintf(searchPath[count], "%s\\compiler\\plugins\\", buffer);
+        break;
+        case 1:
+            //plugins-user
+            searchPath[count] = malloc(strlen(buffer)+25); //"\plugins-user\"
+            *searchPath[count] = 0;
+            sprintf(searchPath[count], "%s\\compiler\\plugins-user\\", buffer);
+        break;
+        case 2:
+            //effects
+            searchPath[count] = malloc(strlen(buffer) + 20); //"\effects\"
+            *searchPath[count] = 0;
+            sprintf(searchPath[count], "%s\\compiler\\effects\\", buffer);
+        break;
     }
     free(buffer);
     //add extra search paths here
