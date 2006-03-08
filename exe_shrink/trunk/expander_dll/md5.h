@@ -61,6 +61,8 @@
  * efficiently on either one than if ARCH_IS_BIG_ENDIAN is defined.
  */
 
+#define ARCH_IS_BIG_ENDIAN 0
+
 typedef unsigned char md5_byte_t; /* 8-bit byte */
 typedef unsigned int md5_word_t; /* 32-bit word */
 
@@ -72,7 +74,7 @@ typedef struct md5_state_s {
 } md5_state_t;
 
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 {
 #endif
 

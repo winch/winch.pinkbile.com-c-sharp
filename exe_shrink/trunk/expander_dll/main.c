@@ -12,9 +12,10 @@
 //functions
 int getSearchPaths(char *SearchPath[], int count);
 int internalFilesSize(void *data);
-int externalFilesSize(void *data, char *searchPath[], int searchCount);
+int externalFilesSize(void *data, char *searchPath[], int searchCount, int md5);
+int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
+                       int searchCount, int md5);
 int useMd5(void *data);
-
 
 void debug_num(char *text, int num)
 {
@@ -55,7 +56,7 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
     data += 1;
 
     //find size of external files
-    externalSize = externalFilesSize(data, searchPath, searchCount);
+    externalSize = externalFilesSize(data, searchPath, searchCount, md5);
 
     //get block
     block = GlobalAlloc(GMEM_FIXED, internalSize + externalSize);
@@ -73,7 +74,7 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
     data += internalSize + 5;
 
     //copy external files to block;
-    if (writeExternalFiles(data, block + internalSize, searchPath, searchCount) == 0)
+    if (writeExternalFiles(data, block + internalSize, searchPath, searchCount, md5) == 0)
     {
         //error with external files
         MessageBox(GetActiveWindow(), "Copy external files failed.", "Error!", 16);
@@ -83,17 +84,26 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
     return block;
 }
 
-int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int searchCount)
+int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
+                       int searchCount, int md5)
 {
     //write exteral files to block
     //returns 0 on failure > 0 on success
-    char *dataByte, *fullName;
+    char *dataByte, *fullName, md5FailMsg;
     char name[255];
+    char md5Sum[33];
     int nameLen = 1;
     int i;
     int pos;
     void *buffer;
     FILE *f_in;
+    //md5 checksum stuff
+    md5_state_t state;
+	md5_byte_t digest[16];
+	int di;
+	char md5SumReq[33];  //required md5
+	md5SumReq[32] = 0;
+	char md5SumFile[33]; //md5 of file
     //loop through files
     while (nameLen > 0)
     {
@@ -105,6 +115,12 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int search
             CopyMemory(name, data, nameLen);
             name[nameLen] = 0;
             data += nameLen;
+            if (md5 == 1)
+            {
+                //read md5
+                CopyMemory(md5SumReq, data, 32);
+                data += 32;
+            }
             //find file in search path
             for (i = 0; i < searchCount; i++)
             {
@@ -125,6 +141,26 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int search
                 fseek(f_in, 0, SEEK_SET);
                 buffer = malloc(pos);
                 fread(buffer, pos, 1, f_in);
+                fclose(f_in);
+                if (md5 == 1)
+                {
+                    //check md5
+                    md5_init(&state);
+                    md5_append(&state, (const md5_byte_t *)buffer, pos);
+                    md5_finish(&state, digest);
+                    for (di = 0; di < 16; ++di)
+                    {
+                        sprintf(md5SumFile + di * 2, "%02x", digest[di]);
+                    }
+                    if (strcmp(md5SumReq ,md5SumFile) != 0)
+                    {
+                        //checksums don't match !TODO!
+                        md5FailMsg = malloc(10);
+                        free(md5FailMsg);
+                        free(buffer);
+                        return 0;
+                    }
+                }
                 //write name
                 CopyMemory(block, &nameLen, 4);
                 block += 4;
@@ -136,7 +172,6 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int search
                 CopyMemory(block, buffer, pos);
                 block += pos;
                 free(buffer);
-                fclose(f_in);
             }
             else
             {
@@ -148,7 +183,7 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int search
     return 1;
 }
 
-int externalFilesSize(void *data, char *searchPath[], int searchCount)
+int externalFilesSize(void *data, char *searchPath[], int searchCount, int md5)
 {
     //get size of external files
     char *dataByte, *fullName;
@@ -170,6 +205,11 @@ int externalFilesSize(void *data, char *searchPath[], int searchCount)
             CopyMemory(name, data, nameLen);
             name[nameLen] = 0;
             data += nameLen;
+            if (md5 == 1)
+            {
+                //skip file md5
+                data += 32;
+            }
             //find file in search path
             for (i = 0; i < searchCount; i++)
             {
