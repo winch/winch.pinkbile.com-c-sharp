@@ -10,13 +10,13 @@
 #include "md5.h"
 
 //functions
-int getSearchPaths(char *SearchPath[], int count);
+int getSearchPaths(char *SearchPath[]);
 int internalFilesSize(void *data);
-int externalFilesSize(void *data, char *searchPath[], int searchCount, int md5);
-int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
-                       int searchCount, int md5);
+int externalFilesSize(void *data, char *searchPath[], int md5);
+int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5);
 int useMd5(void *data);
 
+/*
 void debug_num(char *text, int num)
 {
     char buffer[255];
@@ -29,20 +29,21 @@ void debug_text(char *text)
 {
     MessageBox(GetActiveWindow(), text, "debug", 0);
 }
+*/
 
 HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
 {
-    int searchCount = 3;           // number of paths in search array
-    char *searchPath[searchCount]; // array of paths to search for files
+    #define SEARCHCOUNT 3 //number of paths in search array
+    char *searchPath[SEARCHCOUNT]; // array of paths to search for files
     int internalSize, externalSize, md5;
     void *dataStart = data;
 
     HGLOBAL block = NULL;
 
     //fill searchPath array
-    if (getSearchPaths(searchPath, searchCount) == 0)
+    if (getSearchPaths(searchPath) == 0)
     {
-        //error filling serachPath array
+        //error filling searchPath array
         return;
     }
 
@@ -56,7 +57,7 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
     data += 1;
 
     //find size of external files
-    externalSize = externalFilesSize(data, searchPath, searchCount, md5);
+    externalSize = externalFilesSize(data, searchPath, md5);
     if (externalSize == 0)
     {
         //external file not found
@@ -79,7 +80,7 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
     data += internalSize + 5;
 
     //copy external files to block;
-    if (writeExternalFiles(data, block + internalSize, searchPath, searchCount, md5) == 0)
+    if (writeExternalFiles(data, block + internalSize, searchPath, md5) == 0)
     {
         //error with external files
         MessageBox(GetActiveWindow(), "Copy external files failed.", "Error!", 16);
@@ -89,8 +90,7 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
     return block;
 }
 
-int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
-                       int searchCount, int md5)
+int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5)
 {
     //write exteral files to block
     //returns 0 on failure > 0 on success
@@ -127,7 +127,7 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
                 data += 32;
             }
             //find file in search path
-            for (i = 0; i < searchCount; i++)
+            for (i = 0; i < SEARCHCOUNT; i++)
             {
                 fullName = malloc(strlen(searchPath[i]) + strlen(name) + 1);
                 fullName[0] = 0;
@@ -160,10 +160,16 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
                     if (strcmp(md5SumReq ,md5SumFile) != 0)
                     {
                         //checksums don't match !TODO!
-                        md5FailMsg = malloc(10);
+                        md5FailMsg = malloc(strlen(name) + 47);
+                        sprintf(md5FailMsg, "%s does not match md5 checksum.\nContinue anyway?", name);
+                        i = MessageBox(GetActiveWindow(), md5FailMsg, "Error!", 20);
                         free(md5FailMsg);
-                        free(buffer);
-                        return 0;
+                        if (i == 7)
+                        {
+                            //no button clicked
+                            free(buffer);
+                            return 0;
+                        }
                     }
                 }
                 //write name
@@ -188,7 +194,7 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
     return 1;
 }
 
-int externalFilesSize(void *data, char *searchPath[], int searchCount, int md5)
+int externalFilesSize(void *data, char *searchPath[], int md5)
 {
     //get size of external files
     char *dataByte, *fullName;
@@ -216,7 +222,7 @@ int externalFilesSize(void *data, char *searchPath[], int searchCount, int md5)
                 data += 32;
             }
             //find file in search path
-            for (i = 0; i < searchCount; i++)
+            for (i = 0; i < SEARCHCOUNT; i++)
             {
                 fullName = malloc(strlen(searchPath[i]) + strlen(name) + 1);
                 fullName[0] = 0;
@@ -283,7 +289,7 @@ int internalFilesSize(void *data)
     return data - dataStart;
 }
 
-int getSearchPaths(char *searchPath[], int count)
+int getSearchPaths(char *searchPath[])
 {
     //fills the searchPath array with paths to search for files
     //returns 0 on failure > 0 on success
@@ -307,7 +313,7 @@ int getSearchPaths(char *searchPath[], int count)
         return 0;
     }
     RegCloseKey(hKey);
-    for (i=0; i < count; i++)
+    for (i=0; i < SEARCHCOUNT; i++)
     {
         switch (i)
         {
