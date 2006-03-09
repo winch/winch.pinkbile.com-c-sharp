@@ -10,6 +10,4 @@
 	<File name="md5.h" open="1" top="0">
 		<Cursor position="2182" topLine="0"/>
 	</File>
-	<Expand folder="/Sources"/>
-	<Expand folder="/Headers"/>
 </CodeBlocks_layout_file>
