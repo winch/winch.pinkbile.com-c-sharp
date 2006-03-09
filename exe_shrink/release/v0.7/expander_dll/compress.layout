@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE CodeBlocks_layout_file>
+<CodeBlocks_layout_file>
+	<File name="main.c" open="1" top="1">
+		<Cursor position="7754" topLine="234"/>
+	</File>
+	<File name="md5.c" open="1" top="0">
+		<Cursor position="3657" topLine="330"/>
+	</File>
+	<File name="md5.h" open="1" top="0">
+		<Cursor position="2182" topLine="0"/>
+	</File>
+</CodeBlocks_layout_file>
