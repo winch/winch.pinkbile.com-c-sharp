@@ -31,7 +31,7 @@ class Build
 			brIn.Close();
 			fsIn.Close();
 			//write compress.dll
-			fsIn = new FileStream(Application.StartupPath + Path.DirectorySeparatorChar + "compress.dll", FileMode.Open);
+			fsIn = new FileStream(Application.StartupPath + Path.DirectorySeparatorChar + "compress.dat", FileMode.Open);
 			brIn = new BinaryReader(fsIn);
 			bwOut.Write("compress.dll".Length);
 			bwOut.Write(Encoding.ASCII.GetBytes("compress.dll"));
