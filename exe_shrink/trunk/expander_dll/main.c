@@ -57,6 +57,11 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
 
     //find size of external files
     externalSize = externalFilesSize(data, searchPath, searchCount, md5);
+    if (externalSize == 0)
+    {
+        //external file not found
+        return 0;
+    }
 
     //get block
     block = GlobalAlloc(GMEM_FIXED, internalSize + externalSize);
@@ -89,7 +94,7 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
 {
     //write exteral files to block
     //returns 0 on failure > 0 on success
-    char *dataByte, *fullName, md5FailMsg;
+    char *dataByte, *fullName, *md5FailMsg;
     char name[255];
     char md5Sum[33];
     int nameLen = 1;
@@ -155,8 +160,8 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], \
                     if (strcmp(md5SumReq ,md5SumFile) != 0)
                     {
                         //checksums don't match !TODO!
-                        //md5FailMsg = malloc(10);
-                        //free(md5FailMsg);
+                        md5FailMsg = malloc(10);
+                        free(md5FailMsg);
                         free(buffer);
                         return 0;
                     }
@@ -192,7 +197,7 @@ int externalFilesSize(void *data, char *searchPath[], int searchCount, int md5)
     int i, total;
     DWORD fileSize;
     OFSTRUCT los;
-    HFILE file;
+    HFILE file = HFILE_ERROR;
     total = 0;
     //loop through files
     while (nameLen > 0)
@@ -220,13 +225,15 @@ int externalFilesSize(void *data, char *searchPath[], int searchCount, int md5)
                 free(fullName);
                 if (file != HFILE_ERROR)
                 {
+                    //file found
                     break;
                 }
             }
-            if (file != 0)
+            if (file != HFILE_ERROR)
             {
+                //file found
                 fileSize = GetFileSize((HANDLE) file, NULL);
-                total += fileSize + 8 + strlen(name);
+                total += fileSize + 8 + strlen(name); // filesize + nameLen + dataLen + name
                 CloseHandle((HANDLE) file);
             }
             else
@@ -284,6 +291,7 @@ int getSearchPaths(char *searchPath[], int count)
     DWORD reglen;
     HKEY hKey;
     long ret;
+    int i;
     //find location of dbpro dir
     ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Dark Basic\\Dark Basic Pro\\", 0, KEY_QUERY_VALUE, &hKey);
     if (ret != ERROR_SUCCESS)
@@ -299,29 +307,31 @@ int getSearchPaths(char *searchPath[], int count)
         return 0;
     }
     RegCloseKey(hKey);
-    switch (count)
+    for (i=0; i < count; i++)
     {
-        case 0:
-            //plugins
-            searchPath[count] = malloc(strlen(buffer)+21); //"\compiler\plugins\"
-            *searchPath[count] = 0;
-            sprintf(searchPath[count], "%s\\compiler\\plugins\\", buffer);
-        break;
-        case 1:
-            //plugins-user
-            searchPath[count] = malloc(strlen(buffer)+25); //"\plugins-user\"
-            *searchPath[count] = 0;
-            sprintf(searchPath[count], "%s\\compiler\\plugins-user\\", buffer);
-        break;
-        case 2:
-            //effects
-            searchPath[count] = malloc(strlen(buffer) + 20); //"\effects\"
-            *searchPath[count] = 0;
-            sprintf(searchPath[count], "%s\\compiler\\effects\\", buffer);
-        break;
+        switch (i)
+        {
+            case 0:
+                //plugins
+                searchPath[i] = malloc(strlen(buffer)+21); //"\compiler\plugins\"
+                *searchPath[i] = 0;
+                sprintf(searchPath[i], "%s\\compiler\\plugins\\", buffer);
+            break;
+            case 1:
+                //plugins-user
+                searchPath[i] = malloc(strlen(buffer)+25); //"\plugins-user\"
+                *searchPath[i] = 0;
+                sprintf(searchPath[i], "%s\\compiler\\plugins-user\\", buffer);
+            break;
+            case 2:
+                //effects
+                searchPath[i] = malloc(strlen(buffer) + 20); //"\effects\"
+                *searchPath[i] = 0;
+                sprintf(searchPath[i], "%s\\compiler\\effects\\", buffer);
+            break;
+        }
     }
     free(buffer);
-    //add extra search paths here
     return 1;
 }
 
