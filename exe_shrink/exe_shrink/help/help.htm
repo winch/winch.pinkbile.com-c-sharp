@@ -1,35 +1,68 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>the_winch lives here site stats</title>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-<link href="style.css" type="text/css" rel="stylesheet">
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<style type="text/css">
+@import url("style.css");
+</style>
+<title>exe shrink documentation</title>
+<script type="text/javascript" src="reply.js"></script>
 </head>
 <body>
-<div><img src="image/01.png" alt="screen shot"></div>
-<div><br>Instructions<br><div>
-<div>
-<br>1. Load dbpro exe<br>
-<br>
-Click on the load button and select the dbpro exe you want to shrink.<br>
-The program will generate a list of all the files in the dbpro exe. It will try to guess which files belong in the internal list and which ones belong in the external list.<br>
-Internal files will be built into the mini exe so any files that are specific to your program should be in the internal list.<br>
-External files will be sourced from the [dbpro]\compiler\plugins, [dbpro]\compiler\plugins-user or [dbpro]\compiler\effects directories. All files that are not specific to your
-program and are located in those directories should be in the external files list.<br>
-A typical program with no compiled in media should look like the above screenshot.<br>
-You can move items from one list to the other by right-clicking the item and selecting move to Internal/External. If you move items to the internal list you need to make sure that you
-keep "&lt;Standard Head&gt;" as the first item and "&lt;Extra Data&gt;" as the last item.<br>
-The program will also generate an exe name by putting a "mini_" prefix on the loaded exe name. The exe name is the filename the mini exe will use to build the exe when it is run.<br>
-Click the Include checksums for external files checkbox and when the mini exe is build checksums for the external files will be added. Then when the mini exe is run it will check to
-see if the external files on the users computer match the checksum.<br>
-<br>
-2. Build expander exe<br>
-<br>
-Press the build button to build a mini exe. The program will check all the files in the external list are present in the
-dbpro]\compiler\plugins, [dbpro]\compiler\plugins-user or [dbpro]\compiler\effects directories. If a file is not found then it is proberly a file specific to your program so move the
-offending file into the internal list.<br>
-In order for another user to run your mini exe they must have dbpro installed and all the external files must be present.
-There is no version checking so attempting to run a mini exe on a system with a different dbpro version may cause problems.
+<table align="center">
+<tr><td>
+<div><a href="http://winch.pinkbile.com/exe_shrink.php">exe shrink</a> tutorial.</div>
+</td></tr>
+</table>
+<br />
+<table align="center">
+<tr><td>
+<div>Exe shrink is a runtime style system for darkbasic pro exes.<br />
+Instead of the dbpro dlls being stored in the exe they are sourced from the dbpro installation directory.<br />
+This makes the exes much smaller.</div>
+</td></tr>
+</table>
+<br />
+<table align="center">
+<tr><td>
+<div><img src="image/01.png" /><br />
+<br />
+Start exe shrink and load a dbpro exe by clicking the Load button.<br />
+Internal files are those that will be inculded in the shrunk exe.<br />
+External files are those that will be sourced from the dbpro install dir when the shrunk exe is run.<br /><br />
+The program will attempt to guess which files should go where but will occasionally get it wrong.<br />
+You can move files by right clicking on them and selecting Move to Internal/External.
 </div>
+</td></tr>
+</table>
+<br />
+<table align="center">
+<tr><td>
+<div>Next decide if you want to include checksums for external files.<br />
+If selected a md5 checksum of the file will be inculded in the shrunk exe. When this exe is run<br />
+it will check the files it sources from the dbpro install dir match the md5 checksum.<br />
+If the checksums do not match the user will be asked if they want to continue running the exe.<br />
+</div>
+</td></tr>
+</table>
+<br />
+<table align="center">
+<tr><td>
+<div>For the target exe type select New style (compress.dll)<br />
+Now you can create the shrunk exe. Click the build button and choose where to save it.
+</div>
+</td></tr>
+</table>
+<br />
+<table align="center">
+<tr><td>
+<div>If you want to conver the shrunk exe back to a full size exe <a href="http://winch.pinkbile.com/dark_explorer.php">dark explorer</a>
+can be used.<br />
+Load the shrunk exe in dark explorer and select tools -&gt; Decompress Exe. Dark explorer will then<br />
+decompress the exe using the same method it uses to decompress exes compiled with the compress media option.
+</div>
+</td></tr>
+</table>
+<br />
 </body>
 </html>

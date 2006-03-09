@@ -1,24 +1,24 @@
-Dbpro exe shrinker v0.6
-+++++++++++++++++++++++
+Dbpro exe shrinker
+++++++++++++++++++
 
 http://winch.pinkbile.com/
 dbp@pinkbile.com
 
-Shrinker written in C# requires .net framework to run
-Expander written in C with dev-c++
+v0.7 09 March 2006
 
-v0.6 07 Nov 2005
--Removed console window when starting exe
+Description
++++++++++++
 
-Instructions
-++++++++++++
+Exe shrinker is a runtime style system for darkbasic pro exes. Instead of the dbpro dlls
+being stored in the exe they are sourced from the dbpro installation directory. This
+makes the exes much smaller.
 
-see help\help.htm
+See help/help.htm for instructions.
 
 License
 +++++++
 
-© the_winch 2005
+© the_winch 2006
 Permission to copy, use, modify, sell and distribute this software is
 granted provided this notice appears un-modified in all copies.
 This software is provided as-is without express or implied warranty,

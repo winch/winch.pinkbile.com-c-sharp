@@ -11,9 +11,9 @@ using System.Drawing;
 class aboutDialog: Form
 {
 	string Version = "0.7";
-	string Date = "XX Feb 2006";
+	string Date = "09 March 2006";
 	string Ident = "exe_shrink";
-	int Build = 1;
+	int Build = 2;
 	public aboutDialog()
 	{
 		Text = "About";
