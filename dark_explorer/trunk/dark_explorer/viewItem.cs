@@ -458,7 +458,7 @@ class viewItem : Form
 	private void guessFileType()
 	{
 		//guess the type of item from filename extension
-		switch (Path.GetExtension(item.SubItems[0].Text))
+		switch (Path.GetExtension(item.SubItems[0].Text).ToLower())
 		{
 			case ".dll":
 				itemType.SelectedIndex = itemType.Items.IndexOf("dll");
