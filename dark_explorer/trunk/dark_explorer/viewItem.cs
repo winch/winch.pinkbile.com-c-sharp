@@ -458,7 +458,7 @@ class viewItem : Form
 	private void guessFileType()
 	{
 		//guess the type of item from filename extension
-		switch (Path.GetExtension(item.SubItems[0].Text).ToLower())
+		switch (Path.GetExtension(proExe.DbcRemoveNull(item.SubItems[0].Text)).ToLower())
 		{
 			case ".dll":
 				itemType.SelectedIndex = itemType.Items.IndexOf("dll");
@@ -471,7 +471,7 @@ class viewItem : Form
 				if (item.SubItems[0].Text == "_virtual.dat")
 					itemType.SelectedIndex = itemType.Items.IndexOf("_virtual.dat");
 				else
-					itemType.SelectedIndex = itemType.Items.IndexOf("Other");
+					itemType.SelectedIndex = itemType.Items.IndexOf("Hex");
 				break;
 			case ".bmp":
 			case ".jpg":

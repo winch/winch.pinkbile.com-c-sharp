@@ -310,7 +310,7 @@ class window : Form
 			sfd.Title = "Extract file as";
 			sfd.Filter = "All Files (*.*)|*.*";
 			//extract file
-			sfd.FileName = Path.GetFileName(lvi.Text);
+               sfd.FileName = Path.GetFileName(proExe.DbcRemoveNull(lvi.Text));
 			if (sfd.ShowDialog() == DialogResult.OK)
 			{
 				Cursor.Current = Cursors.WaitCursor;
