@@ -28,6 +28,16 @@ using System.Runtime.InteropServices;
 
 class proExe
 {
+
+	public static string DbcRemoveNull(string name)
+	{
+		//filenames in dbc exes have a null terminator
+		//this function removes the last character of the input string if it is null
+		if (name[name.Length - 1] == '\0')
+			name = name.Substring(0, name.Length - 1);
+		return name;
+	}
+
 	public static void DecompressExe(ListView contents, window win, string oldExe, string newExe)
 	{
 		FileStream fs = null;
