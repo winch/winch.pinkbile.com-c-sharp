@@ -78,10 +78,12 @@ class window : Form
 		EventHandler mEdit = new EventHandler(mEditOnClick);
 		EventHandler mView = new EventHandler(mViewOnClick);
 		EventHandler mDecompress = new EventHandler(mDecompressOnClick);
+		EventHandler mToggleDebug = new EventHandler(mToggleDebugOnClick);
 		EventHandler mAbout = new EventHandler(mAboutOnClick);
 		EventHandler mExit = new EventHandler(mExitOnClick);
 
-		MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) };
+		MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) ,
+							   new MenuItem("Show/Hide debug log", mToggleDebug) };
 		MenuItem[] ami =  { new MenuItem("No display settings", mDisplay),
 							new MenuItem("&Load", mLoad),
 							new MenuItem("&Save", mSave),
@@ -347,6 +349,12 @@ class window : Form
 			vi.Item = lvi;
 			vi.ShowDialog();
 		}
+	}
+
+	private void mToggleDebugOnClick(object sender, EventArgs e)
+	{
+		//show/hide debug log
+		debugLog.Toggle();
 	}
 
 	private void mDecompressOnClick(object sender, EventArgs e)

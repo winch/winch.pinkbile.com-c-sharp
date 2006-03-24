@@ -222,7 +222,7 @@ class viewItem : Form
 		finally
 		{
 			FreeLibrary(hinst);
-			if (fileName != "")
+			if (File.Exists(fileName))
 				File.Delete(fileName);
 			if (brIn != null)
 				brIn.Close();
@@ -502,6 +502,7 @@ class viewItem : Form
 		Cursor.Current = Cursors.Default;
 	}
 
+	//winapi functions required for string table loading
 	[DllImport("user32.dll", EntryPoint="LoadStringA")]
 	public static extern int LoadString(uint hinst, int id, StringBuilder buffer, int bufferMax);
 

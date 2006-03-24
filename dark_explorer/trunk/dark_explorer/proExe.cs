@@ -283,6 +283,8 @@ class proExe
 
 	public static void LoadExe(ListView contents, string fileName, window win)
 	{
+		debugLog.StartSection("LoadExe");
+		int exeSectionSize = 0, extraDataSize = 0;
 		FileStream fs = null;
 		BinaryReader br = null;
 		try
@@ -290,28 +292,36 @@ class proExe
 			fs = new FileStream(fileName, FileMode.Open);
 			br = new BinaryReader(fs);
 			ListViewFileItem lvi;
+			debugLog.Log("Loading " + Path.GetFileName(fileName));
 			//check exe signiture
 			if (Encoding.ASCII.GetString(br.ReadBytes(2)) == "MZ")
 			{
+				debugLog.Log("Found exe signiture");
 				SkipExeSection(fs, br);
 				//add exe to listview
 				lvi = new ListViewFileItem();
 				lvi.Text = "Exe section";
 				lvi.Offset = 0;
 				lvi.Size = (int)fs.Position;
+				exeSectionSize = lvi.Size;
 				lvi.SubItems.Add("No");
 				lvi.SubItems.Add("No");
 				lvi.SubItems.Add("No");
 				lvi.SubItems.Add(lvi.Size.ToString("n0"));
 				lvi.SubItems.Add("<exe>");
 				contents.Items.Add(lvi);
+				debugLog.Log("Exe section size = " + lvi.Size.ToString("n0"));
 				//Check for exe with no attached data
 				if (lvi.Size == (int)fs.Length)
+				{
+					debugLog.Log("Exe has no appended data");
 					return;
+				}
 			}
 			else
 			{
 				//it's a pck file so files start at begining of file
+				debugLog.Log("Exe signiture not found, assuming .pck");
 				fs.Seek(0, SeekOrigin.Begin);
 			}
 			//add attached files
@@ -327,6 +337,8 @@ class proExe
 					lvi.Text = Encoding.ASCII.GetString(br.ReadBytes(nameLength));
 					lvi.Size = br.ReadInt32();
 					lvi.Offset = (int)fs.Position;
+					debugLog.Log(DbcRemoveNull(lvi.Text).PadRight(25, ' ') + " Size :" + lvi.Size.ToString("n0").PadRight(10, ' ') +
+								 " Offset :" + lvi.Offset.ToString("n0"));
 					//check for _virtual.dat
 					if (lvi.Text == "_virtual.dat")
 					{
@@ -360,6 +372,12 @@ class proExe
 					lvi.SubItems.Add("No");
 					lvi.SubItems.Add(lvi.Size.ToString("n0"));
 					lvi.SubItems.Add("<exe>");
+					fs.Seek(-4, SeekOrigin.End);
+					extraDataSize = br.ReadInt32();
+					debugLog.Log("Extra data size :" + lvi.Size.ToString("n0") + " reported exe section size :" +
+								 extraDataSize.ToString("n0"));
+					if (extraDataSize != exeSectionSize)
+						debugLog.Log("Warning exe section size reported in extra data does not match actual exe section size");
 				}
 				contents.Items.Add(lvi);
 			}
@@ -375,6 +393,7 @@ class proExe
 			if (fs != null)
 				fs.Close();
 		}
+		debugLog.StopSection();
 	}
 	public static string getDisplayString(int width, int height, int depth, int mode)
 	{
