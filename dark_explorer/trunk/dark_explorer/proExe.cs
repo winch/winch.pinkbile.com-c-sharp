@@ -38,7 +38,14 @@ class proExe
 		return name;
 	}
 
-	public static void DecompressExe(ListView contents, window win, string oldExe, string newExe)
+	public static string DbcAddNull(string name)
+	{
+		//adds null terminatio to name
+		name = name + "\0";
+		return name;
+	}
+
+	public static void DecompressExe(ListView contents, bool dbPro, window win, string oldExe, string newExe)
 	{
 		FileStream fs = null;
 		BinaryReader br = null;
@@ -48,7 +55,7 @@ class proExe
 		string compressDll = Path.GetTempFileName(); 
 		string tempExe = Path.GetTempFileName();
 		//save exe
-		SaveExe(contents, tempExe, oldExe, win);
+		SaveExe(contents, tempExe, oldExe, dbPro, win);
 		try
 		{
 			fs = new FileStream(tempExe, FileMode.Open);
@@ -165,7 +172,7 @@ class proExe
 		}
 	}
 
-	public static void SaveExe(ListView contents, string fileName, string oldName, window win)
+	public static void SaveExe(ListView contents, string fileName, string oldName, bool dbPro, window win)
 	{
 		FileStream fsExe = null;   //old dbpro exe
 		BinaryReader brExe = null;
@@ -173,6 +180,7 @@ class proExe
 		BinaryWriter bwOut = null;
 		FileStream fsFile;         //current file being written
 		BinaryReader brFile;
+		string name;
 		bool overWrite = false; //has oldName been overwritten
 		int exeSection = -1;    //size of exeSection
 		try
@@ -213,8 +221,11 @@ class proExe
 				if (lvi.SubItems[1].Text == "Yes")
 				{
 					//is a normal file so write name and filedata length
-					bwOut.Write(lvi.Text.Length);
-					bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
+					name = DbcRemoveNull(lvi.Text);
+					if (dbPro == false)
+						name = DbcAddNull(name);
+					bwOut.Write(name.Length);
+					bwOut.Write(Encoding.ASCII.GetBytes(name));
 				}
 				else
 				{
@@ -283,7 +294,7 @@ class proExe
 
 	public static void LoadExe(ListView contents, string fileName, window win)
 	{
-		debugLog.StartSection("LoadExe");
+		//debugLog.StartSection("LoadExe");
 		int exeSectionSize = 0, extraDataSize = 0;
 		FileStream fs = null;
 		BinaryReader br = null;
@@ -292,11 +303,11 @@ class proExe
 			fs = new FileStream(fileName, FileMode.Open);
 			br = new BinaryReader(fs);
 			ListViewFileItem lvi;
-			debugLog.Log("Loading " + Path.GetFileName(fileName));
+			//debugLog.Log("Loading " + Path.GetFileName(fileName));
 			//check exe signiture
 			if (Encoding.ASCII.GetString(br.ReadBytes(2)) == "MZ")
 			{
-				debugLog.Log("Found exe signiture");
+				//debugLog.Log("Found exe signiture");
 				SkipExeSection(fs, br);
 				//add exe to listview
 				lvi = new ListViewFileItem();
@@ -310,18 +321,18 @@ class proExe
 				lvi.SubItems.Add(lvi.Size.ToString("n0"));
 				lvi.SubItems.Add("<exe>");
 				contents.Items.Add(lvi);
-				debugLog.Log("Exe section size = " + lvi.Size.ToString("n0"));
+				//debugLog.Log("Exe section size = " + lvi.Size.ToString("n0"));
 				//Check for exe with no attached data
 				if (lvi.Size == (int)fs.Length)
 				{
-					debugLog.Log("Exe has no appended data");
+					//debugLog.Log("Exe has no appended data");
 					return;
 				}
 			}
 			else
 			{
 				//it's a pck file so files start at begining of file
-				debugLog.Log("Exe signiture not found, assuming .pck");
+				//debugLog.Log("Exe signiture not found, assuming .pck");
 				fs.Seek(0, SeekOrigin.Begin);
 			}
 			//add attached files
@@ -337,8 +348,8 @@ class proExe
 					lvi.Text = Encoding.ASCII.GetString(br.ReadBytes(nameLength));
 					lvi.Size = br.ReadInt32();
 					lvi.Offset = (int)fs.Position;
-					debugLog.Log(DbcRemoveNull(lvi.Text).PadRight(25, ' ') + " Size :" + lvi.Size.ToString("n0").PadRight(10, ' ') +
-								 " Offset :" + lvi.Offset.ToString("n0"));
+					//debugLog.Log(DbcRemoveNull(lvi.Text).PadRight(26, ' ') + " Size :" + lvi.Size.ToString("n0").PadRight(10, ' ') +
+					//			 " Offset :" + lvi.Offset.ToString("n0"));
 					//check for _virtual.dat
 					if (lvi.Text == "_virtual.dat")
 					{
@@ -374,10 +385,10 @@ class proExe
 					lvi.SubItems.Add("<exe>");
 					fs.Seek(-4, SeekOrigin.End);
 					extraDataSize = br.ReadInt32();
-					debugLog.Log("Extra data size :" + lvi.Size.ToString("n0") + " reported exe section size :" +
-								 extraDataSize.ToString("n0"));
-					if (extraDataSize != exeSectionSize)
-						debugLog.Log("Warning exe section size reported in extra data does not match actual exe section size");
+					//debugLog.Log("Extra data size :" + lvi.Size.ToString("n0") + " reported exe section size :" +
+					//			 extraDataSize.ToString("n0"));
+					//if (extraDataSize != exeSectionSize)
+					//	debugLog.Log("Warning exe section size reported in extra data does not match actual exe section size");
 				}
 				contents.Items.Add(lvi);
 			}
@@ -393,7 +404,7 @@ class proExe
 			if (fs != null)
 				fs.Close();
 		}
-		debugLog.StopSection();
+		//debugLog.StopSection();
 	}
 	public static string getDisplayString(int width, int height, int depth, int mode)
 	{

@@ -32,6 +32,7 @@ using System.Windows.Forms;
 class window : Form
 {
 
+	ComboBox exeType;
 	Label exeName;
 	ListView contents;
 	public int displayWidth = -1;
@@ -61,8 +62,17 @@ class window : Form
 		contents.Columns.Add("File size",70,HorizontalAlignment.Right);
 		contents.Columns.Add("Location",90,HorizontalAlignment.Left);
 
+		exeType = new ComboBox();
+		exeType.Parent = this;
+		exeType.Location = new Point(10, 5);
+		exeType.DropDownStyle = ComboBoxStyle.DropDownList;
+		exeType.Items.Add("DbPro");
+		exeType.Items.Add("Dbc");
+		exeType.SelectedIndex = 0;
+		exeType.Width = 60;
+
 		exeName = new Label();
-		exeName.Location = new Point(10, 5);
+		exeName.Location = new Point(exeType.Left + exeType.Width + 10, 5);
 		exeName.Parent = this;
 		exeName.AutoSize = true;
 		exeName.Text = "";
@@ -82,8 +92,9 @@ class window : Form
 		EventHandler mAbout = new EventHandler(mAboutOnClick);
 		EventHandler mExit = new EventHandler(mExitOnClick);
 
-		MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) ,
-							   new MenuItem("Show/Hide debug log", mToggleDebug) };
+		//MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) ,
+		//					   new MenuItem("Show/Hide debug log", mToggleDebug) };
+		MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) };
 		MenuItem[] ami =  { new MenuItem("No display settings", mDisplay),
 							new MenuItem("&Load", mLoad),
 							new MenuItem("&Save", mSave),
@@ -354,7 +365,7 @@ class window : Form
 	private void mToggleDebugOnClick(object sender, EventArgs e)
 	{
 		//show/hide debug log
-		debugLog.Toggle();
+		//debugLog.Toggle();
 	}
 
 	private void mDecompressOnClick(object sender, EventArgs e)
@@ -380,7 +391,10 @@ class window : Form
 				return;
 			}
 			Cursor.Current = Cursors.WaitCursor;
-			proExe.DecompressExe(contents, this, exeName.Text, sfd.FileName);
+			bool dbPro = false;
+			if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
+				dbPro = true;
+			proExe.DecompressExe(contents, dbPro, this, exeName.Text, sfd.FileName);
 			Cursor.Current = Cursors.Default;
 		}
 		sfd.Dispose();
@@ -415,6 +429,24 @@ class window : Form
 		contents.ContextMenu.MenuItems[2].Enabled = true; //save
 		contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = true; //decompress
 		contents.EndUpdate();
+		//work out exeType
+		foreach (ListViewFileItem lvi in contents.Items)
+		{
+			if (lvi.SubItems[1].Text == "Yes")
+			{
+				//attached file
+				if (lvi.Text.EndsWith("\0"))
+				{
+					//filename is null terminated so is dbc exe
+					exeType.SelectedIndex = exeType.Items.IndexOf("Dbc");
+				}
+				else
+				{
+					exeType.SelectedIndex = exeType.Items.IndexOf("DbPro");
+				}
+				break;
+			}
+		}
 		Cursor.Current = Cursors.Default;
 	}
 
@@ -429,7 +461,10 @@ class window : Form
 			if (sfd.ShowDialog() == DialogResult.OK)
 			{
 				Cursor.Current = Cursors.WaitCursor;
-				proExe.SaveExe(contents, sfd.FileName, exeName.Text, this);
+				bool dbPro = false;
+				if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
+					dbPro = true;
+				proExe.SaveExe(contents, sfd.FileName, exeName.Text, dbPro, this);
 				if (exeName.Text == "")
 					exeName.Text = sfd.FileName;
 				Cursor.Current = Cursors.Default;
