@@ -1,6 +1,11 @@
 Version history
 +++++++++++++++
 
+v0.10
+- dark basic classic exes now fully supported
+- View item now identifies the file type correctly when filename is uppercase
+- Close external files after writing when saving exe
+
 v0.9 25 Feb 2006
 - Correctly set exe section size in extra data when exe section is an external file.
 - Allow export of both internal and external files.

@@ -1,6 +1,6 @@
 dark explorer
 +++++++++++++
-A darkbasic professional exe explorer
+A darkbasic professional, fps creator and darkbasic classic exe explorer
 
 Requires .Net framework to run
 
