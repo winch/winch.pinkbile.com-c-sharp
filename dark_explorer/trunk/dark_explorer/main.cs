@@ -82,6 +82,7 @@ class window : Form
 		EventHandler mLoad  = new EventHandler(mLoadOnClick);
 		EventHandler mSave  = new EventHandler(mSaveOnClick);
 		EventHandler mInsert  = new EventHandler(mInsertOnClick);
+		EventHandler mInsertWild  = new EventHandler(mInsertWildOnClick);
 		EventHandler mRemove  = new EventHandler(mRemoveOnClick);
 		EventHandler mReplace  = new EventHandler(mReplaceOnClick);
 		EventHandler mExtract = new EventHandler(mExtractOnClick);
@@ -100,6 +101,7 @@ class window : Form
 							new MenuItem("&Save", mSave),
 							new MenuItem("-"),
 							new MenuItem("&Insert", mInsert),
+							new MenuItem("Insert *", mInsertWild),
 							new MenuItem("&Remove", mRemove),
 						    new MenuItem("Rep&lace", mReplace),
 							new MenuItem("&Extract", mExtract),
@@ -114,12 +116,12 @@ class window : Form
 		contents.ContextMenu = new ContextMenu(ami);
 		contents.ContextMenu.MenuItems[0].Enabled = false; //Display
 		contents.ContextMenu.MenuItems[2].Enabled = false; //save
-		contents.ContextMenu.MenuItems[5].Enabled = false; //remove
-		contents.ContextMenu.MenuItems[6].Enabled = false; //replace
-		contents.ContextMenu.MenuItems[7].Enabled = false; //extract
-		contents.ContextMenu.MenuItems[8].Enabled = false; //edit
-		contents.ContextMenu.MenuItems[9].Enabled = false; //view
-		contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = false; //decompress
+		contents.ContextMenu.MenuItems[6].Enabled = false; //remove
+		contents.ContextMenu.MenuItems[7].Enabled = false; //replace
+		contents.ContextMenu.MenuItems[8].Enabled = false; //extract
+		contents.ContextMenu.MenuItems[9].Enabled = false; //edit
+		contents.ContextMenu.MenuItems[10].Enabled = false; //view
+		contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = false; //decompress
 
 		//double click edits item
 		contents.ItemActivate += mEdit;
@@ -234,6 +236,13 @@ class window : Form
 			contents.ContextMenu.MenuItems[2].Enabled = true; //save
 			contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = true; //decompress
 		}
+	}
+
+	private void mInsertWildOnClick(object sender, EventArgs ea)
+	{
+		//insert wildcard
+		insertWild iw = new insertWild();
+		iw.ShowDialog();
 	}
 
 	private void mRemoveOnClick(object sender, EventArgs e)
@@ -427,7 +436,7 @@ class window : Form
 		proExe.LoadExe(contents, filename, this);
 		exeName.Text = filename;
 		contents.ContextMenu.MenuItems[2].Enabled = true; //save
-		contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = true; //decompress
+		contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
 		contents.EndUpdate();
 		//work out exeType
 		foreach (ListViewFileItem lvi in contents.Items)
@@ -484,28 +493,28 @@ class window : Form
 		if (contents.SelectedItems.Count > 0)
 		{
 			//remove
-			contents.ContextMenu.MenuItems[5].Enabled = true;
-			//replace
 			contents.ContextMenu.MenuItems[6].Enabled = true;
-			//extract
+			//replace
 			contents.ContextMenu.MenuItems[7].Enabled = true;
-			//edit
+			//extract
 			contents.ContextMenu.MenuItems[8].Enabled = true;
-			//view
+			//edit
 			contents.ContextMenu.MenuItems[9].Enabled = true;
+			//view
+			contents.ContextMenu.MenuItems[10].Enabled = true;
 		}
 		else
 		{
 			//remove
-			contents.ContextMenu.MenuItems[5].Enabled = false;
-			//replace
 			contents.ContextMenu.MenuItems[6].Enabled = false;
-			//extract
+			//replace
 			contents.ContextMenu.MenuItems[7].Enabled = false;
-			//edit
+			//extract
 			contents.ContextMenu.MenuItems[8].Enabled = false;
-			//view
+			//edit
 			contents.ContextMenu.MenuItems[9].Enabled = false;
+			//view
+			contents.ContextMenu.MenuItems[10].Enabled = false;
 		}
 	}
 

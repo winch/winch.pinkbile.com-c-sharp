@@ -118,7 +118,7 @@ class viewItem : Form
 		guessFileType();
 		getFileSize();
 		showItem();
-		this.Text += " (" + item.SubItems[0].Text + ")";
+		this.Text += " (" + proExe.DbcRemoveNull(item.SubItems[0].Text) + ")";
 		Cursor.Current = Cursors.Default;
 	}
 
