@@ -241,7 +241,7 @@ class window : Form
 	private void mInsertWildOnClick(object sender, EventArgs ea)
 	{
 		//insert wildcard
-		insertWild iw = new insertWild();
+		insertWild iw = new insertWild(exeName.Text);
 		iw.ShowDialog();
 	}
 

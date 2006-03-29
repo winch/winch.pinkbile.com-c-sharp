@@ -24,6 +24,7 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 class insertWild: Form
 {
@@ -36,8 +37,14 @@ class insertWild: Form
 	Button btnDirectory;
 	CheckBox cbDirectory;
 
-	public insertWild()
+	TextBox filter;
+	ErrorProvider filterError;
+
+	string exePath; //path of loaded exe
+
+	public insertWild(string ExePath)
 	{
+		exePath = ExePath;
 		int y = 5;
 		Text = "Insert files with wildcard";
 		ShowInTaskbar = false;
@@ -71,8 +78,25 @@ class insertWild: Form
 		filtered.Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Left | AnchorStyles.Bottom;
 		y += gbFiltered.Height + 5;
 
-		//directory
+		//filter
 		GroupBox gb = new GroupBox();
+		gb.Parent = this;
+		gb.Text = "Filter regex";
+		gb.Location = new Point(5, y);
+		gb.Size = new Size(this.Width - 20, 45);
+		gb.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+		filter = new TextBox();
+		filter.Parent = gb;
+		filter.Location = new Point(10, 15);
+		filter.Width = gb.Width - 35;
+		filter.TextChanged += new EventHandler(filter_TextChanged);
+		filter.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+		filterError = new ErrorProvider();
+		filterError.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+		y += gb.Height + 5;
+
+		//directory
+		gb = new GroupBox();
 		gb.Parent = this;
 		gb.Text = "Directory";
 		gb.Location = new Point(5, y);
@@ -115,7 +139,7 @@ class insertWild: Form
 			string[] dirFiles = Directory.GetFiles(dir, "*");
 			foreach (string str in dirFiles)
 			{
-				files.Items.Add(Path.GetFileName(str));
+				files.Items.Add(str.Substring(directory.Text.Length, str.Length - directory.Text.Length));
 			}
 			if (recurse == true)
 			{
@@ -137,6 +161,7 @@ class insertWild: Form
 		files.Items.Clear();
 		getFileList(directory.Text, cbDirectory.Checked);
 		files.EndUpdate();
+		filter_TextChanged(this, new EventArgs());
 		Cursor = Cursors.Default;
 	}
 
@@ -160,6 +185,35 @@ class insertWild: Form
 		if (Directory.Exists(directory.Text))
 		{
 			generateFileList();
+		}
+	}
+
+	private void filter_TextChanged(object sender, EventArgs e)
+	{
+		//filter files
+		try
+		{
+			filtered.Items.Clear();
+			filtered.BeginUpdate();
+			Regex r = new Regex(filter.Text, RegexOptions.IgnoreCase);
+			foreach (string str in files.Items)
+			{
+				Match m = r.Match(str);
+				if (m.Success)
+				{
+					filtered.Items.Add(str);
+				}
+			}
+			filterError.SetError(filter, "");
+		}
+		catch (Exception ex)
+		{
+			//
+			filterError.SetError(filter, ex.Message);
+		}
+		finally
+		{
+			filtered.EndUpdate();
 		}
 	}
 }
