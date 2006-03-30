@@ -59,7 +59,7 @@ class viewItem : Form
 	{
 		Text = "View item";
 		ShowInTaskbar = false;
-		Size = new Size(350, 350);
+		Size = new Size(450, 450);
 		StartPosition = FormStartPosition.CenterParent;
 
 		//itemType combobox
