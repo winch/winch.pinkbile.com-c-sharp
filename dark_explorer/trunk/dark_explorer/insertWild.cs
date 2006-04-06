@@ -40,18 +40,49 @@ class insertWild: Form
 	TextBox filter;
 	ErrorProvider filterError;
 
+	Button insertSelected, insertAll;
+
 	string exePath; //path of loaded exe
 
 	public insertWild(string ExePath)
 	{
 		exePath = ExePath;
 		int y = 5;
-		Text = "Insert files with wildcard";
+		GroupBox gb;
+		Text = "Insert multiple files";
 		ShowInTaskbar = false;
-		Size = new Size(500, 500);
+		Size = new Size(500, 490);
 		StartPosition = FormStartPosition.CenterParent;
 
 		this.Resize += new EventHandler(insertWild_Resize);
+
+		//directory
+		gb = new GroupBox();
+		gb.Parent = this;
+		gb.Text = "Directory";
+		gb.Location = new Point(5, y);
+		gb.Size = new Size(this.Width - 20, 45);
+		gb.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
+		directory = new TextBox();
+		directory.Parent = gb;
+		directory.Location = new Point(10, 15);
+		directory.Width = gb.Width - 155;
+		directory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+		directory.TextChanged += new EventHandler(directory_TextChanged);
+		btnDirectory = new Button();
+		btnDirectory.Parent = gb;
+		btnDirectory.Location = new Point(directory.Width + directory.Left + 5, 15);
+		btnDirectory.Text = "...";
+		btnDirectory.Width = 25;
+		btnDirectory.Anchor = AnchorStyles.Right;
+		btnDirectory.Click += new EventHandler(btnDirectory_Click);
+		cbDirectory = new CheckBox();
+		cbDirectory.Parent = gb;
+		cbDirectory.Location = new Point(btnDirectory.Left + btnDirectory.Width + 5, 15);
+		cbDirectory.Text = "Recurse subdirs";
+		cbDirectory.Width = 105;
+		cbDirectory.Anchor = AnchorStyles.Right;
+		y += gb.Height + 5;
 
 		gbFiles = new GroupBox();
 		gbFiles.Parent = this;
@@ -73,13 +104,14 @@ class insertWild: Form
 		gbFiltered.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom;
 		filtered = new ListBox();
 		filtered.Parent = gbFiltered;
+		filtered.SelectionMode = SelectionMode.MultiSimple;
 		filtered.Location = new Point(10, 15);
 		filtered.Size = new Size(gbFiltered.Width - 20, gbFiltered.Height - 25);
 		filtered.Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Left | AnchorStyles.Bottom;
 		y += gbFiltered.Height + 5;
 
 		//filter
-		GroupBox gb = new GroupBox();
+		gb = new GroupBox();
 		gb.Parent = this;
 		gb.Text = "Filter regex";
 		gb.Location = new Point(5, y);
@@ -95,32 +127,27 @@ class insertWild: Form
 		filterError.BlinkStyle = ErrorBlinkStyle.NeverBlink;
 		y += gb.Height + 5;
 
-		//directory
-		gb = new GroupBox();
-		gb.Parent = this;
-		gb.Text = "Directory";
-		gb.Location = new Point(5, y);
-		gb.Size = new Size(this.Width - 20, 45);
-		gb.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-		directory = new TextBox();
-		directory.Parent = gb;
-		directory.Location = new Point(10, 15);
-		directory.Width = gb.Width - 155;
-		directory.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-		directory.TextChanged += new EventHandler(directory_TextChanged);
-		btnDirectory = new Button();
-		btnDirectory.Parent = gb;
-		btnDirectory.Location = new Point(directory.Width + directory.Left + 5, 15);
-		btnDirectory.Text = "...";
-		btnDirectory.Width = 25;
-		btnDirectory.Anchor = AnchorStyles.Right;
-		btnDirectory.Click += new EventHandler(btnDirectory_Click);
-		cbDirectory = new CheckBox();
-		cbDirectory.Parent = gb;
-		cbDirectory.Location = new Point(btnDirectory.Left + btnDirectory.Width + 5, 15);
-		cbDirectory.Text = "Recurse subdirs";
-		cbDirectory.Width = 105;
-		cbDirectory.Anchor = AnchorStyles.Right;
+		Button btn = new Button();
+		btn.Parent = this;
+		btn.Text = "Cancel";
+		btn.Location = new Point(this.Width - btn.Width - 15, y);
+		btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+		CancelButton = btn;
+
+		insertAll = new Button();
+		insertAll.Parent = this;
+		insertAll.Text = "Insert &all";
+		insertAll.Location = new Point(btn.Left - insertAll.Width - 10, y);
+		insertAll.Click += new EventHandler(insertAll_Click);
+		insertAll.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+		insertSelected = new Button();
+		insertSelected.Parent = this;
+		insertSelected.Text = "Insert &Selected";
+		insertSelected.Width += 20;
+		insertSelected.Location = new Point(insertAll.Left - insertSelected.Width - 10, y);
+		insertSelected.Click += new EventHandler(insertSelected_Click);
+		insertSelected.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
 	}
 
 	private void insertWild_Resize(object sender, EventArgs e)
@@ -139,7 +166,10 @@ class insertWild: Form
 			string[] dirFiles = Directory.GetFiles(dir, "*");
 			foreach (string str in dirFiles)
 			{
-				files.Items.Add(str.Substring(directory.Text.Length, str.Length - directory.Text.Length));
+				if (directory.Text.EndsWith(Path.DirectorySeparatorChar.ToString()))
+					files.Items.Add(str.Substring(directory.Text.Length, str.Length - directory.Text.Length));
+				else
+					files.Items.Add(str.Substring(directory.Text.Length + 1, str.Length - directory.Text.Length - 1));
 			}
 			if (recurse == true)
 			{
@@ -186,6 +216,11 @@ class insertWild: Form
 		{
 			generateFileList();
 		}
+		else
+		{
+			files.Items.Clear();
+			filtered.Items.Clear();
+		}
 	}
 
 	private void filter_TextChanged(object sender, EventArgs e)
@@ -208,12 +243,25 @@ class insertWild: Form
 		}
 		catch (Exception ex)
 		{
-			//
 			filterError.SetError(filter, ex.Message);
 		}
 		finally
 		{
 			filtered.EndUpdate();
 		}
+	}
+
+	private void insertAll_Click(object sender, EventArgs e)
+	{
+		//insert all filtered files
+		for (int i = 0; i < filtered.Items.Count; i++)
+		{
+			//
+		}
+	}
+
+	private void insertSelected_Click(object sender, EventArgs e)
+	{
+		//insert selected filtered files
 	}
 }
