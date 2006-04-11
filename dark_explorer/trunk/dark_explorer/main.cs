@@ -234,14 +234,17 @@ class window : Form
 		if (contents.Items.Count > 0)
 		{
 			contents.ContextMenu.MenuItems[2].Enabled = true; //save
-			contents.ContextMenu.MenuItems[11].MenuItems[0].Enabled = true; //decompress
+			contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
 		}
 	}
 
 	private void mInsertWildOnClick(object sender, EventArgs ea)
 	{
 		//insert wildcard
-		insertWild iw = new insertWild(exeName.Text);
+		bool dbPro = false;
+		if (exeType.Items[exeType.SelectedIndex].Equals("DbPro"))
+			dbPro = true;
+		insertWild iw = new insertWild(exeName.Text, dbPro);
 		iw.ShowDialog();
 	}
 

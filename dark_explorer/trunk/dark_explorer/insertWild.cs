@@ -42,9 +42,11 @@ class insertWild: Form
 
 	Button insertSelected, insertAll;
 
+	CheckBox mediaPrefix;
+
 	string exePath; //path of loaded exe
 
-	public insertWild(string ExePath)
+	public insertWild(string ExePath, bool dbPro)
 	{
 		exePath = ExePath;
 		int y = 5;
@@ -148,6 +150,14 @@ class insertWild: Form
 		insertSelected.Location = new Point(insertAll.Left - insertSelected.Width - 10, y);
 		insertSelected.Click += new EventHandler(insertSelected_Click);
 		insertSelected.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+		mediaPrefix = new CheckBox();
+		mediaPrefix.Parent = this;
+		mediaPrefix.Text = "Insert with \"media\\\" prefix";
+		mediaPrefix.Width = 160;
+		mediaPrefix.Checked = dbPro;
+		mediaPrefix.Location = new Point(5, y);
+		mediaPrefix.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 	}
 
 	private void insertWild_Resize(object sender, EventArgs e)
@@ -228,12 +238,18 @@ class insertWild: Form
 		//filter files
 		try
 		{
-			filtered.Items.Clear();
 			filtered.BeginUpdate();
 			Regex r = new Regex(filter.Text, RegexOptions.IgnoreCase);
+			Match m;
+			//remove unselected items
+			for(int i = 0; i < filtered.Items.Count; i++)
+			{
+				if (filtered.SelectedIndices.Contains(i) == false)
+					filtered.Items.RemoveAt(i--);
+			}
 			foreach (string str in files.Items)
 			{
-				Match m = r.Match(str);
+				m = r.Match(str);
 				if (m.Success)
 				{
 					filtered.Items.Add(str);
