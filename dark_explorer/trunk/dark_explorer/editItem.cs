@@ -110,6 +110,8 @@ class editItem : Form
 		media.Text = "&Add \"media\\\" prefix";
 		media.Location = new Point(10,40);
 		media.Width += 25;
+		if (txtBox.Text.StartsWith("media\\"))
+			media.Checked = true;
 		media.CheckStateChanged += new System.EventHandler(media_Click);
 
 		//type combobox
