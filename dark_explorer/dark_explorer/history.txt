@@ -1,7 +1,11 @@
 Version history
 +++++++++++++++
 
-v0.10
+v0.11 12 April 2006
+- insert * dialog for inserting many files at once. Files can be filterd with a regex
+- minor gui fixes
+
+v0.10 25 March 2006
 - dark basic classic exes now fully supported
 - View item now identifies the file type correctly when filename is uppercase
 - Close external files after writing when saving exe

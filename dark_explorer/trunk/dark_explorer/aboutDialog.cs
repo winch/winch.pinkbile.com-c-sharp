@@ -28,10 +28,10 @@ using System.Drawing;
 
 class aboutDialog: Form
 {
-	string Version = "0.10";
-	string Date = "25 March 2006";
+	string Version = "0.11";
+	string Date = "12 April 2006";
 	string Ident = "dark_explorer";
-	int Build = 9;
+	int Build = 10;
 	public aboutDialog()
 	{
 		Text = "About";

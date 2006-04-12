@@ -18,7 +18,7 @@ Exe compression to match decompression.
 Adding media
 ++++++++++++
 
-To add media you must be using realtive paths to load it.
+To add media you must be using relative paths to load it.
 You can add files and media with "inset". For media name of the file in the exe must be prefixed
 with "media\" and the dir name the media is in within you project dir.
 eg
