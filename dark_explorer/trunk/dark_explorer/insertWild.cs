@@ -28,12 +28,37 @@ using System.Text.RegularExpressions;
 
 class insertWild: Form
 {
+	TextBox directory;
+	CheckBox mediaPrefix;
+
+	string[] selectedFiles;
+	public string[] SelectedFiles
+	{
+		get
+		{
+			 return selectedFiles;
+		}
+	}
+	public string SelectedDirectory
+	{
+		get
+		{
+			return directory.Text;
+		}
+	}
+	public bool MediaPrefix
+	{
+		get
+		{
+			return mediaPrefix.Checked;
+		}
+	}
+
 	GroupBox gbFiles;
 	ListBox files;
 	GroupBox gbFiltered;
 	ListBox filtered;
 
-	TextBox directory;
 	Button btnDirectory;
 	CheckBox cbDirectory;
 
@@ -41,8 +66,6 @@ class insertWild: Form
 	ErrorProvider filterError;
 
 	Button insertSelected, insertAll;
-
-	CheckBox mediaPrefix;
 
 	string exePath; //path of loaded exe
 
@@ -55,6 +78,8 @@ class insertWild: Form
 		ShowInTaskbar = false;
 		Size = new Size(500, 490);
 		StartPosition = FormStartPosition.CenterParent;
+
+		selectedFiles = new string[0];
 
 		this.Resize += new EventHandler(insertWild_Resize);
 
@@ -84,6 +109,7 @@ class insertWild: Form
 		cbDirectory.Text = "Recurse subdirs";
 		cbDirectory.Width = 105;
 		cbDirectory.Anchor = AnchorStyles.Right;
+		cbDirectory.CheckStateChanged += new EventHandler(cbDirectory_CheckStateChanged);
 		y += gb.Height + 5;
 
 		gbFiles = new GroupBox();
@@ -224,12 +250,13 @@ class insertWild: Form
 		//get list for new dir
 		if (Directory.Exists(directory.Text))
 		{
+			files.Items.Clear();
+			filtered.Items.Clear();
 			generateFileList();
 		}
 		else
 		{
 			files.Items.Clear();
-			filtered.Items.Clear();
 		}
 	}
 
@@ -252,7 +279,8 @@ class insertWild: Form
 				m = r.Match(str);
 				if (m.Success)
 				{
-					filtered.Items.Add(str);
+					if (filtered.Items.IndexOf(str) == -1)
+                        filtered.Items.Add(str);
 				}
 			}
 			filterError.SetError(filter, "");
@@ -270,14 +298,31 @@ class insertWild: Form
 	private void insertAll_Click(object sender, EventArgs e)
 	{
 		//insert all filtered files
-		for (int i = 0; i < filtered.Items.Count; i++)
-		{
-			//
+		selectedFiles = new string[filtered.Items.Count];
+		for (int i = 0; i < filtered.Items.Count; i ++)
+		{ 
+			selectedFiles[i] = filtered.Items[i].ToString();
 		}
+		this.DialogResult = DialogResult.OK;
+		this.Close();
 	}
 
 	private void insertSelected_Click(object sender, EventArgs e)
 	{
 		//insert selected filtered files
+		selectedFiles = new string[filtered.SelectedItems.Count];
+		for (int i = 0; i < filtered.SelectedItems.Count; i++)
+		{
+			selectedFiles[i] = filtered.SelectedItems[i].ToString();
+		}
+		this.DialogResult = DialogResult.OK;
+		this.Close();
+	}
+
+	private void cbDirectory_CheckStateChanged(object sender, EventArgs e)
+	{
+		//recurse subdirs changed
+		files.Items.Clear();
+		generateFileList();
 	}
 }

@@ -170,6 +170,58 @@ class window : Form
 		}
 	}
 
+	private void InsertFile(string fileName, string name, bool upx, bool nullString)
+	{
+		//insert file
+		FileInfo fi = new FileInfo(fileName);
+		ListViewFileItem lvi = new ListViewFileItem();
+		lvi.Text = name;
+		lvi.SubItems.Add("Yes");
+		lvi.SubItems.Add("No");
+		lvi.SubItems.Add("No");
+		lvi.SubItems.Add(fi.Length.ToString("n0"));
+		lvi.Offset = 0;
+		lvi.Size = (int)fi.Length;
+		lvi.SubItems.Add(Path.GetFullPath(fileName));
+		if (contents.SelectedItems.Count == 0)
+		{
+			//no items selected so add at bottom
+			contents.Items.Add(lvi);
+		}
+		else
+		{
+			//insert before first selected item
+			contents.Items.Insert(contents.SelectedItems[0].Index, lvi);
+		}
+		//check for _virtual.dat
+		if (lvi.Text == "_virtual.dat")
+		{
+			//get display settings from _virtual.dat
+			FileStream fsIn = null;
+			BinaryReader brIn = null;
+			try
+			{
+				fsIn = new FileStream(fileName, FileMode.Open);
+				brIn = new BinaryReader(fsIn);
+				displayMode = brIn.ReadInt32();
+				displayWidth = brIn.ReadInt32();
+				displayHeight = brIn.ReadInt32();
+				displayDepth = brIn.ReadInt32();
+				contents.ContextMenu.MenuItems[0].Text = proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
+				contents.ContextMenu.MenuItems[0].Enabled = true;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.ToString(), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+			finally
+			{
+				brIn.Close();
+				fsIn.Close();
+			}
+		}
+	}
+
 	private void mInsertOnClick(object sender, EventArgs ea)
 	{
 		//insert file
@@ -179,53 +231,7 @@ class window : Form
 		if (ofd.ShowDialog() == DialogResult.OK)
 		{
 			Cursor.Current = Cursors.WaitCursor;
-			FileInfo fi = new FileInfo(ofd.FileName);
-			ListViewFileItem lvi = new ListViewFileItem();
-			lvi.Text = Path.GetFileName(ofd.FileName);
-			lvi.SubItems.Add("Yes");
-			lvi.SubItems.Add("No");
-			lvi.SubItems.Add("No");
-			lvi.SubItems.Add(fi.Length.ToString("n0"));
-			lvi.Offset = 0;
-			lvi.Size = (int)fi.Length;
-			lvi.SubItems.Add(Path.GetFullPath(ofd.FileName));
-			if (contents.SelectedItems.Count == 0)
-			{
-				//no items selected so add at bottom
-				contents.Items.Add(lvi);
-			}
-			else
-			{
-				//insert before first selected item
-				contents.Items.Insert(contents.SelectedItems[0].Index, lvi);
-			}
-			//check for _virtual.dat
-			if (lvi.Text == "_virtual.dat")
-			{
-				//get display settings from _virtual.dat
-				FileStream fsIn = null;
-				BinaryReader brIn = null;
-				try
-				{
-					fsIn = new FileStream(ofd.FileName, FileMode.Open);
-					brIn = new BinaryReader(fsIn);
-					displayMode = brIn.ReadInt32();
-					displayWidth = brIn.ReadInt32();
-					displayHeight = brIn.ReadInt32();
-					displayDepth = brIn.ReadInt32();
-					contents.ContextMenu.MenuItems[0].Text = proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
-					contents.ContextMenu.MenuItems[0].Enabled = true;
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(ex.ToString(), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				}
-				finally
-				{
-					brIn.Close();
-					fsIn.Close();
-				}
-			}
+			InsertFile(ofd.FileName, Path.GetFileName(ofd.FileName), false, false);
 			Cursor.Current = Cursors.Default;
 		}
 		ofd.Dispose();
@@ -245,7 +251,24 @@ class window : Form
 		if (exeType.Items[exeType.SelectedIndex].Equals("DbPro"))
 			dbPro = true;
 		insertWild iw = new insertWild(exeName.Text, dbPro);
-		iw.ShowDialog();
+		if (iw.ShowDialog() == DialogResult.OK)
+		{
+			//insert files
+			Cursor.Current = Cursors.WaitCursor;
+			string prefix, path;
+			if (iw.MediaPrefix == true)
+				prefix = "media\\";
+			else
+				prefix = "";
+			path = iw.SelectedDirectory;
+			if (iw.SelectedDirectory.EndsWith(Path.DirectorySeparatorChar.ToString()) == false)
+				path += Path.DirectorySeparatorChar.ToString();
+			foreach (string str in iw.SelectedFiles)
+			{
+				InsertFile(path + str, prefix + str, false, false);
+			}
+			Cursor.Current = Cursors.Default;
+		}
 	}
 
 	private void mRemoveOnClick(object sender, EventArgs e)
