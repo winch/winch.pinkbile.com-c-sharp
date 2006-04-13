@@ -300,22 +300,20 @@ class insertWild: Form
 	{
 		selectedFiles = new string[items.Count];
 		items.CopyTo(selectedFiles, 0);
+		this.DialogResult = DialogResult.OK;
+		this.Close();
 	}
 
 	private void insertAll_Click(object sender, EventArgs e)
 	{
 		//insert all filtered files
 		Insert(filtered.Items);
-		this.DialogResult = DialogResult.OK;
-		this.Close();
 	}
 
 	private void insertSelected_Click(object sender, EventArgs e)
 	{
 		//insert selected filtered files
 		Insert(filtered.SelectedItems);
-		this.DialogResult = DialogResult.OK;
-		this.Close();
 	}
 
 	private void cbDirectory_CheckStateChanged(object sender, EventArgs e)
