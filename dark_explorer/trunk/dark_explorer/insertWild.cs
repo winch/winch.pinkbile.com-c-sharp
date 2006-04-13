@@ -295,14 +295,17 @@ class insertWild: Form
 		}
 	}
 
+
+	private void Insert(System.Collections.ICollection items)
+	{
+		selectedFiles = new string[items.Count];
+		items.CopyTo(selectedFiles, 0);
+	}
+
 	private void insertAll_Click(object sender, EventArgs e)
 	{
 		//insert all filtered files
-		selectedFiles = new string[filtered.Items.Count];
-		for (int i = 0; i < filtered.Items.Count; i ++)
-		{ 
-			selectedFiles[i] = filtered.Items[i].ToString();
-		}
+		Insert(filtered.Items);
 		this.DialogResult = DialogResult.OK;
 		this.Close();
 	}
@@ -310,11 +313,7 @@ class insertWild: Form
 	private void insertSelected_Click(object sender, EventArgs e)
 	{
 		//insert selected filtered files
-		selectedFiles = new string[filtered.SelectedItems.Count];
-		for (int i = 0; i < filtered.SelectedItems.Count; i++)
-		{
-			selectedFiles[i] = filtered.SelectedItems[i].ToString();
-		}
+		Insert(filtered.SelectedItems);
 		this.DialogResult = DialogResult.OK;
 		this.Close();
 	}
