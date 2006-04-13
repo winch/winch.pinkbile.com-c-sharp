@@ -337,12 +337,12 @@ class proExe
 			}
 			//add attached files
 			int nameLength = 1;
-			while (nameLength > 0 && nameLength < 50 && fs.Position < fs.Length)
+			while (nameLength > 0 && nameLength < 500 && fs.Position < fs.Length)
 			{
 				lvi = new ListViewFileItem();
 				nameLength = br.ReadInt32();
 				//MessageBox.Show(nameLength.ToString());
-				if (nameLength > 0 && nameLength < 50)
+				if (nameLength > 0 && nameLength < 500)
 				{
 					//file
 					lvi.Text = Encoding.ASCII.GetString(br.ReadBytes(nameLength));
