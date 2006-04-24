@@ -89,13 +89,15 @@ class window : Form
 		EventHandler mEdit = new EventHandler(mEditOnClick);
 		EventHandler mView = new EventHandler(mViewOnClick);
 		EventHandler mDecompress = new EventHandler(mDecompressOnClick);
+		EventHandler mCompress = new EventHandler(mCompressOnClick);
 		EventHandler mToggleDebug = new EventHandler(mToggleDebugOnClick);
 		EventHandler mAbout = new EventHandler(mAboutOnClick);
 		EventHandler mExit = new EventHandler(mExitOnClick);
 
 		//MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) ,
 		//					   new MenuItem("Show/Hide debug log", mToggleDebug) };
-		MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) };
+		MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress),
+							   new MenuItem("Compress Exe", mCompress) };
 		MenuItem[] ami =  { new MenuItem("No display settings", mDisplay),
 							new MenuItem("&Load", mLoad),
 							new MenuItem("&Save", mSave),
@@ -122,6 +124,7 @@ class window : Form
 		contents.ContextMenu.MenuItems[9].Enabled = false; //edit
 		contents.ContextMenu.MenuItems[10].Enabled = false; //view
 		contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = false; //decompress
+		contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = false; //compress
 
 		//double click edits item
 		contents.ItemActivate += mEdit;
@@ -149,6 +152,18 @@ class window : Form
 		{
 			string[] str = (string[]) e.Data.GetData(DataFormats.FileDrop);
 			LoadExe(str[0]);
+		}
+	}
+
+	private void updateAlternatingColours()
+	{
+		//alternate colours of items in contents listview
+		for (int i=0; i < contents.Items.Count; i++)
+		{
+			if (i % 2 == 0)
+				contents.Items[i].BackColor = Color.Wheat;
+			else
+				contents.Items[i].BackColor = Color.White;
 		}
 	}
 
@@ -193,6 +208,7 @@ class window : Form
 			//insert before first selected item
 			contents.Items.Insert(contents.SelectedItems[0].Index, lvi);
 		}
+		updateAlternatingColours();
 		//check for _virtual.dat
 		if (lvi.Text == "_virtual.dat")
 		{
@@ -241,6 +257,7 @@ class window : Form
 		{
 			contents.ContextMenu.MenuItems[2].Enabled = true; //save
 			contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
+			contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = true; //compress
 		}
 	}
 
@@ -255,6 +272,7 @@ class window : Form
 		{
 			//insert files
 			Cursor.Current = Cursors.WaitCursor;
+			contents.BeginUpdate();
 			string prefix, path;
 			if (iw.MediaPrefix == true)
 				prefix = "media\\";
@@ -267,17 +285,28 @@ class window : Form
 			{
 				InsertFile(path + str, prefix + str, false, false);
 			}
+			contents.EndUpdate();
 			Cursor.Current = Cursors.Default;
+		}
+		//enable menu items
+		if (contents.Items.Count > 0)
+		{
+			contents.ContextMenu.MenuItems[2].Enabled = true; //save
+			contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
+			contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = true; //compress
 		}
 	}
 
 	private void mRemoveOnClick(object sender, EventArgs e)
 	{
 		//remove selected items
+		contents.BeginUpdate();
 		foreach (ListViewFileItem lvi in contents.SelectedItems)
 		{
 			lvi.Remove();
 		}
+		updateAlternatingColours();
+		contents.EndUpdate();
 		//check for _virtual.dat and set display settings to - 1 if not found
 		bool found = false;
 		foreach (ListViewFileItem lvi in contents.Items)
@@ -294,10 +323,12 @@ class window : Form
 			contents.ContextMenu.MenuItems[0].Text = "No display settings";
 			contents.ContextMenu.MenuItems[0].Enabled = false;
 		}
-		//save menu item
+		//disable menu item
 		if (contents.Items.Count == 0)
 		{
-			contents.ContextMenu.MenuItems[2].Enabled = false;
+			contents.ContextMenu.MenuItems[2].Enabled = false; //save
+			contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = false; //decompress
+			contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = false; //compress
 		}
 	}
 
@@ -405,7 +436,7 @@ class window : Form
 
 	private void mDecompressOnClick(object sender, EventArgs e)
 	{
-		//decompress an exe
+		//decompress loaded exe
 		SaveFileDialog sfd = new SaveFileDialog();
 		sfd.Title = "Save decompressed exe as";
 		sfd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
@@ -430,6 +461,39 @@ class window : Form
 			if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
 				dbPro = true;
 			proExe.DecompressExe(contents, dbPro, this, exeName.Text, sfd.FileName);
+			Cursor.Current = Cursors.Default;
+		}
+		sfd.Dispose();
+	}
+
+	private void mCompressOnClick(object sender, EventArgs e)
+	{
+		//compress exe
+		//decompress loaded exe
+		SaveFileDialog sfd = new SaveFileDialog();
+		sfd.Title = "Save compressed exe as";
+		sfd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
+		//check for compress.dll to ensure exe is not compressed.
+		if (contents.Items.Count > 3 && contents.Items[1].Text.ToLower() == "compress.dll")
+		{
+			MessageBox.Show("Exe is already compressed.", "Error!",
+				MessageBoxButtons.OK, MessageBoxIcon.Error);
+			return;
+		}
+		if (sfd.ShowDialog() == DialogResult.OK)
+		{
+			//Make sure filenames don't match, this is really just to ensure there is a backup incase decompression fails
+			if (exeName.Text == sfd.FileName)
+			{
+				MessageBox.Show("Compressed exe filename and decompressed exe filename must be different.", "Error!",
+					MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			Cursor.Current = Cursors.WaitCursor;
+			bool dbPro = false;
+			if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
+				dbPro = true;
+			proExe.CompressExe(contents, dbPro, this, exeName.Text, sfd.FileName);
 			Cursor.Current = Cursors.Default;
 		}
 		sfd.Dispose();
@@ -463,6 +527,8 @@ class window : Form
 		exeName.Text = filename;
 		contents.ContextMenu.MenuItems[2].Enabled = true; //save
 		contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
+		contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = true; //compress
+		updateAlternatingColours();
 		contents.EndUpdate();
 		//work out exeType
 		foreach (ListViewFileItem lvi in contents.Items)

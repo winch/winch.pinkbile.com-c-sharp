@@ -45,6 +45,13 @@ class proExe
 		return name;
 	}
 
+	public static void CompressExe(ListView contents, bool dbPro, window win, string OldExe, string newExe)
+	{
+		//
+	}
+	[DllImport("decompress.dll", EntryPoint="compress")]
+	private static extern void CompressDll(string fileName, int exeSection, int dataOffset, string newExe, string compressDll);
+
 	public static void DecompressExe(ListView contents, bool dbPro, window win, string oldExe, string newExe)
 	{
 		FileStream fs = null;

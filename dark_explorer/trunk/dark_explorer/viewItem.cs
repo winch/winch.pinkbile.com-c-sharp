@@ -356,6 +356,7 @@ class viewItem : Form
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
 				br = new BinaryReader(fs);
+				fs.Seek(item.Offset, SeekOrigin.Current);
 			}
 			else
 			{

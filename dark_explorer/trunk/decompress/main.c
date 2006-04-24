@@ -7,18 +7,26 @@
     #define DLL_EXPORT
 #endif
 
-// a sample exported function
+//magic "extra data"
+char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                     0x4E, 0x61, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+void DLL_EXPORT compress(char *oldExeName, int exeSection, int dataOffset, char *newExeName, char *compressDll)
+{
+    //compress uncompressed dbpro exe
+}
+
 void DLL_EXPORT decompress(char *oldExeName, int exeSection, int dataOffset, char *newExeName, char *compressDll)
 {
+    // decompress compressed dbpro exe
     void* (*decomp)(void*, int);
-    FILE *oldExe = fopen(oldExeName, "rb");
-    FILE *newExe = fopen(newExeName, "wb");
-    HANDLE lib = LoadLibrary(compressDll);
+    FILE *oldExe = fopen(oldExeName, "rb"); //compressed exe
+    FILE *newExe = fopen(newExeName, "wb"); //uncompressed exe
+    HANDLE lib = LoadLibrary(compressDll);  //compress.dll from compressed exe
     SIZE_T decompSize;
     long time;
     float seconds;
-    char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                         0x4E, 0x61, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
     decomp = (void* (*)(void*, int)) GetProcAddress(lib, "decompress_block");
     void *buffer;
 
