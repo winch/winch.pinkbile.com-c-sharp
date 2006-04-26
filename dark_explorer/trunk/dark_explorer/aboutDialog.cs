@@ -23,15 +23,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 using System;
 using System.Text;
 using System.Net;
+using System.Windows;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Threading;
 
 class aboutDialog: Form
 {
-	string Version = "0.11";
-	string Date = "12 April 2006";
+	string Version = "0.12";
+	string Date = "XX April 2006";
 	string Ident = "dark_explorer";
 	int Build = 10;
+	Button btnUpdate;
+	ProgressBar progress;
 	public aboutDialog()
 	{
 		Text = "About";
@@ -40,7 +44,7 @@ class aboutDialog: Form
 		MaximizeBox   = false;
 		MinimizeBox   = false;
 		ShowInTaskbar = false;
-		Size = new Size(200,255);
+		Size = new Size(200,270);
 		StartPosition = FormStartPosition.CenterParent;
 
 		Label version = new Label();
@@ -78,28 +82,47 @@ class aboutDialog: Form
 		version.Text = "This program is free software and may be distributed according to the terms of the GNU GPL";
 		version.Location = new Point(20,100);
 
+		//progress bar
+		progress = new ProgressBar();
+		progress.Parent = this;
+		progress.Height = 15;
+		progress.Width = this.Width - 15;
+		progress.Location = new Point(5, 160);
+
 		//Ok button
 		Button	btn = new Button();
 		btn.Parent = this;
 		btn.Text = "&Ok";
-		btn.Location = new Point(50, 195);
+		btn.Location = new Point(50, 215);
 		btn.Width += 20;
 		btn.DialogResult = DialogResult.OK;
 		AcceptButton = btn;
 		CancelButton = btn;
 
 		//updates button
-		Button btnUpdate = new Button();
+		btnUpdate = new Button();
 		btnUpdate.Parent = this;
 		btnUpdate.Width += 40;
 		btnUpdate.Text = "Check for updates";
-		btnUpdate.Location = new Point(40, 160);
+		btnUpdate.Location = new Point(40, 185);
 		btnUpdate.Click += new EventHandler(btnUpdate_Click);
+
+		System.Windows.Forms.Timer updateTick = new System.Windows.Forms.Timer();
+		updateTick.Interval = 250;
+		updateTick.Tick += new EventHandler(updateTick_Tick);
+		updateTick.Start();
 	}
 
-	private void btnUpdate_Click(object sender, EventArgs e)
+	enum UpdateState
 	{
-		//update button
+		Stopped,
+		Canceled,
+		Running
+	}
+	UpdateState state = UpdateState.Stopped;
+
+	void UpdateCheck()
+	{
 		StringBuilder sb = new StringBuilder();
 		int result;
 		string url = "http://winch.pinkbile.com/update/" + Ident + ".php";
@@ -108,13 +131,30 @@ class aboutDialog: Form
 			HttpWebRequest r = (HttpWebRequest) WebRequest.Create(url);
 			HttpWebResponse wr = (HttpWebResponse) r.GetResponse();
 			byte[] buffer = new byte[10];
+			if (state == UpdateState.Canceled)
+			{
+				wr.Close();
+				state = UpdateState.Stopped;
+				return;
+			}
 			while (wr.GetResponseStream().Read(buffer, 0, buffer.Length) > 0)
 			{
+				if (state == UpdateState.Canceled)
+				{
+					wr.Close();
+					state = UpdateState.Stopped;
+					return;
+				}
 				sb.Append(Encoding.UTF8.GetString(buffer));
 			}
 		}
 		catch (Exception ex)
 		{
+			if (state == UpdateState.Canceled)
+			{
+				state = UpdateState.Stopped;
+				return;
+			}
 			string msg = ex.Message + "\n\nUpdate check failed";
 			MessageBox.Show(msg, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			return;
@@ -123,6 +163,7 @@ class aboutDialog: Form
 		if (result > Build)
 		{
 			//updates available
+			state = UpdateState.Stopped;
 			DialogResult dr = MessageBox.Show("There is a newer version available for download.\n\n Go to download page?", "Update",			MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 			if (dr == DialogResult.Yes)
 			{
@@ -139,7 +180,25 @@ class aboutDialog: Form
 		else
 		{
 			//no updates
+			state = UpdateState.Stopped;
 			MessageBox.Show("No updates available", "Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+		}
+	}
+
+	private void btnUpdate_Click(object sender, EventArgs e)
+	{
+		//update button
+		if (btnUpdate.Text == "Check for updates" && state == UpdateState.Stopped)
+		{
+			btnUpdate.Text = "Stop";
+			state = UpdateState.Running;
+			Thread update = new Thread(new ThreadStart(UpdateCheck));
+			update.Start();
+		}
+		else
+		{
+			btnUpdate.Text = "Check for updates";
+			state = UpdateState.Canceled;
 		}
 	}
 
@@ -158,5 +217,21 @@ class aboutDialog: Form
 	private void email_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 	{
 		System.Diagnostics.Process.Start("mailto:dbp@pinkbile.com");
+	}
+
+	private void updateTick_Tick(object sender, EventArgs e)
+	{
+		//show animation if update check in progress
+		switch (state)
+		{
+			case UpdateState.Running:
+					  progress.Increment(10);
+				if (progress.Value > 100)
+					progress.Value = 0;
+				break;
+			case UpdateState.Stopped:
+					  progress.Value = 0;
+				break;
+		}
 	}
 }
