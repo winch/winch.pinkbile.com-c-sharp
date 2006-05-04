@@ -90,7 +90,6 @@ class window : Form
 		EventHandler mView = new EventHandler(mViewOnClick);
 		EventHandler mDecompress = new EventHandler(mDecompressOnClick);
 		EventHandler mCompress = new EventHandler(mCompressOnClick);
-		EventHandler mToggleDebug = new EventHandler(mToggleDebugOnClick);
 		EventHandler mAbout = new EventHandler(mAboutOnClick);
 		EventHandler mExit = new EventHandler(mExitOnClick);
 
@@ -125,6 +124,7 @@ class window : Form
 		contents.ContextMenu.MenuItems[10].Enabled = false; //view
 		contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = false; //decompress
 		contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = false; //compress
+		this.ContextMenu = contents.ContextMenu;
 
 		//double click edits item
 		contents.ItemActivate += mEdit;
@@ -151,7 +151,10 @@ class window : Form
 		if (e.Data.GetDataPresent(DataFormats.FileDrop))
 		{
 			string[] str = (string[]) e.Data.GetData(DataFormats.FileDrop);
-			LoadExe(str[0]);
+			if (File.Exists(str[0]))
+			{
+				LoadExe(str[0]);
+			}
 		}
 	}
 
@@ -161,7 +164,7 @@ class window : Form
 		for (int i=0; i < contents.Items.Count; i++)
 		{
 			if (i % 2 == 0)
-				contents.Items[i].BackColor = Color.Wheat;
+				contents.Items[i].BackColor = Color.LightBlue;
 			else
 				contents.Items[i].BackColor = Color.White;
 		}
@@ -405,13 +408,14 @@ class window : Form
 		//edit selected items
 		foreach (ListViewFileItem lvi in contents.SelectedItems)
 		{
-			editItem ei = new editItem(lvi.Text, lvi.SubItems[1].Text, lvi.SubItems[2].Text, lvi.SubItems[3].Text);
+			editItem ei = new editItem(lvi.SubItems[(int)ListViewOrder.Name].Text, lvi.SubItems[(int)ListViewOrder.FileType].Text,
+									   lvi.SubItems[(int)ListViewOrder.Upx].Text, lvi.SubItems[(int)ListViewOrder.NullString].Text);
 			if (ei.ShowDialog() == DialogResult.OK)
 			{
-				lvi.Text = ei.FileName;
-				lvi.SubItems[1].Text = ei.Filetype;
-				lvi.SubItems[2].Text = ei.Upx;
-				lvi.SubItems[3].Text = ei.StringNull;
+				lvi.SubItems[(int)ListViewOrder.Name].Text = ei.FileName;
+				lvi.SubItems[(int)ListViewOrder.FileType].Text = ei.Filetype;
+				lvi.SubItems[(int)ListViewOrder.Upx].Text = ei.Upx;
+				lvi.SubItems[(int)ListViewOrder.NullString].Text = ei.StringNull;
 			}
 		}
 	}
@@ -426,12 +430,6 @@ class window : Form
 			vi.Item = lvi;
 			vi.ShowDialog();
 		}
-	}
-
-	private void mToggleDebugOnClick(object sender, EventArgs e)
-	{
-		//show/hide debug log
-		//debugLog.Toggle();
 	}
 
 	private void mDecompressOnClick(object sender, EventArgs e)
@@ -482,7 +480,7 @@ class window : Form
 		}
 		if (sfd.ShowDialog() == DialogResult.OK)
 		{
-			//Make sure filenames don't match, this is really just to ensure there is a backup incase decompression fails
+			//Make sure filenames don't match, this is really just to ensure there is a backup incase compression fails
 			if (exeName.Text == sfd.FileName)
 			{
 				MessageBox.Show("Compressed exe filename and decompressed exe filename must be different.", "Error!",

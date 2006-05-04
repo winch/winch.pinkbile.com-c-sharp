@@ -40,7 +40,7 @@ class proExe
 
 	public static string DbcAddNull(string name)
 	{
-		//adds null terminatio to name
+		//adds null termination to name
 		name = name + "\0";
 		return name;
 	}
@@ -145,7 +145,7 @@ class proExe
 		BinaryWriter bwOut = null;
 		try
 		{
-			if (lvi.SubItems[5].Text == "<exe>")
+			if (lvi.SubItems[(int)ListViewOrder.Location].Text == "<exe>")
 			{
 				//internal file
 				fsIn = new FileStream(exeName, FileMode.Open);
@@ -154,7 +154,7 @@ class proExe
 			else
 			{
 				//external file
-				fsIn = new FileStream(lvi.SubItems[5].Text, FileMode.Open);
+				fsIn = new FileStream(lvi.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
 				brIn = new BinaryReader(fsIn);
 			}
 			fsOut = new FileStream(outName, FileMode.Create);
@@ -210,7 +210,7 @@ class proExe
 			bwOut = new BinaryWriter(fsOut);
 			foreach (ListViewFileItem lvi in contents.Items)
 			{
-				if (lvi.SubItems[5].Text == "<exe>")
+				if (lvi.SubItems[(int)ListViewOrder.Location].Text == "<exe>")
 				{
 					//internal file
 					fsFile = fsExe;
@@ -219,13 +219,13 @@ class proExe
 				else
 				{
 					//external file
-					fsFile = new FileStream(lvi.SubItems[5].Text, FileMode.Open);
+					fsFile = new FileStream(lvi.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
 					brFile = new BinaryReader(fsFile);
 				}
 				//seek to data start
 				fsFile.Seek(lvi.Offset, SeekOrigin.Begin);
 				//name
-				if (lvi.SubItems[1].Text == "Yes")
+				if (lvi.SubItems[(int)ListViewOrder.FileType].Text == "Yes")
 				{
 					//is a normal file so write name and filedata length
 					name = DbcRemoveNull(lvi.Text);
@@ -236,7 +236,7 @@ class proExe
 				}
 				else
 				{
-					if (lvi.Text == "Exe section")
+					if (lvi.SubItems[(int)ListViewOrder.Name].Text == "Exe section")
 					{
 						exeSection = lvi.Size;
 					}
@@ -258,7 +258,8 @@ class proExe
 				else
 				{
 					//write data
-					if (lvi.SubItems[1].Text == "No" && lvi.Text == "Compressed or extra data")
+					if (lvi.SubItems[(int)ListViewOrder.FileType].Text == "No" &&
+						lvi.SubItems[(int)ListViewOrder.Name].Text == "Compressed or extra data")
 					{
 						//write exeSection size at end of extra data
 						bwOut.Write(brFile.ReadBytes(lvi.Size - 4));
@@ -269,7 +270,7 @@ class proExe
 						WriteData(fsFile, brFile, lvi, bwOut);
 					}
 				}
-				if (lvi.SubItems[5].Text != "<exe>")
+				if (lvi.SubItems[(int)ListViewOrder.Location].Text != "<exe>")
 				{
 					//close external file
 					brFile.Close();
@@ -440,19 +441,19 @@ class proExe
 	private static int WriteData(FileStream fsIn, BinaryReader brIn, ListViewFileItem lvi, BinaryWriter bwOut)
 	{
 		//writes filedata to file after modifing it if required (upx, string table null, etc)
-		if (lvi.SubItems[2].Text == "Yes")
+		if (lvi.SubItems[(int)ListViewOrder.Upx].Text == "Yes")
 		{
 			//upx
 			MessageBox.Show("Sorry Upx support is not done yet");
 			return 0;
 		}
-		else if (lvi.SubItems[3].Text == "Yes")
+		else if (lvi.SubItems[(int)ListViewOrder.NullString].Text == "Yes")
 		{
 			//str table null
 			MessageBox.Show("Sorry null string tables not done yet.");
 			return 0;
 		}
-		if (lvi.SubItems[1].Text == "Yes")
+		if (lvi.SubItems[(int)ListViewOrder.FileType].Text == "Yes")
 		{
 			//attached file so writedata size
 			bwOut.Write(lvi.Size);

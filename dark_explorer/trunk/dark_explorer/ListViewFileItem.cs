@@ -23,6 +23,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 using System.Windows.Forms;
 
+enum ListViewOrder
+{
+	//order of items in contents listview
+	Name = 0,
+	FileType = 1,
+	Upx = 2,
+	NullString = 3,
+	FileSize = 4,
+	Location = 5
+}
+
 class ListViewFileItem : ListViewItem
 {
 	int fileoffset;
