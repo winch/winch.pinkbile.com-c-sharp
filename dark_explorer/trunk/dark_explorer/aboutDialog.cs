@@ -231,6 +231,7 @@ class aboutDialog: Form
 				break;
 			case UpdateState.Stopped:
 					  progress.Value = 0;
+					  btnUpdate.Text = "Check for updates";
 				break;
 		}
 	}
