@@ -193,11 +193,12 @@ class window : Form
 		//insert file
 		FileInfo fi = new FileInfo(fileName);
 		ListViewFileItem lvi = new ListViewFileItem();
-		lvi.Text = name;
-		lvi.SubItems.Add("Yes");
-		lvi.SubItems.Add("No");
-		lvi.SubItems.Add("No");
-		lvi.SubItems.Add(fi.Length.ToString("n0"));
+		lvi.SubItems[(int)ListViewOrder.Name].Text = name;
+		lvi.SubItems[(int)ListViewOrder.FileType].Text = "Yes";
+		lvi.SubItems[(int)ListViewOrder.Upx].Text = "No";
+		lvi.SubItems[(int)ListViewOrder.NullString].Text = "No";
+		lvi.SubItems[(int)ListViewOrder.FileSize].Text = fi.Length.ToString("n0");
+		lvi.SubItems[(int)ListViewOrder.Location].Text = fileName;
 		lvi.Offset = 0;
 		lvi.Size = (int)fi.Length;
 		lvi.SubItems.Add(Path.GetFullPath(fileName));

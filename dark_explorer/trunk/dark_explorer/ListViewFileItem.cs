@@ -61,4 +61,11 @@ class ListViewFileItem : ListViewItem
 			filesize = value;
 		}
 	}
+	public ListViewFileItem()
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			this.SubItems.Add("");
+		}
+	}
 }

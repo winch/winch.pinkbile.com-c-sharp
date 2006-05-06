@@ -319,15 +319,15 @@ class proExe
 				SkipExeSection(fs, br);
 				//add exe to listview
 				lvi = new ListViewFileItem();
-				lvi.Text = "Exe section";
+				lvi.SubItems[(int)ListViewOrder.Name].Text = "Exe section";
 				lvi.Offset = 0;
 				lvi.Size = (int)fs.Position;
 				exeSectionSize = lvi.Size;
-				lvi.SubItems.Add("No");
-				lvi.SubItems.Add("No");
-				lvi.SubItems.Add("No");
-				lvi.SubItems.Add(lvi.Size.ToString("n0"));
-				lvi.SubItems.Add("<exe>");
+				lvi.SubItems[(int)ListViewOrder.FileType].Text = "No";
+				lvi.SubItems[(int)ListViewOrder.Upx].Text = "No";
+				lvi.SubItems[(int)ListViewOrder.NullString].Text = "No";
+				lvi.SubItems[(int)ListViewOrder.FileSize].Text = lvi.Size.ToString("n0");
+				lvi.SubItems[(int)ListViewOrder.Location].Text = "<exe>";
 				contents.Items.Add(lvi);
 				//debugLog.Log("Exe section size = " + lvi.Size.ToString("n0"));
 				//Check for exe with no attached data
@@ -353,13 +353,13 @@ class proExe
 				if (nameLength > 0 && nameLength < 500)
 				{
 					//file
-					lvi.Text = Encoding.ASCII.GetString(br.ReadBytes(nameLength));
+					lvi.SubItems[(int)ListViewOrder.Name].Text = Encoding.ASCII.GetString(br.ReadBytes(nameLength));
 					lvi.Size = br.ReadInt32();
 					lvi.Offset = (int)fs.Position;
 					//debugLog.Log(DbcRemoveNull(lvi.Text).PadRight(26, ' ') + " Size :" + lvi.Size.ToString("n0").PadRight(10, ' ') +
 					//			 " Offset :" + lvi.Offset.ToString("n0"));
 					//check for _virtual.dat
-					if (lvi.Text == "_virtual.dat")
+					if (lvi.SubItems[(int)ListViewOrder.Name].Text == "_virtual.dat")
 					{
 						//get display settings
 						win.displayMode = br.ReadInt32();
@@ -374,23 +374,23 @@ class proExe
 						fs.Seek(-16, SeekOrigin.Current);
 					}
 					fs.Seek(lvi.Size, SeekOrigin.Current);
-					lvi.SubItems.Add("Yes");
-					lvi.SubItems.Add("No");
-					lvi.SubItems.Add("No");
-					lvi.SubItems.Add(lvi.Size.ToString("n0"));
-					lvi.SubItems.Add("<exe>");
+					lvi.SubItems[(int)ListViewOrder.FileType].Text = "Yes";
+					lvi.SubItems[(int)ListViewOrder.Upx].Text = "No";
+					lvi.SubItems[(int)ListViewOrder.NullString].Text = "No";
+					lvi.SubItems[(int)ListViewOrder.FileSize].Text = lvi.Size.ToString("n0");
+					lvi.SubItems[(int)ListViewOrder.Location].Text = "<exe>";
 				}
 				else
 				{
 					//compressed or extra data
-					lvi.Text = "Compressed or extra data";
+					lvi.SubItems[(int)ListViewOrder.Name].Text = "Compressed or extra data";
 					lvi.Offset = (int)fs.Position - 4;
 					lvi.Size = (int)(fs.Length - (fs.Position - 4));
-					lvi.SubItems.Add("No");
-					lvi.SubItems.Add("No");
-					lvi.SubItems.Add("No");
-					lvi.SubItems.Add(lvi.Size.ToString("n0"));
-					lvi.SubItems.Add("<exe>");
+					lvi.SubItems[(int)ListViewOrder.FileType].Text = "No";
+					lvi.SubItems[(int)ListViewOrder.Upx].Text = "No";
+					lvi.SubItems[(int)ListViewOrder.NullString].Text = "No";
+					lvi.SubItems[(int)ListViewOrder.FileSize].Text = lvi.Size.ToString("n0");
+					lvi.SubItems[(int)ListViewOrder.Location].Text = "<exe>";
 					fs.Seek(-4, SeekOrigin.End);
 					extraDataSize = br.ReadInt32();
 					//debugLog.Log("Extra data size :" + lvi.Size.ToString("n0") + " reported exe section size :" +
