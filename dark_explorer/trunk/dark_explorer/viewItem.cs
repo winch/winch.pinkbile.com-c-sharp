@@ -117,7 +117,6 @@ class viewItem : Form
 		Cursor.Current = Cursors.WaitCursor;
 		guessFileType();
 		getFileSize();
-		showItem();
 		this.Text += " (" + proExe.DbcRemoveNull(item.SubItems[0].Text) + ")";
 		Cursor.Current = Cursors.Default;
 	}
