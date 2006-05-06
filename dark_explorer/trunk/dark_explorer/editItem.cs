@@ -43,9 +43,9 @@ class editItem : Form
 		get
 		{
 			if (type.SelectedIndex == 0)
-				return "Yes";
+				return ListViewStrings.Yes;
 			if (type.SelectedIndex == 1)
-				return "No";
+				return ListViewStrings.No;
 			return "";
 		}
 	}
@@ -54,9 +54,9 @@ class editItem : Form
 		get
 		{
 			if (upx.Checked)
-				return "Yes";
+				return ListViewStrings.Yes;
 			else
-				return "No";
+				return ListViewStrings.No;
 		}
 	}
 	public string StringNull
@@ -64,9 +64,9 @@ class editItem : Form
 		get
 		{
 			if (str.Checked)
-				return "Yes";
+				return ListViewStrings.Yes;
 			else
-				return "No";
+				return ListViewStrings.No;
 		}
 	}
 
@@ -121,7 +121,7 @@ class editItem : Form
 		type.Location = new Point(150,40);
 		type.Items.Add("Attached file");
 		type.Items.Add("Special file");
-		if (file == "Yes")
+		if (file == ListViewStrings.Yes)
 			type.SelectedIndex = 0;
 		else
 			type.SelectedIndex = 1;
@@ -132,7 +132,7 @@ class editItem : Form
 		upx.Text = "Compress with upx";
 		upx.Location = new Point(10, 70);
 		upx.Width += 25;
-		if (useUpx == "Yes")
+		if (useUpx == ListViewStrings.Yes)
 			upx.Checked = true;
 
 		//str null checkbox
@@ -140,7 +140,7 @@ class editItem : Form
 		str.Parent = this;
 		str.Text = "Null string table";
 		str.Location = new Point(150 ,70);
-		if (nullStrings == "Yes")
+		if (nullStrings == ListViewStrings.Yes)
 			str.Checked = true;
 	}
 

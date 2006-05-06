@@ -194,9 +194,9 @@ class window : Form
 		FileInfo fi = new FileInfo(fileName);
 		ListViewFileItem lvi = new ListViewFileItem();
 		lvi.SubItems[(int)ListViewOrder.Name].Text = name;
-		lvi.SubItems[(int)ListViewOrder.FileType].Text = "Yes";
-		lvi.SubItems[(int)ListViewOrder.Upx].Text = "No";
-		lvi.SubItems[(int)ListViewOrder.NullString].Text = "No";
+		lvi.SubItems[(int)ListViewOrder.FileType].Text = ListViewStrings.Yes;
+		lvi.SubItems[(int)ListViewOrder.Upx].Text = ListViewStrings.No;
+		lvi.SubItems[(int)ListViewOrder.NullString].Text = ListViewStrings.No;
 		lvi.SubItems[(int)ListViewOrder.FileSize].Text = fi.Length.ToString("n0");
 		lvi.SubItems[(int)ListViewOrder.Location].Text = fileName;
 		lvi.Offset = 0;
@@ -532,7 +532,7 @@ class window : Form
 		//work out exeType
 		foreach (ListViewFileItem lvi in contents.Items)
 		{
-			if (lvi.SubItems[1].Text == "Yes")
+			if (lvi.SubItems[1].Text == ListViewStrings.Yes)
 			{
 				//attached file
 				if (lvi.Text.EndsWith("\0"))

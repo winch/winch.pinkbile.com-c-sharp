@@ -70,7 +70,7 @@ class viewItem : Form
 		itemType.Location = new Point(this.Width - itemType.Width - 15, 10);
 		itemType.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 		itemType.Items.Add("_virtual.dat");
-		itemType.Items.Add("Compressed or extra data");
+		itemType.Items.Add(ListViewStrings.ExtraData);
 		itemType.Items.Add("dll");
 		itemType.Items.Add("Text");
 		itemType.Items.Add("Image");
@@ -148,7 +148,7 @@ class viewItem : Form
 			textBox.Visible = true;
 			showVirtualDat();
 		}
-		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Compressed or extra data"))
+		else if (itemType.SelectedIndex == itemType.Items.IndexOf(ListViewStrings.ExtraData))
 		{
 			//_virtual.dat
 			textBox.Visible = true;
@@ -175,7 +175,7 @@ class viewItem : Form
 		listBox.BeginUpdate();
 		try
 		{
-			if (item.SubItems[5].Text == "<exe>")
+			if (item.SubItems[5].Text ==ListViewStrings.LocationExe)
 			{
 				//internal file
 				fileName = Path.GetTempFileName();
@@ -242,7 +242,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == "<exe>")
+			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -278,7 +278,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == "<exe>")
+			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -350,7 +350,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == "<exe>")
+			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -385,7 +385,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == "<exe>")
+			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -420,7 +420,7 @@ class viewItem : Form
 		FileStream fs = null;
 		try
 		{
-			if (item.SubItems[5].Text == "<exe>")
+			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				byte[] buffer = new byte[item.Size];
@@ -482,8 +482,8 @@ class viewItem : Form
 				itemType.SelectedIndex = itemType.Items.IndexOf("Image");
 				break;
 			default:
-				if (item.SubItems[0].Text == "Compressed or extra data")
-					itemType.SelectedIndex = itemType.Items.IndexOf("Compressed or extra data");
+				if (item.SubItems[0].Text == ListViewStrings.ExtraData)
+					itemType.SelectedIndex = itemType.Items.IndexOf(ListViewStrings.ExtraData);
 				else
 					itemType.SelectedIndex = itemType.Items.IndexOf("Hex");
 				break;

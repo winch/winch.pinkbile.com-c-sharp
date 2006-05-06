@@ -23,6 +23,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 using System.Windows.Forms;
 
+class ListViewStrings
+{
+	public static readonly string Yes = "Yes";
+	public static readonly string No  = "No";
+	public static readonly string LocationExe = "<exe>";
+	public static readonly string ExeSection = "Exe section";
+	public static readonly string ExtraData = "Compressed or extra data";
+}
+
 enum ListViewOrder
 {
 	//order of items in contents listview
