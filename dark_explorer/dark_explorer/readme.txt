@@ -2,7 +2,7 @@ dark explorer
 +++++++++++++
 A darkbasic professional, fps creator and darkbasic classic exe explorer
 
-Requires .Net framework to run
+Requires .Net framework v1.1 to run
 
 Usage
 +++++
@@ -13,7 +13,6 @@ Todo
 ++++
 
 Compress with upx and null string tables do not yet work.
-Exe compression to match decompression.
 
 Adding media
 ++++++++++++

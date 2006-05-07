@@ -1,6 +1,12 @@
 Version history
 +++++++++++++++
 
+v0.12 07 May 2006
+- Can now compress exes using a user selected compress.dll
+- Fix bug causing show item dialog to load item twice on initial display
+- Increase maximum lenght of filename in exe from 50 to 500
+- misc source code cleanups.
+
 v0.11 12 April 2006
 - insert * dialog for inserting many files at once. Files can be filterd with a regex
 - minor gui fixes
