@@ -117,7 +117,7 @@ class viewItem : Form
 		Cursor.Current = Cursors.WaitCursor;
 		guessFileType();
 		getFileSize();
-		this.Text += " (" + proExe.DbcRemoveNull(item.SubItems[0].Text) + ")";
+		this.Text += " (" + proExe.DbcRemoveNull(item.SubItems[(int)ListViewOrder.Name].Text) + ")";
 		Cursor.Current = Cursors.Default;
 	}
 
@@ -175,7 +175,7 @@ class viewItem : Form
 		listBox.BeginUpdate();
 		try
 		{
-			if (item.SubItems[5].Text ==ListViewStrings.LocationExe)
+			if (item.SubItems[(int)ListViewOrder.Location].Text ==ListViewStrings.LocationExe)
 			{
 				//internal file
 				fileName = Path.GetTempFileName();
@@ -192,7 +192,7 @@ class viewItem : Form
 			else
 			{
 				//external file
-				hinst = LoadLibrary(item.SubItems[5].Text);
+				hinst = LoadLibrary(item.SubItems[(int)ListViewOrder.Location].Text);
 			}
 			if (hinst != 0)
 			{
@@ -242,7 +242,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
+			if (item.SubItems[(int)ListViewOrder.Location].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -252,7 +252,7 @@ class viewItem : Form
 			else
 			{
 				//external file
-				fs = new FileStream(item.SubItems[5].Text, FileMode.Open);
+				fs = new FileStream(item.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
 				br = new BinaryReader(fs);
 				fs.Seek(fs.Length - 4, SeekOrigin.Begin);
 			}
@@ -278,7 +278,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
+			if (item.SubItems[(int)ListViewOrder.Location].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -288,7 +288,7 @@ class viewItem : Form
 			else
 			{
 				//external file
-				fs = new FileStream(item.SubItems[5].Text, FileMode.Open);
+				fs = new FileStream(item.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
 				br = new BinaryReader(fs);
 			}
 			textBox.Text = "";
@@ -350,7 +350,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
+			if (item.SubItems[(int)ListViewOrder.Location].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -360,7 +360,7 @@ class viewItem : Form
 			else
 			{
 				//external file
-				fs = new FileStream(item.SubItems[5].Text, FileMode.Open);
+				fs = new FileStream(item.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
 				br = new BinaryReader(fs);
 			}
 			textBox.Text = "Not done yet.";
@@ -385,7 +385,7 @@ class viewItem : Form
 		BinaryReader br = null;
 		try
 		{
-			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
+			if (item.SubItems[(int)ListViewOrder.Location].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
@@ -396,7 +396,7 @@ class viewItem : Form
 			else
 			{
 				//external file
-				fs = new FileStream(item.SubItems[5].Text, FileMode.Open);
+				fs = new FileStream(item.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
 				br = new BinaryReader(fs);
 				textBox.Text = Encoding.UTF8.GetString(br.ReadBytes((int)fs.Length));
 			}
@@ -420,7 +420,7 @@ class viewItem : Form
 		FileStream fs = null;
 		try
 		{
-			if (item.SubItems[5].Text == ListViewStrings.LocationExe)
+			if (item.SubItems[(int)ListViewOrder.Location].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				byte[] buffer = new byte[item.Size];
@@ -434,7 +434,7 @@ class viewItem : Form
 			else
 			{
 				//external file
-				fs = new FileStream(item.SubItems[5].Text, FileMode.Open);
+				fs = new FileStream(item.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
 				pictureBox.Image = Image.FromStream(fs);
 			}
 		}
@@ -458,7 +458,7 @@ class viewItem : Form
 	private void guessFileType()
 	{
 		//guess the type of item from filename extension
-		switch (Path.GetExtension(proExe.DbcRemoveNull(item.SubItems[0].Text)).ToLower())
+		switch (Path.GetExtension(proExe.DbcRemoveNull(item.SubItems[(int)ListViewOrder.Name].Text)).ToLower())
 		{
 			case ".dll":
 				itemType.SelectedIndex = itemType.Items.IndexOf("dll");
@@ -468,7 +468,7 @@ class viewItem : Form
 				itemType.SelectedIndex = itemType.Items.IndexOf("Text");
 				break;
 			case ".dat":
-				if (item.SubItems[0].Text == "_virtual.dat")
+				if (item.SubItems[(int)ListViewOrder.Name].Text == "_virtual.dat")
 					itemType.SelectedIndex = itemType.Items.IndexOf("_virtual.dat");
 				else
 					itemType.SelectedIndex = itemType.Items.IndexOf("Hex");
@@ -482,7 +482,7 @@ class viewItem : Form
 				itemType.SelectedIndex = itemType.Items.IndexOf("Image");
 				break;
 			default:
-				if (item.SubItems[0].Text == ListViewStrings.ExtraData)
+				if (item.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.ExtraData)
 					itemType.SelectedIndex = itemType.Items.IndexOf(ListViewStrings.ExtraData);
 				else
 					itemType.SelectedIndex = itemType.Items.IndexOf("Hex");

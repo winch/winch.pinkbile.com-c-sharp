@@ -28,7 +28,6 @@ using System.Runtime.InteropServices;
 
 class proExe
 {
-
 	public static string DbcRemoveNull(string name)
 	{
 		//filenames in dbc exes have a null terminator

@@ -347,10 +347,10 @@ class window : Form
 			{
 				Cursor.Current = Cursors.WaitCursor;
 				FileInfo fi = new FileInfo(ofd.FileName);
-				lvi.SubItems[4].Text = fi.Length.ToString("n0");
+				lvi.SubItems[(int)ListViewOrder.FileSize].Text = fi.Length.ToString("n0");
 				lvi.Offset = 0;
 				lvi.Size = (int)fi.Length;
-				lvi.SubItems[5].Text = Path.GetFullPath(ofd.FileName);
+				lvi.SubItems[(int)ListViewOrder.Location].Text = Path.GetFullPath(ofd.FileName);
 				//check for _virtual.dat
 				if (lvi.Text == "_virtual.dat")
 				{
@@ -538,7 +538,7 @@ class window : Form
 		//work out exeType
 		foreach (ListViewFileItem lvi in contents.Items)
 		{
-			if (lvi.SubItems[1].Text == ListViewStrings.Yes)
+			if (lvi.SubItems[(int)ListViewOrder.FileType].Text == ListViewStrings.Yes)
 			{
 				//attached file
 				if (lvi.Text.EndsWith("\0"))
