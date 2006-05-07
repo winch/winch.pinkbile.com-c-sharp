@@ -1,3 +1,3 @@
 @echo off
-upx -9 compress.dll
+upx --brute compress.dll
 move compress.dll compress.dat

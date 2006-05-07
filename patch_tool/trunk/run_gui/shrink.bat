@@ -1,3 +1,3 @@
 @echo off
-upx.exe -9 patcher.exe
+upx.exe --brute patcher.exe
 move patcher.exe patcher.dat
