@@ -45,12 +45,51 @@ class proExe
 		return name;
 	}
 
-	public static void CompressExe(ListView contents, bool dbPro, window win, string OldExe, string newExe)
+	public static void CompressExe(ListView contents, bool dbPro, window win, string oldExe, string newExe, string compressDll)
 	{
-		//
+		FileStream fs = null;
+		BinaryReader br = null;
+		int exeSection = 0, extraData = 0;
+		string tempExe = Path.GetTempFileName();
+		//save exe
+		SaveExe(contents, tempExe, oldExe, dbPro, win);
+		try
+		{
+			fs = new FileStream(tempExe, FileMode.Open);
+			br = new BinaryReader(fs);
+			SkipExeSection(fs, br);
+			exeSection = (int)fs.Position;
+			//get size of extra data
+			if (contents.Items[contents.Items.Count - 1].SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.ExtraData)
+			{
+				ListViewFileItem lvi = (ListViewFileItem)contents.Items[contents.Items.Count - 1];
+				extraData = lvi.Size;
+			}
+		}
+		catch (Exception ex)
+		{
+			MessageBox.Show(ex.ToString(), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+		}
+		finally
+		{
+			if (br != null)
+				br.Close();
+			if (fs != null)
+				fs.Close();
+		}
+		try
+		{
+			CompressDll(oldExe, exeSection, extraData, newExe, compressDll);
+		}
+		catch(Exception ex)
+		{
+			MessageBox.Show(ex.ToString(), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);			
+		}
+		if (File.Exists(tempExe))
+			File.Delete(tempExe);
 	}
-	[DllImport("decompress.dll", EntryPoint="compress")]
-	private static extern void CompressDll(string fileName, int exeSection, int dataOffset, string newExe, string compressDll);
+	[DllImport("comp.dll", EntryPoint="compress")]
+	private static extern void CompressDll(string fileName, int exeSection, int extraData, string newExe, string compressDll);
 
 	public static void DecompressExe(ListView contents, bool dbPro, window win, string oldExe, string newExe)
 	{
@@ -76,7 +115,7 @@ class proExe
 			fsDll = new FileStream(compressDll, FileMode.Create);
 			bwDll = new BinaryWriter(fsDll);
 			bwDll.Write(br.ReadBytes(dataLength));
-			dataOffset = (int)fs.Position;
+			dataOffset = (int)fs.Position; //start of compressed data
 		}
 		catch (Exception ex)
 		{
@@ -106,7 +145,7 @@ class proExe
 		if (File.Exists(tempExe))
 			File.Delete(tempExe);
 	}
-	[DllImport("decompress.dll", EntryPoint="decompress")]
+	[DllImport("comp.dll", EntryPoint="decompress")]
 	private static extern void DecompressDll(string fileName, int exeSection, int dataOffset, string newExe, string compressDll);
 
 	private static void SkipExeSection(FileStream fs, BinaryReader br)

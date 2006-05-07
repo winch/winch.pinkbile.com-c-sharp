@@ -472,6 +472,9 @@ class window : Form
 		SaveFileDialog sfd = new SaveFileDialog();
 		sfd.Title = "Save compressed exe as";
 		sfd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
+		OpenFileDialog ofd = new OpenFileDialog();
+		ofd.Title = "Select compress.dll";
+		ofd.Filter = "compress.dll|compress.dll|Dll Files (*.dll)|*.dll|All Files (*.*)|*.*";
 		//check for compress.dll to ensure exe is not compressed.
 		if (contents.Items.Count > 3 && contents.Items[1].Text.ToLower() == "compress.dll")
 		{
@@ -488,12 +491,15 @@ class window : Form
 					MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			Cursor.Current = Cursors.WaitCursor;
-			bool dbPro = false;
-			if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
-				dbPro = true;
-			proExe.CompressExe(contents, dbPro, this, exeName.Text, sfd.FileName);
-			Cursor.Current = Cursors.Default;
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				Cursor.Current = Cursors.WaitCursor;
+				bool dbPro = false;
+				if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
+					dbPro = true;
+				proExe.CompressExe(contents, dbPro, this, exeName.Text, sfd.FileName, ofd.FileName);
+				Cursor.Current = Cursors.Default;
+			}
 		}
 		sfd.Dispose();
 	}
