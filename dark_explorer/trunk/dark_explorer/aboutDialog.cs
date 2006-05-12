@@ -30,8 +30,8 @@ using System.Threading;
 
 class aboutDialog: Form
 {
-	string Version = "0.12";
-	string Date = "07 May 2006";
+	string Version = "0.13";
+	string Date = "xx May 2006";
 	string Ident = "dark_explorer";
 	int Build = 11;
 	Button btnUpdate;

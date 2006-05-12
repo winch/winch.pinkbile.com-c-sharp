@@ -24,6 +24,7 @@ using System;
 using System.Windows.Forms;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 class proExe
@@ -272,13 +273,6 @@ class proExe
 					bwOut.Write(name.Length);
 					bwOut.Write(Encoding.ASCII.GetBytes(name));
 				}
-				else
-				{
-					if (lvi.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.ExeSection)
-					{
-						exeSection = lvi.Size;
-					}
-				}
 				//check for _virtual.dat
 				if (lvi.Text == "_virtual.dat")
 				{
@@ -295,17 +289,23 @@ class proExe
 				}
 				else
 				{
-					//write data
+					//not _virtual.dat
 					if (lvi.SubItems[(int)ListViewOrder.FileType].Text == ListViewStrings.No &&
 						lvi.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.ExtraData)
 					{
-						//write exeSection size at end of extra data
+						//extra data so write exeSection size at end of extra data
 						bwOut.Write(brFile.ReadBytes(lvi.Size - 4));
 						bwOut.Write(exeSection);
 					}
 					else
 					{
-						WriteData(fsFile, brFile, lvi, bwOut);
+						//not _virtual.dat or extra data
+						int written = WriteData(fsFile, brFile, lvi, bwOut);
+						if (lvi.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.ExeSection)
+						{
+							//set exeSection size if it was written
+							exeSection = written;
+						}
 					}
 				}
 				if (lvi.SubItems[(int)ListViewOrder.Location].Text != ListViewStrings.LocationExe)
@@ -479,24 +479,95 @@ class proExe
 	private static int WriteData(FileStream fsIn, BinaryReader brIn, ListViewFileItem lvi, BinaryWriter bwOut)
 	{
 		//writes filedata to file after modifing it if required (upx, string table null, etc)
-		if (lvi.SubItems[(int)ListViewOrder.Upx].Text == ListViewStrings.Yes)
+		string tempFile;
+		FileStream fsTemp = null;
+		BinaryWriter bwTemp = null;
+		BinaryReader brTemp = null;
+		if (lvi.SubItems[(int)ListViewOrder.Upx].Text == ListViewStrings.Yes ||
+			lvi.SubItems[(int)ListViewOrder.NullString].Text == ListViewStrings.Yes)
 		{
-			//upx
-			MessageBox.Show("Sorry Upx support is not done yet");
-			return 0;
+			//upx or null string table
+			if (lvi.SubItems[(int)ListViewOrder.Upx].Text == ListViewStrings.Yes)
+			{
+				//check for upx.exe
+				if (File.Exists(Application.StartupPath + Path.DirectorySeparatorChar + "upx.exe") == false)
+				{
+					MessageBox.Show("upx.exe not found in program directory.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return 0;
+				}
+			}
+			tempFile = Path.GetTempFileName();
+			try
+			{
+				//write temp file
+				fsTemp = new FileStream(tempFile, FileMode.Create);
+				bwTemp = new BinaryWriter(fsTemp);
+				bwTemp.Write(brIn.ReadBytes(lvi.Size));
+				bwTemp.Close();
+				bwTemp = null;
+				fsTemp.Close();
+				fsTemp = null;
+				if (lvi.SubItems[(int)ListViewOrder.Upx].Text == ListViewStrings.Yes)
+				{
+					//compress with upx
+					Process upx = new Process();
+					upx.StartInfo.CreateNoWindow = true;
+					upx.StartInfo.UseShellExecute = false;
+					upx.StartInfo.RedirectStandardOutput = true;
+					upx.StartInfo.RedirectStandardError = true;
+					upx.StartInfo.FileName = Application.StartupPath + Path.DirectorySeparatorChar + "upx.exe";
+					upx.StartInfo.Arguments = tempFile;
+					upx.Start();
+					upx.WaitForExit();
+					if (upx.StandardOutput.ReadToEnd().IndexOf("Packed 1 file.") == -1)
+					{
+						//upx failed
+						if (MessageBox.Show("Upx failed to compress " + lvi.SubItems[(int)ListViewOrder.Name].Text + "\n See upx error?",
+							"Error!", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+						{
+							//show upx output
+							MessageBox.Show(upx.StandardError.ReadToEnd());
+						}
+					}
+				}
+				else if(lvi.SubItems[(int)ListViewOrder.NullString].Text == ListViewStrings.Yes)
+				{
+					//null string table
+				}
+				//write modified file
+				fsTemp = new FileStream(tempFile, FileMode.Open);
+				brTemp = new BinaryReader(fsTemp);
+				if (lvi.SubItems[(int)ListViewOrder.FileType].Text == ListViewStrings.Yes)
+				{
+					//attached file so writedata size
+					bwOut.Write((int)fsTemp.Length);
+				}
+				bwOut.Write(brTemp.ReadBytes((int)fsTemp.Length));
+				return (int)fsTemp.Length;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.ToString(), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+			finally
+			{
+				if (bwTemp != null)
+					bwTemp.Close();
+				if (brTemp != null)
+					brTemp.Close();
+				if (fsTemp != null)
+					fsTemp.Close();
+				if (File.Exists(tempFile))
+					File.Delete(tempFile);
+			}
 		}
-		else if (lvi.SubItems[(int)ListViewOrder.NullString].Text == ListViewStrings.Yes)
-		{
-			//str table null
-			MessageBox.Show("Sorry null string tables not done yet.");
-			return 0;
-		}
+		//unmodified file data 
 		if (lvi.SubItems[(int)ListViewOrder.FileType].Text == ListViewStrings.Yes)
 		{
 			//attached file so writedata size
 			bwOut.Write(lvi.Size);
 		}
-		//data
+		//write data
 		fsIn.Seek(lvi.Offset, SeekOrigin.Begin);
 		bwOut.Write(brIn.ReadBytes(lvi.Size));
 		//return ammount of data written
