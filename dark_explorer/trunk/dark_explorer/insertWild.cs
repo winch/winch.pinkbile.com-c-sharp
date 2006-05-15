@@ -83,6 +83,15 @@ class insertWild: Form
 
 		this.Resize += new EventHandler(insertWild_Resize);
 
+		//filtered contextmenu
+		EventHandler mAll = new EventHandler(mAllOnClick);
+		EventHandler mNone = new EventHandler(mNoneOnClick);
+		EventHandler mInvert = new EventHandler(mInvertOnClick);
+
+		MenuItem[] ami = {new MenuItem("Select &All", mAll),
+						  new MenuItem("Select &None", mNone),
+						  new MenuItem("&Invert Selection", mInvert)};
+
 		//directory
 		gb = new GroupBox();
 		gb.Parent = this;
@@ -136,6 +145,7 @@ class insertWild: Form
 		filtered.Location = new Point(10, 15);
 		filtered.Size = new Size(gbFiltered.Width - 20, gbFiltered.Height - 25);
 		filtered.Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Left | AnchorStyles.Bottom;
+		filtered.ContextMenu = new ContextMenu(ami);
 		y += gbFiltered.Height + 5;
 
 		//filter
@@ -192,6 +202,32 @@ class insertWild: Form
 		gbFiles.Width = (this.Width / 2) - 20;
 		gbFiltered.Width = gbFiles.Width;
 		gbFiltered.Left = this.Width / 2;
+	}
+
+	private void mAllOnClick(object sender, EventArgs e)
+	{
+		//select all filtered files
+		for(int i = 0; i < filtered.Items.Count; i++)
+			filtered.SetSelected(i, true);
+	}
+
+	private void mNoneOnClick(object sender, EventArgs e)
+	{
+		//select no filtered files
+		for(int i = 0; i < filtered.Items.Count; i++)
+			filtered.SetSelected(i, false);
+	}
+
+	private void mInvertOnClick(object sender, EventArgs e)
+	{
+		//invert filterd files selection
+		for(int i = 0; i < filtered.Items.Count; i++)
+		{
+			if (filtered.SelectedIndices.Contains(i))
+                filtered.SetSelected(i, false);
+			else
+				filtered.SetSelected(i, true);
+		}
 	}
 
 	private void getFileList(string dir, bool recurse)
