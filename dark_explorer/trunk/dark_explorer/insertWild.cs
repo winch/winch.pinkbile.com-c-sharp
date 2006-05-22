@@ -193,7 +193,7 @@ class insertWild: Form
 		mediaPrefix.Width = 160;
 		mediaPrefix.Checked = dbPro;
 		mediaPrefix.Location = new Point(5, y);
-		mediaPrefix.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+		mediaPrefix.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
 	}
 
 	private void insertWild_Resize(object sender, EventArgs e)
