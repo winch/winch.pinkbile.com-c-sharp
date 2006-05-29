@@ -40,6 +40,24 @@ class window : Form
 	public int displayDepth = -1;
 	public int displayMode = -1;
 
+	//position of menu items in contents context menu
+	public const int MENU_DISPLAY = 0;
+	private const int MENU_LOAD = 1;
+	private const int MENU_SAVE = 2;
+	private const int MENU_INSERT = 4;
+	private const int MENU_INSERTWILD = 5;
+	private const int MENU_REMOVE = 6;
+	private const int MENU_REPLACE = 7;
+	private const int MENU_EXTRACT = 8;
+	private const int MENU_EDIT = 9;
+	private const int MENU_EDITWILD = 10;
+	private const int MENU_VIEW = 11;
+	private const int MENU_TOOLS = 13;
+	private const int MENU_DECOMPRESS = 0;
+	private const int MENU_COMPRESS = 1;
+	private const int MENU_ABOUT = 14;
+	private const int MENU_EXIT = 15;
+
 	public static void Main()
 	{
 		Application.Run(new window());
@@ -87,6 +105,7 @@ class window : Form
 		EventHandler mReplace  = new EventHandler(mReplaceOnClick);
 		EventHandler mExtract = new EventHandler(mExtractOnClick);
 		EventHandler mEdit = new EventHandler(mEditOnClick);
+		EventHandler mEditWild = new EventHandler(mEditWildOnClick);
 		EventHandler mView = new EventHandler(mViewOnClick);
 		EventHandler mDecompress = new EventHandler(mDecompressOnClick);
 		EventHandler mCompress = new EventHandler(mCompressOnClick);
@@ -107,6 +126,7 @@ class window : Form
 						    new MenuItem("Rep&lace", mReplace),
 							new MenuItem("&Extract", mExtract),
 							new MenuItem("E&dit", mEdit),
+						    new MenuItem("Edit *", mEditWild),
 						    new MenuItem("&View", mView),
 						    new MenuItem("-"),
 							new MenuItem("&Tools", amiTools),
@@ -115,19 +135,21 @@ class window : Form
 							new MenuItem("E&xit", mExit)
 						  };
 		contents.ContextMenu = new ContextMenu(ami);
-		contents.ContextMenu.MenuItems[0].Enabled = false; //Display
-		contents.ContextMenu.MenuItems[2].Enabled = false; //save
-		contents.ContextMenu.MenuItems[6].Enabled = false; //remove
-		contents.ContextMenu.MenuItems[7].Enabled = false; //replace
-		contents.ContextMenu.MenuItems[8].Enabled = false; //extract
-		contents.ContextMenu.MenuItems[9].Enabled = false; //edit
-		contents.ContextMenu.MenuItems[10].Enabled = false; //view
-		contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = false; //decompress
-		contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = false; //compress
+		contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_SAVE].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_REMOVE].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_REPLACE].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_EXTRACT].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_EDIT].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_EDITWILD].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_VIEW].Enabled = false;
+
+		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_DECOMPRESS].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_COMPRESS].Enabled = false;
 		this.ContextMenu = contents.ContextMenu;
 
 		//double click edits item
-		contents.ItemActivate += mEdit;
+		contents.ItemActivate += mView;
 		contents.SelectedIndexChanged += new EventHandler(contents_SelectedIndexChanged);
 
 		AllowDrop = true;
@@ -184,7 +206,8 @@ class window : Form
 			displayHeight = dd.displayHeight;
 			displayDepth = dd.displayDepth;
 			displayMode = dd.displayMode;
-			contents.ContextMenu.MenuItems[0].Text = proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
+			contents.ContextMenu.MenuItems[MENU_DISPLAY].Text =
+				proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
 		}
 	}
 
@@ -227,8 +250,9 @@ class window : Form
 				displayWidth = brIn.ReadInt32();
 				displayHeight = brIn.ReadInt32();
 				displayDepth = brIn.ReadInt32();
-				contents.ContextMenu.MenuItems[0].Text = proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
-				contents.ContextMenu.MenuItems[0].Enabled = true;
+				contents.ContextMenu.MenuItems[MENU_DISPLAY].Text =
+					proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
+				contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = true;
 			}
 			catch (Exception ex)
 			{
@@ -259,9 +283,9 @@ class window : Form
 		//enable menu items
 		if (contents.Items.Count > 0)
 		{
-			contents.ContextMenu.MenuItems[2].Enabled = true; //save
-			contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
-			contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = true; //compress
+			contents.ContextMenu.MenuItems[MENU_SAVE].Enabled = true;
+			contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_DECOMPRESS].Enabled = true;
+			contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_COMPRESS].Enabled = true;
 		}
 	}
 
@@ -295,9 +319,9 @@ class window : Form
 		//enable menu items
 		if (contents.Items.Count > 0)
 		{
-			contents.ContextMenu.MenuItems[2].Enabled = true; //save
-			contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
-			contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = true; //compress
+			contents.ContextMenu.MenuItems[MENU_SAVE].Enabled = true;
+			contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_DECOMPRESS].Enabled = true;
+			contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_COMPRESS].Enabled = true;
 		}
 	}
 
@@ -324,15 +348,15 @@ class window : Form
 			displayWidth = -1;
 			displayHeight = -1;
 			displayMode = -1;
-			contents.ContextMenu.MenuItems[0].Text = "No display settings";
-			contents.ContextMenu.MenuItems[0].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_DISPLAY].Text = "No display settings";
+			contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = false;
 		}
 		//disable menu item
 		if (contents.Items.Count == 0)
 		{
-			contents.ContextMenu.MenuItems[2].Enabled = false; //save
-			contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = false; //decompress
-			contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = false; //compress
+			contents.ContextMenu.MenuItems[MENU_SAVE].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_DECOMPRESS].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_COMPRESS].Enabled = false;
 		}
 	}
 
@@ -365,9 +389,9 @@ class window : Form
 						displayWidth = brIn.ReadInt32();
 						displayHeight = brIn.ReadInt32();
 						displayDepth = brIn.ReadInt32();
-						contents.ContextMenu.MenuItems[0].Text = proExe.getDisplayString(displayWidth, displayHeight, displayDepth,
-																						 displayMode);
-						contents.ContextMenu.MenuItems[0].Enabled = true;
+						contents.ContextMenu.MenuItems[MENU_DISPLAY].Text =
+							proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
+						contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = true;
 					}
 					catch (Exception ex)
 					{
@@ -418,6 +442,16 @@ class window : Form
 				lvi.SubItems[(int)ListViewOrder.Upx].Text = ei.Upx;
 				lvi.SubItems[(int)ListViewOrder.NullString].Text = ei.StringNull;
 			}
+		}
+	}
+
+	private void mEditWildOnClick(object sender, EventArgs e)
+	{
+		//bulk edit
+		editWild ew = new editWild();
+		if (ew.ShowDialog() == DialogResult.OK)
+		{ 
+			ew.EditItems(contents.SelectedItems);
 		}
 	}
 
@@ -526,13 +560,13 @@ class window : Form
 		displayMode = -1;
 		contents.BeginUpdate();
 		contents.Items.Clear();
-		contents.ContextMenu.MenuItems[0].Text = "No display settings";
-		contents.ContextMenu.MenuItems[0].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_DISPLAY].Text = "No display settings";
+		contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = false;
 		proExe.LoadExe(contents, filename, this);
 		exeName.Text = filename;
-		contents.ContextMenu.MenuItems[2].Enabled = true; //save
-		contents.ContextMenu.MenuItems[12].MenuItems[0].Enabled = true; //decompress
-		contents.ContextMenu.MenuItems[12].MenuItems[1].Enabled = true; //compress
+		contents.ContextMenu.MenuItems[MENU_SAVE].Enabled = true;
+		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_DECOMPRESS].Enabled = true;
+		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_COMPRESS].Enabled = true;
 		updateAlternatingColours();
 		contents.EndUpdate();
 		//work out exeType
@@ -589,29 +623,32 @@ class window : Form
 		//enable / disable menu items appropriatly
 		if (contents.SelectedItems.Count > 0)
 		{
-			//remove
-			contents.ContextMenu.MenuItems[6].Enabled = true;
-			//replace
-			contents.ContextMenu.MenuItems[7].Enabled = true;
-			//extract
-			contents.ContextMenu.MenuItems[8].Enabled = true;
-			//edit
-			contents.ContextMenu.MenuItems[9].Enabled = true;
-			//view
-			contents.ContextMenu.MenuItems[10].Enabled = true;
+			contents.ContextMenu.MenuItems[MENU_REMOVE].Enabled = true;
+			contents.ContextMenu.MenuItems[MENU_REPLACE].Enabled = true;
+			contents.ContextMenu.MenuItems[MENU_EXTRACT].Enabled = true;
+			if (contents.SelectedItems.Count < 6)
+			{
+				contents.ContextMenu.MenuItems[MENU_EDIT].Enabled = true;
+			}
+			else
+			{
+				contents.ContextMenu.MenuItems[MENU_EDIT].Enabled = false;
+			}
+			if (contents.SelectedItems.Count > 1)
+			{
+				contents.ContextMenu.MenuItems[MENU_EDITWILD].Enabled = true;
+			}
+			contents.ContextMenu.MenuItems[MENU_VIEW].Enabled = true;
 		}
 		else
 		{
 			//remove
-			contents.ContextMenu.MenuItems[6].Enabled = false;
-			//replace
-			contents.ContextMenu.MenuItems[7].Enabled = false;
-			//extract
-			contents.ContextMenu.MenuItems[8].Enabled = false;
-			//edit
-			contents.ContextMenu.MenuItems[9].Enabled = false;
-			//view
-			contents.ContextMenu.MenuItems[10].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_REMOVE].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_REPLACE].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_EXTRACT].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_EDIT].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_EDITWILD].Enabled = false;
+			contents.ContextMenu.MenuItems[MENU_VIEW].Enabled = false;
 		}
 	}
 

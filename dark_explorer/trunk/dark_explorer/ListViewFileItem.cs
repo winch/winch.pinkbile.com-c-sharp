@@ -25,6 +25,7 @@ using System.Windows.Forms;
 
 class ListViewStrings
 {
+	//strings used in listview
 	public static readonly string Yes = "Yes";
 	public static readonly string No  = "No";
 	public static readonly string LocationExe = "<exe>";

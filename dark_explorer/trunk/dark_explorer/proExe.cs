@@ -407,8 +407,9 @@ class proExe
 						win.displayWidth = Width;
 						win.displayHeight = Height;
 						win.displayDepth = Depth;
-						contents.ContextMenu.MenuItems[0].Text = proExe.getDisplayString(Width, Height, Depth, win.displayMode);
-						contents.ContextMenu.MenuItems[0].Enabled = true;
+						contents.ContextMenu.MenuItems[window.MENU_DISPLAY].Text =
+							proExe.getDisplayString(Width, Height, Depth, win.displayMode);
+						contents.ContextMenu.MenuItems[window.MENU_DISPLAY].Enabled = true;
 						fs.Seek(-16, SeekOrigin.Current);
 					}
 					fs.Seek(lvi.Size, SeekOrigin.Current);
