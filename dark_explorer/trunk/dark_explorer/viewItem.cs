@@ -30,6 +30,7 @@ using System.Runtime.InteropServices;
 class viewItem : Form
 {
 	string exeName;
+	bool stealFocus = true; //steal focus from itemType combobox?
 	public string ExeName
 	{
 		set
@@ -110,7 +111,7 @@ class viewItem : Form
 		listBox.Anchor = pictureBox.Anchor;
 		listBox.Visible = false;
 
-		this.Load += new System.EventHandler(viewItem_Load);
+		this.Activated += new System.EventHandler(viewItem_Load);
 	}
  	private void viewItem_Load(object sender, System.EventArgs e)
 	{
@@ -150,8 +151,7 @@ class viewItem : Form
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf(ListViewStrings.ExtraData))
 		{
-			//_virtual.dat
-			textBox.Visible = true;
+			//extra data
 			showExtraData();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Hex"))
@@ -160,6 +160,76 @@ class viewItem : Form
 			textBox.Visible = true;
 			showHex();
 		}
+		if (stealFocus)
+		{
+			//steal focues from item type comobox
+			if (textBox.Visible)
+				textBox.Focus();
+			if (listBox.Visible)
+				listBox.Focus();
+			if (pictureBox.Visible)
+				pictureBox.Focus();
+			stealFocus = false;
+		}
+	}
+
+	private string stringTableToText(string item)
+	{
+		//converts a dbpro string table item to human readable text
+		string[] parts = item.Split('%');
+		if (parts.Length < 3)
+			return item;
+		StringBuilder text = new StringBuilder();
+		bool returnsValue = false;
+		if (parts[0].IndexOf('[') != -1)
+		{
+			//function returns a value
+			returnsValue = true;
+			text.Append(stringTypeToText(parts[1].Substring(0, 1)) + " = ");
+			parts[1] = parts[1].Substring(1, parts[1].Length - 1);
+		}
+		//function name
+		text.Append(parts[0].Replace("[", ""));
+		if (returnsValue)
+			text.Append('(');
+		else
+			text.Append(' ');
+		//arguments
+		bool first = true;
+		foreach(char c in parts[1])
+		{
+			if (first)
+				first = false;
+			else
+				text.Append(", ");
+			text.Append(stringTypeToText(c.ToString()));
+		}
+		if (returnsValue)
+			text.Append(')');
+		return text.ToString();
+	}
+
+	private string stringTypeToText(string type)
+	{
+		//converts a type in a string table to human readable text
+		switch (type.ToUpper())
+		{
+			case "L":
+				return "Integer";
+			case "F":
+				return "Float";
+			case "S":
+				return "String";
+			case "O":
+				return "Double Float";
+			case "R":
+				return "Double Integer";
+			case "D":
+				return "Byte";
+			case "0":
+				return "";
+		}
+		return type;
 	}
 
 	private void showDll()
@@ -204,7 +274,7 @@ class viewItem : Form
 				{
 					if (LoadString(hinst, s, sb, 255) > 0)
 					{
-						listBox.Items.Add(sb.ToString());
+						listBox.Items.Add(stringTableToText(sb.ToString()));
 					}
 					else
 					{
@@ -323,12 +393,14 @@ class viewItem : Form
 			textBox.Text += "Window caption :";
 			//read window caption
 			c = 'a';
+			StringBuilder sb = new StringBuilder();
 			while (c > 0)
 			{
 				c = br.ReadChar();
-				textBox.Text += c.ToString();
+				sb.Append(c);
+				//textBox.Text += c.ToString();
 			}
-			textBox.Text += "\r\n";
+			textBox.Text += sb.ToString() + "\r\n";
 		}
 		catch (Exception ex)
 		{
@@ -504,11 +576,11 @@ class viewItem : Form
 
 	//winapi functions required for string table loading
 	[DllImport("user32.dll", EntryPoint="LoadStringA")]
-	public static extern int LoadString(uint hinst, int id, StringBuilder buffer, int bufferMax);
+	static extern int LoadString(uint hinst, int id, StringBuilder buffer, int bufferMax);
 
 	[DllImport("kernel32.dll", EntryPoint="LoadLibrary")]
-	public static extern uint LoadLibrary(string fileName);
+	static extern uint LoadLibrary(string fileName);
 
 	[DllImport("kernel32.dll", EntryPoint="FreeLibrary")]
-	public static extern void FreeLibrary(uint hinst);
+	static extern void FreeLibrary(uint hinst);
 }
