@@ -144,7 +144,7 @@ class displayDialog : Form
 		//quick selector
 		quick = new ComboBox();
 		quick.Parent = this;
-		quick.Location = new Point(150, 20);
+		quick.Location = new Point(150, 10);
 		quick.Width = 95;
 		quick.DropDownStyle = ComboBoxStyle.DropDownList;
 		quick.Items.Add("640x480");
@@ -174,6 +174,8 @@ class displayDialog : Form
 
 		Height = y;
 		Width = 260;
+
+		this.Activated += new System.EventHandler(displayDialog_Activated);
 	}
 
 	private void quick_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -182,5 +184,12 @@ class displayDialog : Form
 		string[] str = quick.SelectedItem.ToString().Split("x".ToCharArray(), 2);
 		width.Text = str[0];
 		height.Text = str[1];
+	}
+
+	private void displayDialog_Activated(object sender, System.EventArgs e)
+	{
+		//select item in quick box
+		if (quick.Items.IndexOf(width.Text + "x" + height.Text) != -1)
+			quick.SelectedIndex = quick.Items.IndexOf(width.Text + "x" + height.Text);
 	}
 }
