@@ -99,6 +99,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "editWild.cs"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "insertWild.cs"
                     SubType = "Form"
                     BuildAction = "Compile"

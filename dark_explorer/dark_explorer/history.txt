@@ -1,6 +1,13 @@
 Version history
 +++++++++++++++
 
+v0.13 xx May 2006
+- Can now compress files with upx on save
+- Edit multiple item dialog
+- Display string table items in a more human readable form in item viewer
+- InsertWild dialog, right click menu on filtered files to select all, none or invert
+- Minor gui fixes
+
 v0.12 07 May 2006
 - Can now compress exes using a user selected compress.dll
 - Fix bug causing show item dialog to load item twice on initial display

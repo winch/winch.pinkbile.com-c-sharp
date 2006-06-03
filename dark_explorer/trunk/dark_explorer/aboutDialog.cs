@@ -226,7 +226,7 @@ class aboutDialog: Form
 		{
 			case UpdateState.Running:
 					  progress.Increment(10);
-				if (progress.Value > 100)
+				if (progress.Value > 99)
 					progress.Value = 0;
 				break;
 			case UpdateState.Stopped:

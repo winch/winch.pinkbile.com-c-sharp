@@ -21,9 +21,11 @@ text-decoration: underline overline;
 </head>
 <body>
 <h1>Dbpro exe format information</h1>
-<p>v0.4 - 11 Feb 2006</p>
+<p>v0.5 - 26 May  2006</p>
 <p>Information based on exes produced by dbpro 5.9.</p>
-<p>Darkbasic professional exes consist of a standard win32 exe with files and data appended onto the end. When the dbpro exe is run it creates a %TEMP%\dbpdata
+<p>Darkbasic professional exes consist of a standard win32 exe with files and data appended onto the end. When the dbpro exe is run it creates a dbpdata
+directory in the windows temp dir. If there is an existing dbpdata dir a number is appended to the end an incremented, dbpdata1, dbpdata2 etc. until
+a name that doesn't exist is found.
 directory and extracts the appended files into it.<br />
 The extracted files consist of dbpro dlls, plugin dlls, attached media and the _virtual.dat file. The _virtual.dat file contains among other things
 the compiled dbpro code.</p>
@@ -69,7 +71,7 @@ name
 int datalength
 data
 </pre>
-<p>Continue reading files while namelength is > 0 and < 50 or you reach the end of the file.</p>
+<p>Continue reading files while namelength is &gt; 0 and &lt; 50 or you reach the end of the file.</p>
 <p>Some dbpro code that lists the files in an exe, requires the get_exe_size function above.</p>
 <pre class="code">
 sync on : sync
@@ -86,7 +88,7 @@ open to read 1, exeFile
     repeat
         name$ = ""
         read long 1, namesize
-        if namesize > 0 and namesize < 50
+        if namesize &gt; 0 and namesize &lt; 50
             for i = 1 to namesize
                 read byte 1, b
                 name$ = name$ + chr$(b)
@@ -97,7 +99,7 @@ open to read 1, exeFile
             text 250, y, str$(datasize)
             inc y, 15
         endif
-    until namesize = 0 or namesize > 50
+    until namesize = 0 or namesize &gt; 50
     `check for extra data
     if file end(1) = 0
         datasize = 4  : `namesize was read earlier so start at 4 so those 4 bytes are counted
@@ -117,7 +119,7 @@ wait key
 <p>The above code will only let you view the contents of a normal dbpro exe, through the options in the IDE you can instruct the compiler to
 compile one of several different types of dbpro exe. For all of these types the standard exe section is identical. All types can also contain
 attached media files. Any media files will have a "media\" prefix on the filename. The dbpro media loading commands automatically
-check for attached media so you need to do to add media to an exe is append it to the exe. It is possible to change a compiled exe of one type
+check for attached media so you can add and remove media from the exe without problems. It is possible to change a compiled exe of one type
 into any of the other types.<p>
 <ol>
 <li>Normal Executable - The default option and by far the most popular, this is the format discussed above.</li>
@@ -133,9 +135,10 @@ not have the extra 20 bytes at the end. To identify this type of exe check for a
 as the exe.</p>
 <h3>Executable with compressed data</h3>
 <p>With this format the attached files are compressed to reduce the size of the exe. Exes in this format consist of the standard exe section
-followed by compress.dll and then the compressed data followed by the 20 bytes of extra data. Compress.dll is used by the exe section to
-decompress the compressed data and is attached to the exe in the usual manor. To identify this type of exe check to see if the first attached
-file is compress.dll instead of _virtual.dat. The compression used is not terribly good and quite slow so these exes are rare.<br />
+followed by compress.dll and then the compressed data followed by the 20 bytes of extra data. Compress.dll is used by the compiler to compress
+the files and by the exe section to decompress the compressed data and is attached to the exe in the usual manor. To identify this type of exe
+check to see if the first attached file is compress.dll instead of _virtual.dat. The compression used is not terribly good and quite slow so
+these exes are rare.<br />
 </p>
 <h2>_virtual.dat</h2>
 <p>Other than the standard exe section which changes when you use a different icon or version information _virtual.dat is the only file
@@ -163,8 +166,8 @@ monitor flickering when the exe starts.</p>
 text is the same length, just swap the characters for the new ones. It is also easy to replace with a shorter string, just swap the characters
 and add a null character at the end. Leave the extra characters from the original string in place so the _virtual.dat file remains the same
 length. Sometimes it is even possible to replace it with a longer string, just overwrite the data following the original string.</p>
-<h2>Usefull links</h2>
+<h2>Useful links</h2>
 <p><a href="http://dbp-unchained.tk/">Dbp unchained</a> - An unofficial collection of research, observations and commentary on the architecture
-of DarkBASIC PRO software.</p>
+of DarkBASIC PRO software.</p>  
 </body>
 </html>

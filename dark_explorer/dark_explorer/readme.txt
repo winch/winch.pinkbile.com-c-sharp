@@ -3,6 +3,7 @@ dark explorer
 A darkbasic professional, fps creator and darkbasic classic exe explorer
 
 Requires .Net framework v1.1 to run
+Upx compression needs upx.exe in the program directory, download from http://upx.sourceforge.net/
 
 Usage
 +++++
@@ -12,7 +13,7 @@ The program is controled by the right-click menu.
 Todo
 ++++
 
-Compress with upx and null string tables do not yet work.
+Null string tables does not yet work.
 
 Adding media
 ++++++++++++
@@ -31,11 +32,6 @@ Adding non tpc dlls
 
 Depending on how the dll is loaded it may or may not need a "media\" prefix to the name.
 
-The following dlls require a "media\" prefix
-nuclear glory collision (NGCollision.dll)
-
-The following dlls require no prefix
-Newton wrapper (Newton.dll)
 
 license
 +++++++
