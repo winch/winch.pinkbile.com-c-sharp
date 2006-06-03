@@ -31,9 +31,9 @@ using System.Threading;
 class aboutDialog: Form
 {
 	string Version = "0.13";
-	string Date = "xx May 2006";
+	string Date = "3 June 2006";
 	string Ident = "dark_explorer";
-	int Build = 11;
+	int Build = 12;
 	Button btnUpdate;
 	ProgressBar progress;
 	public aboutDialog()
