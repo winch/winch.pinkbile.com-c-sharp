@@ -201,7 +201,7 @@ class window : Form
 	private void mInterEditOnClick(object obj, EventArgs ea)
 	{
 		//edit item
-		if (Intern.SelectedItems.Count == 1 && Intern.SelectedItems[0].SubItems[1].Text != "<exe>")
+		if (Intern.SelectedItems.Count == 1 && Intern.SelectedItems[0].SubItems[1].Text != ListViewStrings.LocationExe)
 		{
 			addFilesDialog dlg = new addFilesDialog(Intern.SelectedItems[0].Text,Intern.SelectedItems[0].SubItems[1].Text);
 			if (dlg.ShowDialog() == DialogResult.OK)
@@ -226,7 +226,7 @@ class window : Form
 		//Selected items in Intern changed so select menu item accordingly
 		if (Intern.SelectedItems.Count > 0)
 		{
-			if (Intern.SelectedItems.Count == 1 && Intern.SelectedItems[0].SubItems[1].Text != "<exe>")
+			if (Intern.SelectedItems.Count == 1 && Intern.SelectedItems[0].SubItems[1].Text != ListViewStrings.LocationExe)
 				Intern.ContextMenu.MenuItems[2].Enabled = true;
 			else
 				Intern.ContextMenu.MenuItems[2].Enabled = false;
@@ -306,7 +306,7 @@ class window : Form
 		//Selected items in Extern changed so select menu item accordingly
 		if (Extern.SelectedItems.Count > 0)
 		{
-			if (Extern.SelectedItems.Count == 1 && Extern.SelectedItems[0].SubItems[1].Text != "<exe>")
+			if (Extern.SelectedItems.Count == 1 && Extern.SelectedItems[0].SubItems[1].Text != ListViewStrings.LocationExe)
 				Extern.ContextMenu.MenuItems[2].Enabled = true;
 			else
 				Extern.ContextMenu.MenuItems[2].Enabled = false;

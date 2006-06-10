@@ -51,12 +51,12 @@ class proExe
 			SkipExeSection(fs, br);
 			//add exe to listview
 			ListViewFileItem lvi = new ListViewFileItem();
-			lvi.Text = "<Standard Head>";
+			lvi.Text = ListViewStrings.ExeSection;
 			lvi.Offset = 0;
 			lvi.Size = (int) fs.Position;
 			//lvi.SubItems.Add("No");
 			//lvi.SubItems.Add(lvi.Size.ToString());
-			lvi.SubItems.Add("<exe>");
+			lvi.SubItems.Add(ListViewStrings.LocationExe);
 			contents.Items.Add(lvi);
 			//Check for exe with no attached data
 			if (lvi.Size == (int)fs.Length)
@@ -77,17 +77,17 @@ class proExe
 					fs.Seek(lvi.Size, SeekOrigin.Current);
 					//lvi.SubItems.Add("Yes");
 					//lvi.SubItems.Add(lvi.Size.ToString());
-					lvi.SubItems.Add("<exe>");
+					lvi.SubItems.Add(ListViewStrings.LocationExe);
 				}
 				else
 				{
 					//compressed or extra data
-					lvi.Text = "<Extra Data>";
+					lvi.Text = ListViewStrings.ExtraData;
 					lvi.Offset = (int)fs.Position - 4;
 					lvi.Size = (int)(fs.Length - (fs.Position - 4));
 					//lvi.SubItems.Add("No");
 					//lvi.SubItems.Add(lvi.Size.ToString());
-					lvi.SubItems.Add("<exe>");
+					lvi.SubItems.Add(ListViewStrings.LocationExe);
 				}
 				contents.Items.Add(lvi);
 			}

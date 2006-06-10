@@ -49,7 +49,7 @@ class Build
 					bwOut.Write(lvi.Text.Length);
 					bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
 					//data
-					if (lvi.SubItems[1].Text == "<exe>")
+					if (lvi.SubItems[1].Text == ListViewStrings.LocationExe)
 						fsIn = new FileStream(oldExe, FileMode.Open);
 					else
 						fsIn = new FileStream(lvi.SubItems[1].Text, FileMode.Open);
@@ -81,7 +81,7 @@ class Build
 					if (checkSums == true)
 					{
 						string checksum;
-						if (lvi.SubItems[1].Text == "<exe>")
+						if (lvi.SubItems[1].Text == ListViewStrings.LocationExe)
 							fsIn = new FileStream(oldExe, FileMode.Open);
 						else
 							fsIn = new FileStream(lvi.SubItems[1].Text, FileMode.Open);
@@ -156,7 +156,7 @@ class Build
 				bwOut.Write(Encoding.ASCII.GetBytes(itm.Text));
 				//data
 				//check if file is in <exe> or not
-				if (itm.SubItems[1].Text == "<exe>")
+				if (itm.SubItems[1].Text == ListViewStrings.LocationExe)
 				{
 					//in <exe>
 					fsIn.Seek(itm.Offset, SeekOrigin.Begin);
