@@ -79,8 +79,8 @@ class addFilesDialog: Form
 		comboaction.Size = new Size(90,comboaction.Height);
 		comboaction.Location = new Point(400,10);
 		comboaction.DropDownStyle = ComboBoxStyle.DropDownList;
-		comboaction.Items.Add("Add/Replace");
-		comboaction.Items.Add("Remove");
+		comboaction.Items.Add(ActionStrings.AddReplace);
+		comboaction.Items.Add(ActionStrings.Remove);
 		//comboaction.Items.Add("Patch");
 		comboaction.SelectedIndex = selectedAction;
 

@@ -13,6 +13,12 @@ using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
 
+class ActionStrings
+{
+	public static readonly string AddReplace = "Add/Replace";
+	public static readonly string Remove = "Remove";
+}
+
 class Window : Form
 {
 	public TextBox name;
@@ -154,7 +160,7 @@ class Window : Form
 		{
 			//edit item
 			int i = 0;
-			if (files.SelectedItems[0].SubItems[1].Text == "Remove")
+			if (files.SelectedItems[0].SubItems[1].Text == ActionStrings.Remove)
 				i = 1;
 
 			addFilesDialog dlg = new addFilesDialog(files.SelectedItems[0].Text,files.SelectedItems[0].SubItems[2].Text,i);

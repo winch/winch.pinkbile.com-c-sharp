@@ -229,15 +229,15 @@ class main: Window
 				bw.Write((byte)files.Items.Count);
 				for (int i=0; i<files.Items.Count; i++)
 				{
-					//action "Add/Replace" "Remove"
-					if (files.Items[i].SubItems[1].Text == "Add/Replace")
+					//action
+					if (files.Items[i].SubItems[1].Text == ActionStrings.AddReplace)
 						bw.Write((byte)0);
-					if (files.Items[i].SubItems[1].Text == "Remove")
+					if (files.Items[i].SubItems[1].Text == ActionStrings.Remove)
 						bw.Write((byte)1);
 					//filename
 					write_text(bw,files.Items[i].Text);
 					//filedata if required
-					if (files.Items[i].SubItems[1].Text == "Add/Replace")
+					if (files.Items[i].SubItems[1].Text == ActionStrings.AddReplace)
 					{
 						ListViewFileItem lvi = (ListViewFileItem) files.Items[i];
 						FileStream fsin = new FileStream(files.Items[i].SubItems[2].Text,FileMode.Open);
@@ -284,7 +284,7 @@ class main: Window
 					//changed item so add to files
 					ListViewFileItem item = new ListViewFileItem();
 					item.Text = lvi.Text;
-					item.SubItems.Add("Add/Replace");
+					item.SubItems.Add(ActionStrings.AddReplace);
 					item.SubItems.Add(ad.newExeName);
 					item.Size = lvi.Size;
 					item.Offset = lvi.Offset;
