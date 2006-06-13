@@ -27,6 +27,14 @@ would need a name of
 media\image\wall.png
 in the exe.
 
+Upx and exe compression notes
++++++++++++++++++++++++++++++
+
+Using upx and/or the built in dbpro compression will give you a smaller exe that is harder to compress.
+If you plan to zip your exe then the final zip will usually be bigger when using a compressed exe.
+Compressed exes will also be decompressed when the exe is run so they will start up slower
+than an uncompressed exe. Upx is much faster at decompressing than dbpro so is less noticable.
+
 Adding non tpc dlls
 +++++++++++++++++++
 
