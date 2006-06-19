@@ -1,7 +1,7 @@
 dark injector
 +++++++++++++
 
-v0.1 19 Nov 2005
+v0.2 19 June 2006
 
 Usage
 +++++
@@ -39,13 +39,13 @@ This program provides a simple way to inject a dll as the first attached file an
 dlls to inject.
 
 For more information on dbpro exes see
-http://winch.pinkbile.com/dbpro_exe_format.htm
+http://winch.pinkbile.com/dbpro_exe_format.php
 http://dbp-unchained.tk/
 
 license
 +++++++
 
-dark_injector Copyright (C) 2005 the_winch
+dark_injector Copyright (C) 2006 the_winch
 Permission to copy, use, modify, sell and distribute this software is
 granted provided this notice appears un-modified in all copies.
 This software is provided as-is without express or implied warranty,

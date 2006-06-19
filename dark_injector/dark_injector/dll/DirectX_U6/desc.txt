@@ -1,11 +1,11 @@
-Use this if your exe is compiled with Update 5.x
+Use this if your exe is compiled with Update 6.x
 
-Checks if DirectX 9.0c or later is installed.
+Checks if DirectX 9.0c (December 2005) or later is installed.
 
 If it is installed the exe runs as normal.
 
 If it is not installed the exe shows a message box before exiting. The messageBox contains the text,
-"DirectX 9.0c or later is required to run this program.
+"DirectX 9.0c (December 2005) or later is required to run this program.
 
 The latest version of DirectX can be downloaded from
 http://www.microsoft.com/directx"
