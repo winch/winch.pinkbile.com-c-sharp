@@ -176,9 +176,19 @@ class viewItem : Form
 	private string stringTableToText(string item)
 	{
 		//converts a dbpro string table item to human readable text
+		string[] description = null;
 		string[] parts = item.Split('%');
 		if (parts.Length < 3)
 			return item;
+		if (parts.Length > 3)
+		{
+			//get description strings
+			description = parts[3].Split(',');
+			for (int i = 0; i < description.Length; i++)
+			{
+				description[i] = description[i].Trim();
+			}
+		}
 		StringBuilder text = new StringBuilder();
 		bool returnsValue = false;
 		if (parts[0].IndexOf('[') != -1)
@@ -269,16 +279,12 @@ class viewItem : Form
 				//read string table
 				StringBuilder sb = new StringBuilder(255);
 				int s = 1;
-				int bad = 0;
-				while (bad < 5)
+				//while (bad < 5)
+				while (s < 1000)
 				{
 					if (LoadString(hinst, s, sb, 255) > 0)
 					{
 						listBox.Items.Add(stringTableToText(sb.ToString()));
-					}
-					else
-					{
-						bad ++;
 					}
 					s ++;
 				}
