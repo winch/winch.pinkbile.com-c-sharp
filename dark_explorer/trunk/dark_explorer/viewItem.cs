@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 class viewItem : Form
 {
 	string exeName;
-	bool stealFocus = true; //steal focus from itemType combobox?
+	bool stealFocus = false; //steal focus from itemType combobox?
 	public string ExeName
 	{
 		set
@@ -111,15 +111,24 @@ class viewItem : Form
 		listBox.Anchor = pictureBox.Anchor;
 		listBox.Visible = false;
 
-		this.Activated += new System.EventHandler(viewItem_Load);
+		this.Load += new System.EventHandler(viewItem_Load);
+		this.Activated += new System.EventHandler(viewItem_Activate);
 	}
  	private void viewItem_Load(object sender, System.EventArgs e)
 	{
-		Cursor.Current = Cursors.WaitCursor;
-		guessFileType();
-		getFileSize();
-		this.Text += " (" + proExe.DbcRemoveNull(item.SubItems[(int)ListViewOrder.Name].Text) + ")";
-		Cursor.Current = Cursors.Default;
+		//form has just loaded so steal focus from combobox
+		stealFocus = true;
+	}
+	private void viewItem_Activate(object sender, System.EventArgs e)
+	{
+		if (stealFocus == true)
+		{
+			Cursor.Current = Cursors.WaitCursor;
+			guessFileType();
+			getFileSize();
+			this.Text += " (" + proExe.DbcRemoveNull(item.SubItems[(int)ListViewOrder.Name].Text) + ")";
+			Cursor.Current = Cursors.Default;
+		}
 	}
 
 	private void showItem()
