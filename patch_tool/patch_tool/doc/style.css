@@ -1,0 +1,20 @@
+body {
+  background-color: #D4D0C8;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 9pt;
+}
+td, th {
+  background-color: #ffecfd;
+  padding: 6px;
+}
+th {
+  font-weight: normal;
+}
+table {
+  border: 0;
+  font-size: 9pt;
+  background-color: #20c543;
+}
+.code {
+  background-color: #D4D0C8;
+}

@@ -7,19 +7,19 @@ dbp@pinkbile.com
 builder written in c#, requires .net to run
 patcher written in c using dev-c++
 
-builder v0.7 - 08 Feb 2006
-patcher v0.6 - 18 June 2005
+builder v0.8 - 08 Feb 2006
+patcher v0.8 - 18 June 2005
 
 source for both supplied in src\ dir
 
-Changes in v0.7
+Changes in v0.8
 +++++++++++++++
 
 Patcher
-No changes.
+Use windows crypto api to calculate md5 hash in patcher. This makes patcher a few Kb smaller.
 
 Builder
-Analyser dialog, changed files are highlighted so it's easier to see which files have changed.
+No changes.
 
 Instructions
 ++++++++++++

@@ -210,7 +210,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_SYSCOMMAND:
             if (LOWORD(wParam) == 1)
             {
-                MessageBox(hwnd,"patch_tool v0.6\n\nhttp://winch.pinkbile.com/","",0);
+                MessageBox(hwnd,"patch_tool v0.8\n\nhttp://winch.pinkbile.com/","",0);
                 return 0;
             }
     }
