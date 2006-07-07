@@ -30,9 +30,9 @@ using System.Drawing;
 class aboutDialog: Form
 {
 	string Version = "0.12";
-	string Date = "XX September 2005";
+	string Date = "07 July 2006";
 	string Ident = "dll_tool";
-	int Build = 1;
+	int Build = 2;
 	public aboutDialog()
 	{
 		Text = "About";

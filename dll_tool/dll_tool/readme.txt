@@ -9,6 +9,10 @@ requires .Net SDK
 version history
 +++++++++++++++
 
+v0.12 07 July 2006
+- Fix deadlock where ilasm would fill the standard output buffer and block when building dlls with lots of methods.
+- Use Begin/EndUpdate() in a few places.
+
 v0.11 05 July 2005
 - improved command line support to work with net_tool
 
