@@ -33,7 +33,11 @@ using Microsoft.Win32;
 class main: Form
 {
 	public string ilasm = "";
+	public string ilasm1 = ""; //framework v1.1 ilasm
+	public string ilasm2 = ""; //framework v2.2 ilasm
 	public string ildasm = "";
+	public string ildasm1 = "";
+	public string ildasm2 = "";
 	public string dllName = "";
 	public string[] args;
 
@@ -313,6 +317,8 @@ class main: Form
 		//move method(s) right
 		if (methodBox.SelectedItems.Count > 0)
 		{
+			exportBox.BeginUpdate();
+			methodBox.BeginUpdate();
 			foreach (ListViewItem lvi in methodBox.SelectedItems)
 			{
 				ListViewItem export = new ListViewItem(lvi.Text);
@@ -325,6 +331,8 @@ class main: Form
 				exportBox.Items.Add(export);
 				lvi.Remove();
 			}
+			exportBox.EndUpdate();
+			methodBox.EndUpdate();
 		}
 	}
 
@@ -361,19 +369,26 @@ class main: Form
 		}
 		//find location of liasm and ildasm?
 		//check ilasm and ildasm exist
-		try
+		RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\.NETFramework");
+		ildasm1 = (string)reg.GetValue("sdkInstallRootv1.1") + "bin\\ildasm.exe";
+		//ildasm2 = (string)reg.GetValue("sdkInstallRootv2.0") + "bin\\ildasm.exe";
+		ildasm2 = null;
+		reg.Close();
+		if (ildasm1 != null)
 		{
-			RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\.NETFramework");
-			ildasm = (string)reg.GetValue("sdkInstallRootv1.1") + "bin\\ildasm.exe";
-			reg.Close();
+			//use v1.1 ildasm by default
+			ildasm = ildasm1;
 		}
-		catch
+		else
 		{
-			//
+			if (ildasm2 != null)
+			{
+				ildasm = ildasm2;
+			}
 		}
 		if (! File.Exists(ildasm))
 		{
-			MessageBox.Show("ildasm not found\nMake sure you have .NET SDK installed");
+			MessageBox.Show("ildasm not found\nMake sure you have .NET SDK installed", "dll_tool");
 			Application.Exit();
 		}
 		ilasm = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory() + "\\ilasm.exe";
@@ -413,6 +428,7 @@ class main: Form
 			MessageBox.Show("No exported methods to generate string table with!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			return;
 		}
+		stringBox.BeginUpdate();
 		foreach (ListViewItem lvi in exportBox.Items)
 		{
 			//generate string table for each item
@@ -488,6 +504,7 @@ class main: Form
 				types += "0"; //no parameters
 			stringBox.Items.Add(lvi.SubItems[2].Text.ToUpper().Replace("'","") + types + "%" + lvi.SubItems[2].Text.Replace("'","") + "%");
 		}
+		stringBox.EndUpdate();
 	}
 
 	private void strAddBtn_Click(object sender, EventArgs e)
