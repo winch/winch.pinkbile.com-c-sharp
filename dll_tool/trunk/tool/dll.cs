@@ -297,8 +297,8 @@ class dll
 			process.StartInfo.CreateNoWindow = true;
 			process.StartInfo.RedirectStandardOutput = true;
 			process.Start();
-			process.WaitForExit();
 			string result = process.StandardOutput.ReadToEnd();
+			process.WaitForExit();
 			if (result.IndexOf("Operation completed successfully") != -1)
 				MessageBox.Show("Build sucessfull!","", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			else
