@@ -68,7 +68,7 @@ class dll
 			Application.DoEvents();
 		if (File.Exists(tempDir + Path.DirectorySeparatorChar + ilFile) == false)
 		{
-			throw new Exception("ilDasm failed");
+			throw new FileNotFoundException("ilDasm did not output .il file.", ilFile);
 		}
 	}
 
