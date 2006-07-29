@@ -19,15 +19,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 using System;
 using System.IO;
+using System.Collections;
 using System.Diagnostics;
 using System.Windows.Forms;
 
 class dll
 {
-	tools Tools = new tools(); //remove this
+	tools Tools = tools.GetInstance(); //remove this
 	string dllFile;
 	string tempDir;
-	readonly string ilFile = "dll.il";
+	readonly string ilFileName = "dll.il";
+	string ilFile;
+	ArrayList ilCode = new ArrayList();
 	ilTool ilAsm = null;
 	ilTool ilDasm = null;
 
@@ -36,6 +39,7 @@ class dll
 		dllFile = DllFilename;
 		//do this properly
 		tempDir = Path.GetTempFileName();
+		ilFile = tempDir + Path.DirectorySeparatorChar + ilFileName;
 		File.Delete(tempDir);
 		Directory.CreateDirectory(tempDir);
 
@@ -60,15 +64,37 @@ class dll
 		Process process = new Process();
 		process.StartInfo.FileName = ilDasm.Path;
 		process.StartInfo.Arguments += "\"" + dllFile + "\"";
-        process.StartInfo.Arguments += " /TEXT /OUT:\"" + tempDir + Path.DirectorySeparatorChar + ilFile + "\"";
+        process.StartInfo.Arguments += " /TEXT /OUT:\"" + ilFileName + "\"";
 		process.StartInfo.UseShellExecute = false;
 		process.StartInfo.CreateNoWindow = true;
 		process.Start();
 		while (process.HasExited == false)
 			Application.DoEvents();
-		if (File.Exists(tempDir + Path.DirectorySeparatorChar + ilFile) == false)
+		if (File.Exists(ilFileName) == false)
 		{
-			throw new FileNotFoundException("ilDasm did not output .il file.", ilFile);
+			throw new FileNotFoundException("ilDasm did not output .il file.", ilFileName);
+		}
+		FileStream fs = null;
+		StreamReader sr = null;
+		try
+		{
+			fs = new FileStream(ilFileName, FileMode.Open);
+			sr = new StreamReader(fs);
+			while (sr.Peek() > 0)
+			{
+				ilCode.Add(sr.ReadLine());
+			}
+		}
+		catch (Exception ex)
+		{
+			throw new FileLoadException("Unable to load .il file", ilFileName);
+		}
+		finally
+		{
+			if (sr != null)
+				sr.Close();
+			if (fs != null)
+				fs.Close();
 		}
 	}
 

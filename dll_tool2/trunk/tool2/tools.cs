@@ -26,9 +26,19 @@ using System.IO;
 
 class tools
 {
+	private static tools theTools = null;
 	public ArrayList IlAsm = new ArrayList();
 	public ArrayList IlDasm = new ArrayList();
-	public tools()
+
+	public static tools GetInstance()
+	{
+		//create new instance if required
+		if (theTools == null)
+			theTools = new tools();
+		return theTools;
+	}
+
+	private tools()
 	{
 		ilTool tool;
 		string installRoot = null;
