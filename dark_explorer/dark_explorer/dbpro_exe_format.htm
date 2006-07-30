@@ -4,14 +4,12 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <style type="text/css">
 body {
-    background-color: #ffecfd;
     font-family: verdana, arial, helvetica, sans-serif;
-    font-size: 9pt;
 }
 .code {
-    background-color: #D4D0C8;
+    background: #D4D0C8;
     font-family: courier;
-    font-size: 9pt;
+    font-size: 0.9em;
 }
 h1, h2, h3 {
 text-decoration: underline overline;
@@ -21,18 +19,17 @@ text-decoration: underline overline;
 </head>
 <body>
 <h1>Dbpro exe format information</h1>
-<p>v0.5 - 26 May  2006</p>
+<p>v0.6 - 30 July 2006</p>
 <p>Information based on exes produced by dbpro 5.9.</p>
 <p>Darkbasic professional exes consist of a standard win32 exe with files and data appended onto the end. When the dbpro exe is run it creates a dbpdata
 directory in the windows temp dir. If there is an existing dbpdata dir a number is appended to the end an incremented, dbpdata1, dbpdata2 etc. until
-a name that doesn't exist is found.
-directory and extracts the appended files into it.<br />
+a name that doesn't exist is found. The exe then extracts the appended files into this dbpdata dir.<br />
 The extracted files consist of dbpro dlls, plugin dlls, attached media and the _virtual.dat file. The _virtual.dat file contains among other things
 the compiled dbpro code.</p>
 <h2>Standard win32 exe</h2>
 <p>The start of a dbpro exe is a standard win32 exe. The exe section of all dbpro exes compiled with the same dbpro version appear to be very similar for
 all compiled programs. The only time this section appears to differ is when you modify the exe icon or version information.<br />
-The most reliable method to find the size of this section is to use some knowledge of the windows exe format to find the size of the exe.
+The most reliable method to find the size of this section is to use some knowledge of the windows exe format.
 <a href="http://wotsit.org">Wotsit.org</a> has several documents that describe the windows exe format.<br />
 Here is a simple dbpro function returns the size in bytes of an exe section of a dbpro exe.<br />
 <pre class="code">
@@ -57,7 +54,7 @@ function get_exe_size(fileName as string)
     inc size, pos
 endfunction size
 </pre>
-Dbpro does not use such a method. Instead it writes the lenght of the exe section as a 4 byte int at the very end of the exe. The method
+Dbpro does not use such a method. Instead it writes the length of the exe section as a 4 byte int at the very end of the exe. The method
 Dbpro uses can cause problems when you change the size of the exe, for instance when you change the exe icon.
 </p>
 <h2>Attached files</h2>
@@ -71,7 +68,7 @@ name
 int datalength
 data
 </pre>
-<p>Continue reading files while namelength is &gt; 0 and &lt; 50 or you reach the end of the file.</p>
+<p>Continue reading files while namelength is &gt; 0 and &lt; 255 or you reach the end of the file.</p>
 <p>Some dbpro code that lists the files in an exe, requires the get_exe_size function above.</p>
 <pre class="code">
 sync on : sync
@@ -88,7 +85,7 @@ open to read 1, exeFile
     repeat
         name$ = ""
         read long 1, namesize
-        if namesize &gt; 0 and namesize &lt; 50
+        if namesize &gt; 0 and namesize &lt; 255
             for i = 1 to namesize
                 read byte 1, b
                 name$ = name$ + chr$(b)
@@ -99,7 +96,7 @@ open to read 1, exeFile
             text 250, y, str$(datasize)
             inc y, 15
         endif
-    until namesize = 0 or namesize &gt; 50
+    until namesize = 0 or namesize &gt; 255
     `check for extra data
     if file end(1) = 0
         datasize = 4  : `namesize was read earlier so start at 4 so those 4 bytes are counted
@@ -135,10 +132,71 @@ not have the extra 20 bytes at the end. To identify this type of exe check for a
 as the exe.</p>
 <h3>Executable with compressed data</h3>
 <p>With this format the attached files are compressed to reduce the size of the exe. Exes in this format consist of the standard exe section
-followed by compress.dll and then the compressed data followed by the 20 bytes of extra data. Compress.dll is used by the compiler to compress
-the files and by the exe section to decompress the compressed data and is attached to the exe in the usual manor. To identify this type of exe
-check to see if the first attached file is compress.dll instead of _virtual.dat. The compression used is not terribly good and quite slow so
-these exes are rare.<br />
+followed by compress.dll and then the compressed data followed by the 20 bytes of extra data. compress.dll is used by the compiler to compress
+the data at compile time and by the dbpro exe to decompress the data at runtime.<br />
+The two functions exported in compress.dll look like this,</p>
+<pre class="code">
+HGLOBAL decompress_block(void* data, int datalength)
+HGLOBAL compress_block(void* data, int datalength)
+</pre>
+<p>Using these two functions is fairly simple.<br />
+To decompress a compressed exe,<br />
+<ol>
+<li>Load the exe as normal, and extract compress.dll</li>
+<li>Following compress.dll is the compressed data, load it to memory ignoring the last 20bytes of extra data.</li>
+<li>Call decompress_block passing it a pointer to the compressed data and its size</li>
+<li>decompress_block returns a handle to a memory object, use <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/globalLock.asp">GlobalLock</a>
+on this handle to get normal memory pointer.</li>
+<li>Use <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/GlobalSize.asp">GlobalSize</a> on the
+handle to find the size of the decompressed data.</li>
+<li>Write a normal dbpro exe section to disk, then the uncompressed data followed by the 20 bytes of extra data.</li>
+</ol>
+To compress an uncompressed exe,<br />
+<ol>
+<li>Source compress.dll from the dbpro compiler\plugins directory or another source.</li>
+<li>Load a dbpro exe into memory discarding the exe section and 20 bytes of extra data.</li>
+<li>Call compress_block passing it a pointer to the uncompressed data and its size.</li>
+<li>compress_block returns a handle to a memory object, use <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/globalLock.asp">GlobalLock</a>
+on this handle to get normal memory pointer.</li>
+<li>Use <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/GlobalSize.asp">GlobalSize</a> on the
+handle to find the size of the compressed data.</li>
+<li>Write a normal dbpro exe section to disk, followed by the compress.dll you used as a normal attached file. Then write the compressed
+data followed by the extra data.</li>
+</ol>
+</p>
+<h2>compress.dll code injection trick</h2>
+<p>We can inject are own compress.dll as the first attached file in a normal dbpro exe. Then when the dbpro exe is run it will call our
+decompress_block function passing it the already decompressed data.<br />
+A simple C example that shows a message box asking the user if they want to continue running the exe.
+<pre class="code">
+DLLIMPORT HGLOBAL decompress_block(void* data, DWORD dataSize)
+{
+    HGLOBAL block;
+    if (IDYES == MessageBox(GetActiveWindow(), "Continue running exe?", "", MB_YESNO))
+    {
+        //for the dbpro exe to run it needs to receive the data as if it has been decompressed
+        //by the real compress.dll. Since the dbpro exe is not compressed we just need to allocate
+        //some memory, copy the already uncompressed data to it then return the HGLOBAL to dbpro
+        block = GlobalAlloc(GMEM_FIXED, dataSize);
+        if (block)
+        {
+            CopyMemory(block, data, dataSize);
+        }
+    }
+    else
+    {
+        //Returning 0 to dbpro will tell it an error has occured and the dbpro exe will silently exit
+        block = (HGLOBAL) 0;
+    }
+    return block;
+}
+</pre>
+This allows us to do some interesting things including,
+<ul>
+<li>Show a user friendly message box if the correct version of DirectX isn't installed.</li>
+<li>Show a display mode dialog and alter the _virtal.dat file in memory so the exe starts in the correct mode.</li>
+<li>Convert dbpro to a runtime style system with small exes by souring the dlls from the dbpro install dir.</li>
+</ul>
 </p>
 <h2>_virtual.dat</h2>
 <p>Other than the standard exe section which changes when you use a different icon or version information _virtual.dat is the only file
@@ -158,11 +216,11 @@ displayDepth
 3 = full exclusive
 4 = windowed fullscreen
 </pre>
-<p>By modifing these 4 ints it's possible to change the initial display mode of a compiled exe. Unfortunatly lots of people for some reason ignore
+<p>By modifying these 4 ints it's possible to change the initial display mode of a compiled exe. Unfortunately lots of people for some reason ignore
 the display mode settings in the IDE and use SET DISPLAY MODE in their code instead. Setting the initial display mode will then not change the
 display mode, however you can set the initial display mode to the same as the mode used by SET DISPLAY MODE, sometimes this can reduce
 monitor flickering when the exe starts.</p>
-<p>After the display settings is a null terminated string that is used as the window caption. Changing this string is easy if the replacment
+<p>After the display settings is a null terminated string that is used as the window caption. Changing this string is easy if the replacement
 text is the same length, just swap the characters for the new ones. It is also easy to replace with a shorter string, just swap the characters
 and add a null character at the end. Leave the extra characters from the original string in place so the _virtual.dat file remains the same
 length. Sometimes it is even possible to replace it with a longer string, just overwrite the data following the original string.</p>
