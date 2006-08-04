@@ -30,6 +30,7 @@ class dll
 	string tempDir;
 	readonly string ilFileName = "dll.il";
 	string ilFile;
+	string resFile;
 	ArrayList ilCode = new ArrayList();
 	ilTool ilAsm = null;
 	ilTool ilDasm = null;
@@ -40,6 +41,8 @@ class dll
 		//do this properly
 		tempDir = Path.GetTempFileName();
 		ilFile = tempDir + Path.DirectorySeparatorChar + ilFileName;
+		resFile = Path.GetDirectoryName(ilFile) + Path.DirectorySeparatorChar
+			+ Path.GetFileNameWithoutExtension(ilFile) + ".res";
 		File.Delete(tempDir);
 		Directory.CreateDirectory(tempDir);
 
@@ -53,24 +56,24 @@ class dll
 		//clean up temp dir
 		if (Directory.Exists(tempDir))
             Directory.Delete(tempDir, true);
-	} 
+	}
 
 	public void Load()
 	{
 		if (File.Exists(dllFile) == false)
-			throw new FileNotFoundException(null, dllFile);
+			throw new FileNotFoundException("Dll file not found", dllFile);
 		if (File.Exists(ilDasm.Path) == false)
-			throw new FileNotFoundException(null, ilDasm.Path);
+			throw new FileNotFoundException("ilDasm exe not found", ilDasm.Path);
 		Process process = new Process();
 		process.StartInfo.FileName = ilDasm.Path;
 		process.StartInfo.Arguments += "\"" + dllFile + "\"";
-        process.StartInfo.Arguments += " /TEXT /OUT:\"" + ilFileName + "\"";
+        process.StartInfo.Arguments += " /TEXT /OUT:\"" + ilFile + "\"";
 		process.StartInfo.UseShellExecute = false;
 		process.StartInfo.CreateNoWindow = true;
 		process.Start();
 		while (process.HasExited == false)
 			Application.DoEvents();
-		if (File.Exists(ilFileName) == false)
+		if (File.Exists(ilFile) == false)
 		{
 			throw new FileNotFoundException("ilDasm did not output .il file.", ilFileName);
 		}
@@ -78,7 +81,7 @@ class dll
 		StreamReader sr = null;
 		try
 		{
-			fs = new FileStream(ilFileName, FileMode.Open);
+			fs = new FileStream(ilFile, FileMode.Open);
 			sr = new StreamReader(fs);
 			while (sr.Peek() > 0)
 			{
@@ -87,7 +90,7 @@ class dll
 		}
 		catch (Exception ex)
 		{
-			throw new FileLoadException("Unable to load .il file", ilFileName);
+			throw new FileLoadException("Unable to load .il file", ilFile);
 		}
 		finally
 		{
@@ -101,6 +104,48 @@ class dll
 	public void Save(string fileName)
 	{
 		if (File.Exists(ilAsm.Path) == false)
-			throw new FileNotFoundException(null, ilAsm.Path);
+			throw new FileNotFoundException("ilAsm exe not found", ilAsm.Path);
+		if (File.Exists(ilFile) == false)
+            throw new FileNotFoundException(".il file not found", ilFile);
+		FileStream fs = null;
+		StreamWriter sw = null;
+		//write il file
+		try
+		{
+			fs = new FileStream(ilFile, FileMode.Create);
+			sw = new StreamWriter(fs);
+			foreach (string str in ilCode)
+			{
+				sw.WriteLine(str);
+			}
+		}
+		catch (Exception ex)
+		{
+			//TODO find appropriate exception to throw here
+			throw ex;
+		}
+		finally
+		{
+			if (sw != null)
+				sw.Close();
+			if (fs != null)
+				fs.Close();
+		}
+		//write res file
+		//compile dll
+		Process process = new Process();
+		process.StartInfo.FileName = ilAsm.Path;
+		//" /OUT:\"" + fileName + "\"" + " \"" + win.TEMP + "_dll.il\"" + " /DLL /resource:\"" + win.TEMP + "_dll.res\"";
+		process.StartInfo.Arguments = " /DLL /OUTPUT=\"" + fileName + "\"";
+		if (File.Exists(resFile))
+			process.StartInfo.Arguments += " /RESOURCE=\"" + resFile + "\"";
+		process.StartInfo.Arguments += " \"" + ilFile + "\"";
+		process.StartInfo.UseShellExecute = false;
+		process.StartInfo.CreateNoWindow = true;
+		process.StartInfo.RedirectStandardOutput = true;
+		process.Start();
+		string result = process.StandardOutput.ReadToEnd();
+		while (process.HasExited == false)
+			Application.DoEvents();
 	}
 }
