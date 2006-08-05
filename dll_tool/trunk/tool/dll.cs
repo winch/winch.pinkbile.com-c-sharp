@@ -367,14 +367,35 @@ class dll
 		win.stringBox.Items.Clear();
 		FileStream fs = null;
 		StreamReader sr = null;
+		//DateTime startTime = DateTime.Now;
 		try
 		{
 			fs = new FileStream(win.TEMP + "\\_dll.il", FileMode.Open);
 			sr = new StreamReader(fs);
-			string temp = "";
+			string temp;
+			string cat = null;
 			while ((temp = sr.ReadLine()) != null)
 			{
-				win.lb.Items.Add(temp.Trim());
+				temp = temp.Trim();
+				if (temp.EndsWith(","))
+				{
+					cat = temp;
+				}
+				else
+				{
+					if (temp.Length > 0 && temp.StartsWith("//") == false)
+					{
+						if (cat == null)
+						{
+							win.lb.Items.Add(temp);
+						}
+						else
+						{
+							win.lb.Items.Add(cat + temp);
+							cat = null;
+						}
+					}
+				}
 			}
 		}
 		catch (Exception ex)
@@ -386,7 +407,7 @@ class dll
 			sr.Close();
 			fs.Close();
 		}
-		//remove comments and blank lines from listview, this makes it easier to parse later
+		//remove comments from listview, this makes it easier to parse later
 		//join lines that end in ","
 		//change .corflags 0x00000001 to .corflags 0x00000002
 		int i;
@@ -395,7 +416,6 @@ class dll
 		for (i = 0; i < win.lb.Items.Count; i++)
 		{
 			str = win.lb.Items[i].ToString();
-			//strip spaces
 			if (corflags == false)
 			{
 				if (str == ".corflags 0x00000001")
@@ -404,34 +424,6 @@ class dll
 					corflags = true;
 				}
 			}
-			if (str.Length == 0)
-			{
-				win.lb.Items.RemoveAt(i);
-				i--;
-			}
-			if (i >= 0)
-			{
-				if (str.StartsWith("//"))
-				{
-					win.lb.Items.RemoveAt(i);
-					i --;
-				}
-			}
-			//if previous line ended with "," stick this line on end
-			if (i > 0)
-			{
-				if (win.lb.Items[i-1].ToString().EndsWith(","))
-				{
-					win.lb.Items[i-1] = win.lb.Items[i-1].ToString() + str;
-					win.lb.Items.RemoveAt(i);
-					i --;
-				}
-			}
-		}
-		// find methods
-		for (i = 0; i < win.lb.Items.Count; i++)
-		{
-			str = win.lb.Items[i].ToString();
 			if (str.StartsWith(".method"))
 			{
 				//if next line doesn't start with "{" stick it on the line with .method
@@ -459,6 +451,8 @@ class dll
 		}
 		win.methodBox.EndUpdate();
 		win.lb.EndUpdate();
+		//TimeSpan ts = DateTime.Now - startTime;
+		//MessageBox.Show(ts.ToString());
 		//show normal cursor
 		Cursor.Current = Cursors.Default;
 	}
