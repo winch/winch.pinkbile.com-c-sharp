@@ -9,6 +9,9 @@ requires .Net SDK
 version history
 +++++++++++++++
 
+v0.13 05 August 2006
+-Significantly speed up dll loading, new method takes 1/3 the time of the old one.
+
 v0.12 07 July 2006
 - Fix deadlock where ilasm would fill the standard output buffer and block when building dlls with lots of methods.
 - Use Begin/EndUpdate() in a few places.
