@@ -67,7 +67,7 @@ class viewItem : Form
 		itemType = new ComboBox();
 		itemType.Parent = this;
 		itemType.DropDownStyle = ComboBoxStyle.DropDownList;
-		itemType.Width = 140;
+		itemType.Width = 150;
 		itemType.Location = new Point(this.Width - itemType.Width - 15, 10);
 		itemType.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 		itemType.Items.Add("_virtual.dat");
@@ -161,6 +161,7 @@ class viewItem : Form
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf(ListViewStrings.ExtraData))
 		{
 			//extra data
+			textBox.Visible = true;
 			showExtraData();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Hex"))
