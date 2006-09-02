@@ -6,62 +6,6 @@ http://winch.pinkbile.com/
 
 requires .Net SDK
 
-version history
-+++++++++++++++
-
-v0.13 05 August 2006
--Significantly speed up dll loading, new method takes 1/3 the time of the old one.
-
-v0.12 07 July 2006
-- Fix deadlock where ilasm would fill the standard output buffer and block when building dlls with lots of methods.
-- Use Begin/EndUpdate() in a few places.
-
-v0.11 05 July 2005
-- improved command line support to work with net_tool
-
-v0.10 03 July 2005
-- added command line support
-- added update checker on about dialog
-
-v0.9 28 June 2005
-- added .dsf file loading and saving, .dsf files contain the settings for the dll.
-
-v0.8 27 June 2005
-- fixed stupid bug in auto string table generator
-- can now choose which calling convention exported methods will use between Cdecl and StdCall
-
-v0.7 26 June 2005
-- yet more slight speedups in load function
-- edit il dialog, allows you to view, edit, save and load il code
-- edit il before build, shows il edit dialog just before the il is assembled with ilasm
-
-v0.6 26 June 2005
-- Tempory files now created in %TEMP% dir not application dir
-- exports now use cdecl insted of stdcall
-- very minor code speed ups
-- fixed problems with method names that are ilasm reserved words
-
-v0.5 03 January 2005
-- String table generation completed
-- fixed error when .method name had no opening bracket
-
-v0.4 02 January 2005
-- Improved the gui again to make handling large dlls much easier
-- Started work on string table generator function but it doesn't yet fill in parameters
-
-v0.3 01 January 2005
-- Existing .res file is now edited instead or replaced
-- Now supports more than 15 string table items
-- Confims success or failure of build with option to show ilasm output on failure
-
-v0.2 30 December 2004
--various gui bugs fixed and gui tidyup
--added option to include string table with built dll
--tries to find location of ilasm and ildasm instead of using hardcoded paths
-
-v0.1 26 December 2004
--initial release
-
 usage
 +++++
 

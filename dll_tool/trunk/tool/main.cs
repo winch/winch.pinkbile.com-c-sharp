@@ -32,16 +32,15 @@ using Microsoft.Win32;
 
 class main: Form
 {
-	public string ilasm = "";
-	public string ilasm1 = ""; //framework v1.1 ilasm
-	public string ilasm2 = ""; //framework v2.2 ilasm
-	public string ildasm = "";
-	public string ildasm1 = "";
-	public string ildasm2 = "";
-	public string dllName = "";
 	public string[] args;
 
 	public string TEMP = Path.GetTempPath();
+
+	public tools Tools;
+	public ilTool ilAsm;
+	public ilTool ilDasm;
+
+	public string dllName;
 
 	public ListBox lb;
 	public ListView methodBox;
@@ -51,8 +50,10 @@ class main: Form
 	public CheckBox editIl;
 	public Button build;
 	public ComboBox exportsType;
+	ComboBox ilAsmVersion;
+	ComboBox ilDasmVersion;
 
-	public static void Main(string[] arg)
+	public static void Main(string[] arg) 
 	{
 		Application.Run(new main(arg));
 	}
@@ -62,9 +63,26 @@ class main: Form
 		args = arg;
 
 		Text = "dll_tool";
-		Size = new Size(600,560);
+		Size = new Size(600,580);
 		this.Load += new EventHandler(main_Load);
 		this.Disposed += new EventHandler(main_Disposed);
+
+		//ilasm
+		Tools = tools.GetInstance();
+		//make sure ilasm and ildasm are installed.
+		if (Tools.IlAsm.Count == 0)
+		{
+			MessageBox.Show("ilasm.exe not found.\nInstall .Net SDK.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			Application.Exit();
+		}
+		if (Tools.IlDasm.Count == 0)
+		{
+			MessageBox.Show("ildasm.exe not found.\nInstall .Net SDK.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
+		}
+		ilAsm = (ilTool) Tools.IlAsm[Tools.IlAsm.Count - 1];
+		ilDasm = (ilTool) Tools.IlDasm[Tools.IlDasm.Count - 1];
+
 
 		//load button
 		Button load = new Button();
@@ -123,22 +141,56 @@ class main: Form
 		editIl.Location = new Point(this.Width - editIl.Width - 10, 5);
 		editIl.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 
+		//ilasm label
+		Label lab = new Label();
+		lab.Parent = this;
+		lab.AutoSize = true;
+		lab.Location = new Point(5, 45);
+		lab.Text = "ilAsm";
+
+		//ilasm combobox
+		ilAsmVersion = new ComboBox();
+		ilAsmVersion.Parent = this;
+		ilAsmVersion.DropDownStyle = ComboBoxStyle.DropDownList;
+		ilAsmVersion.Width = 80;
+		ilAsmVersion.Location = new Point(lab.Width + lab.Left, 40);
+		foreach(ilTool iltool in Tools.IlAsm)
+			ilAsmVersion.Items.Add(iltool.Version);
+		ilAsmVersion.SelectedIndex = ilAsmVersion.Items.Count - 1;
+
+		//ildasm label
+		lab = new Label();
+		lab.Parent = this;
+		lab.AutoSize = true;
+		lab.Location = new Point(ilAsmVersion.Left + ilAsmVersion.Width + 5, 45);
+		lab.Text = "ilDasm";
+
+		//ildasm combobox
+		ilDasmVersion = new ComboBox();
+		ilDasmVersion.Parent = this;
+		ilDasmVersion.DropDownStyle = ComboBoxStyle.DropDownList;
+		ilDasmVersion.Width = 80;
+		ilDasmVersion.Location = new Point(lab.Left + lab.Width, 40);
+		foreach(ilTool iltool in Tools.IlDasm)
+			ilDasmVersion.Items.Add(iltool.Version);
+		ilDasmVersion.SelectedIndex = ilDasmVersion.Items.Count - 1;
+
 		//exports type combobox
 		exportsType = new ComboBox();
 		exportsType.Parent = this;
 		exportsType.DropDownStyle = ComboBoxStyle.DropDownList;
 		exportsType.Width = 80;
-		exportsType.Location = new Point(this.Width - exportsType.Width - 20,35);
+		exportsType.Location = new Point(this.Width - exportsType.Width - 20, 40);
 		exportsType.Items.Add("Cdecl");
 		exportsType.Items.Add("StdCall");
 		exportsType.SelectedIndex = 0;
 		exportsType.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 
 		//exports type label
-		Label lab = new Label();
+		lab = new Label();
 		lab.Parent = this;
 		lab.AutoSize = true;
-		lab.Location = new Point(exportsType.Left - lab.Width - 120, 40);
+		lab.Location = new Point(exportsType.Left - lab.Width - 120, 45);
 		lab.Text = "Moved methods will be";
 		lab.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 
@@ -146,7 +198,7 @@ class main: Form
 		GroupBox gb = new GroupBox();
 		gb.Parent = this;
 		gb.Text = "Methods";
-		gb.Location = new Point(10, 55);
+		gb.Location = new Point(10, 70);
 		gb.Size = new Size(230, 150);
 
 		//method listview
@@ -162,7 +214,7 @@ class main: Form
 		gb = new GroupBox();
 		gb.Parent = this;
 		gb.Text = "Exports";
-		gb.Location = new Point(290, 55);
+		gb.Location = new Point(290, 70);
 		gb.Size = new Size(290, 150);
 		gb.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -183,7 +235,7 @@ class main: Form
 		Button leftBtn = new Button();
 		leftBtn.Parent = this;
 		leftBtn.Text = "&<";
-		leftBtn.Location = new Point(250, 130);
+		leftBtn.Location = new Point(250, 150);
 		leftBtn.Size = new Size(30,70);
 		leftBtn.Click += new EventHandler(leftBtn_Click);
 
@@ -191,7 +243,7 @@ class main: Form
 		Button rightBtn = new Button();
 		rightBtn.Parent = this;
 		rightBtn.Text = "&>";
-		rightBtn.Location = new Point(250, 55);
+		rightBtn.Location = new Point(250, 75);
 		rightBtn.Size = new Size(30, 70);
 		rightBtn.Click += new EventHandler(rightBtn_Click);
 
@@ -199,7 +251,7 @@ class main: Form
 		gb = new GroupBox();
 		gb.Parent = this;
 		gb.Text = "String Table";
-		gb.Location = new Point(10,210);
+		gb.Location = new Point(10,230);
 		gb.Size = new Size(570,145);
 		gb.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
 
@@ -257,7 +309,7 @@ class main: Form
 		docBuild.Height -= 5;
 		docBuild.Location = new Point(465,100);
 		docBuild.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-		//docBuild.Visible = false;
+		docBuild.Visible = false;
 
 		//generate ini button
 		Button iniBuild = new Button();
@@ -267,13 +319,13 @@ class main: Form
 		iniBuild.Height -= 5;
 		iniBuild.Location = new Point(465,120);
 		iniBuild.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-		//iniBuild.Visible = false;
+		iniBuild.Visible = false;
 
 		//il groubbox
 		gb = new GroupBox();
 		gb.Parent = this;
 		gb.Text = "IL code (double click to edit)";
-		gb.Location = new Point(10, 365);
+		gb.Location = new Point(10, 385);
 		gb.Size = new Size(570, 160);
 		gb.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
 
@@ -366,36 +418,6 @@ class main: Form
 		if (args.Length > 0)
 		{
 			this.Hide();
-		}
-		//find location of liasm and ildasm?
-		//check ilasm and ildasm exist
-		RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\.NETFramework");
-		ildasm1 = (string)reg.GetValue("sdkInstallRootv1.1") + "bin\\ildasm.exe";
-		//ildasm2 = (string)reg.GetValue("sdkInstallRootv2.0") + "bin\\ildasm.exe";
-		ildasm2 = null;
-		reg.Close();
-		if (ildasm1 != null)
-		{
-			//use v1.1 ildasm by default
-			ildasm = ildasm1;
-		}
-		else
-		{
-			if (ildasm2 != null)
-			{
-				ildasm = ildasm2;
-			}
-		}
-		if (! File.Exists(ildasm))
-		{
-			MessageBox.Show("ildasm not found\nMake sure you have .NET SDK installed", "dll_tool");
-			Application.Exit();
-		}
-		ilasm = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory() + "\\ilasm.exe";
-		if (! File.Exists(ilasm))
-		{
-			MessageBox.Show("ilasm not found");
-			Application.Exit();
 		}
 		if (args.Length > 0)
 		{

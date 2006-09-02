@@ -105,15 +105,17 @@ class dll
 		Cursor.Current = Cursors.WaitCursor;
 		//disable build button to prevent building twice
 		win.build.Enabled = false;
-		//find .corflags 0x00000002 and insert .vtfixup after it
+		//find .corflags 0x00000001 and insert .vtfixup after it
 		int i;
 		win.lb.BeginUpdate();
 		int slot = 1; //current slot number
 		for (i = 0; i < win.lb.Items.Count; i++)
 		{
-			if (win.lb.Items[i].ToString().StartsWith(".corflags 0x00000002"))
+			if (win.lb.Items[i].ToString().StartsWith(".corflags 0x00000001"))
 			{
-				//.corflags 0x00000002 found so create VTableFixup table with enough slots for exported methods
+				//.corflags 0x00000001 found, change to 0x00000002
+                win.lb.Items[i] = ".corflags 0x00000002";				
+				//create VTableFixup table with enough slots for exported methods
 				foreach (ListViewItem lvi in win.exportBox.Items)
 				{
 					win.lb.Items.Insert(i+1, ".vtfixup [1] int32 fromunmanaged at VT_0" + slot.ToString());
@@ -289,7 +291,7 @@ class dll
 		//build new dll
 		//OUT:HelloWorldDll.dll HelloWorldDll.il /DLL /resource:HelloWorldDll.res
 		Process process = new Process();
-		process.StartInfo.FileName = "\"" + win.ilasm + "\"";
+		process.StartInfo.FileName = "\"" + win.ilAsm.Path + "\"";
 		process.StartInfo.Arguments = " /OUT:\"" + fileName + "\"" + " \"" + win.TEMP + "_dll.il\"" + " /DLL /resource:\"" + win.TEMP + "_dll.res\"";
 		if (Quiet == false)
 		{
@@ -340,7 +342,7 @@ class dll
 			File.Delete(Application.StartupPath + "\\_dll.res");
 		//use ildasm to decompile dll to il code
 		Process process = new Process();
-		process.StartInfo.FileName = "\"" + win.ildasm +"\"";
+		process.StartInfo.FileName = "\"" + win.ilDasm.Path +"\"";
 		process.StartInfo.Arguments = " /OUT:\"" + win.TEMP + "\\_dll.il\" \"" + filename + "\"";
 		process.StartInfo.UseShellExecute = false;
 		process.StartInfo.RedirectStandardOutput = true;
