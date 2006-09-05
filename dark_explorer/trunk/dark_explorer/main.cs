@@ -79,6 +79,7 @@ class window : Form
 		contents.Columns.Add("Null Str table",75,HorizontalAlignment.Left);
 		contents.Columns.Add("File size",70,HorizontalAlignment.Right);
 		contents.Columns.Add("Location",90,HorizontalAlignment.Left);
+		contents.AllowColumnReorder = true;
 
 		exeType = new ComboBox();
 		exeType.Parent = this;
