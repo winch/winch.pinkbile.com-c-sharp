@@ -1,12 +1,15 @@
 version history
 +++++++++++++++
 
-v0.14 02 September
--Choose ilasm and ildasm versions to use so .net 2.0 can no be used.
--Fix major bug introduced in v0.13 where functions where not exported correctly.
+v0.15 05 September 2006
+- Use the correct ilAsm and ilDasm versions according to the combo boxes.
+
+v0.14 02 September 2006
+- Choose ilasm and ildasm versions to use so .net 2.0 can no be used.
+- Fix major bug introduced in v0.13 where functions where not exported correctly.
 
 v0.13 05 August 2006
--Significantly speed up dll loading, new method takes 1/3 the time of the old one.
+- Significantly speed up dll loading, new method takes 1/3 the time of the old one.
 
 v0.12 07 July 2006
 - Fix deadlock where ilasm would fill the standard output buffer and block when building dlls with lots of methods.
