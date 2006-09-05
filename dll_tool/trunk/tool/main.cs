@@ -157,6 +157,7 @@ class main: Form
 		foreach(ilTool iltool in Tools.IlAsm)
 			ilAsmVersion.Items.Add(iltool.Version);
 		ilAsmVersion.SelectedIndex = ilAsmVersion.Items.Count - 1;
+		ilAsmVersion.SelectedIndexChanged += new EventHandler(ilAsmVersion_SelectedIndexChanged);
 
 		//ildasm label
 		lab = new Label();
@@ -174,6 +175,7 @@ class main: Form
 		foreach(ilTool iltool in Tools.IlDasm)
 			ilDasmVersion.Items.Add(iltool.Version);
 		ilDasmVersion.SelectedIndex = ilDasmVersion.Items.Count - 1;
+		ilDasmVersion.SelectedIndexChanged += new EventHandler(ilDasmVersion_SelectedIndexChanged);
 
 		//exports type combobox
 		exportsType = new ComboBox();
@@ -724,5 +726,17 @@ class main: Form
 					fs.Close();
 			}
 		}
+	}
+
+	private void ilDasmVersion_SelectedIndexChanged(object sender, EventArgs e)
+	{
+		//ilDasm version changed
+		ilDasm = (ilTool) Tools.IlDasm[ilDasmVersion.SelectedIndex];
+	}
+
+	private void ilAsmVersion_SelectedIndexChanged(object sender, EventArgs e)
+	{
+		//ilAsm version changed
+		ilAsm = (ilTool) Tools.IlAsm[ilAsmVersion.SelectedIndex];
 	}
 }
