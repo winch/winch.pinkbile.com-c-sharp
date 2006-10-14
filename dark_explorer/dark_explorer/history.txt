@@ -1,6 +1,11 @@
 Version history
 +++++++++++++++
 
+v0.14 14 October 2006
+- Show textbox when viewing extra data in item viewer
+- Correctly steal focus from itemType combobox on viewItem form load
+- String table viewer now works if string table items don't begin at 0.
+
 v0.13 03 June 2006
 - Can now compress files with upx on save
 - Edit multiple item dialog

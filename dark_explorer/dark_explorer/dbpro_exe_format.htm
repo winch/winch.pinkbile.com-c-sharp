@@ -32,6 +32,7 @@ all compiled programs. The only time this section appears to differ is when you 
 The most reliable method to find the size of this section is to use some knowledge of the windows exe format.
 <a href="http://wotsit.org">Wotsit.org</a> has several documents that describe the windows exe format.<br />
 Here is a simple dbpro function returns the size in bytes of an exe section of a dbpro exe.<br />
+</p>
 <pre class="code">
 function get_exe_size(fileName as string)
     `Returns the size in bytes of an exe section of a dbpro exe
@@ -54,6 +55,7 @@ function get_exe_size(fileName as string)
     inc size, pos
 endfunction size
 </pre>
+<p>
 Dbpro does not use such a method. Instead it writes the length of the exe section as a 4 byte int at the very end of the exe. The method
 Dbpro uses can cause problems when you change the size of the exe, for instance when you change the exe icon.
 </p>
@@ -140,7 +142,7 @@ HGLOBAL decompress_block(void* data, int datalength)
 HGLOBAL compress_block(void* data, int datalength)
 </pre>
 <p>Using these two functions is fairly simple.<br />
-To decompress a compressed exe,<br />
+To decompress a compressed exe,</p>
 <ol>
 <li>Load the exe as normal, and extract compress.dll</li>
 <li>Following compress.dll is the compressed data, load it to memory ignoring the last 20bytes of extra data.</li>
@@ -151,7 +153,7 @@ on this handle to get normal memory pointer.</li>
 handle to find the size of the decompressed data.</li>
 <li>Write a normal dbpro exe section to disk, then the uncompressed data followed by the 20 bytes of extra data.</li>
 </ol>
-To compress an uncompressed exe,<br />
+<p>To compress an uncompressed exe,</p>
 <ol>
 <li>Source compress.dll from the dbpro compiler\plugins directory or another source.</li>
 <li>Load a dbpro exe into memory discarding the exe section and 20 bytes of extra data.</li>
@@ -163,11 +165,11 @@ handle to find the size of the compressed data.</li>
 <li>Write a normal dbpro exe section to disk, followed by the compress.dll you used as a normal attached file. Then write the compressed
 data followed by the extra data.</li>
 </ol>
-</p>
 <h2>compress.dll code injection trick</h2>
 <p>We can inject are own compress.dll as the first attached file in a normal dbpro exe. Then when the dbpro exe is run it will call our
 decompress_block function passing it the already decompressed data.<br />
 A simple C example that shows a message box asking the user if they want to continue running the exe.
+</p>
 <pre class="code">
 DLLIMPORT HGLOBAL decompress_block(void* data, DWORD dataSize)
 {
@@ -191,13 +193,12 @@ DLLIMPORT HGLOBAL decompress_block(void* data, DWORD dataSize)
     return block;
 }
 </pre>
-This allows us to do some interesting things including,
+<p>This allows us to do some interesting things including,</p>
 <ul>
 <li>Show a user friendly message box if the correct version of DirectX isn't installed.</li>
 <li>Show a display mode dialog and alter the _virtal.dat file in memory so the exe starts in the correct mode.</li>
 <li>Convert dbpro to a runtime style system with small exes by souring the dlls from the dbpro install dir.</li>
 </ul>
-</p>
 <h2>_virtual.dat</h2>
 <p>Other than the standard exe section which changes when you use a different icon or version information _virtual.dat is the only file
 that differs between dbpro exes. You can therefore conclude the compiled code and other settings are stored in the _virtual.dat file.</p>
@@ -226,6 +227,6 @@ and add a null character at the end. Leave the extra characters from the origina
 length. Sometimes it is even possible to replace it with a longer string, just overwrite the data following the original string.</p>
 <h2>Useful links</h2>
 <p><a href="http://dbp-unchained.tk/">Dbp unchained</a> - An unofficial collection of research, observations and commentary on the architecture
-of DarkBASIC PRO software.</p>  
+of DarkBASIC PRO software.</p>
 </body>
 </html>
