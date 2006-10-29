@@ -109,8 +109,8 @@ class window : Form
 	{
 		//browse for new proExe
 		OpenFileDialog ofd = new OpenFileDialog();
-		ofd.Title = "Select Dbpro exe";
-		ofd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
+		ofd.Title = "Select Dbpro exe or pck";
+		ofd.Filter = "Exe or Pck Files (*.exe, *.pck)|*.exe;*.pck|All Files (*.*)|*.*";
 		if (ofd.ShowDialog() == DialogResult.OK)
 		{
 			proExe.Text = ofd.FileName;
@@ -126,8 +126,12 @@ class window : Form
 			string[] files = Directory.GetDirectories(Application.StartupPath + Path.DirectorySeparatorChar + "dll", "*");
 			foreach (string str in files)
 			{
-				dllList.Items.Add(str.Substring(str.LastIndexOf(Path.DirectorySeparatorChar) + 1,
-					str.Length - str.LastIndexOf(Path.DirectorySeparatorChar) - 1));
+				//check for compress.dll in directory
+				if (File.Exists(str + "\\compress.dll"))
+				{
+					dllList.Items.Add(str.Substring(str.LastIndexOf(Path.DirectorySeparatorChar) + 1,
+						str.Length - str.LastIndexOf(Path.DirectorySeparatorChar) - 1));
+				}
 			}
 			//Seclect first item in list
 			if (dllList.Items.Count > 0)
@@ -181,8 +185,8 @@ class window : Form
 			return;
 		}
 		SaveFileDialog sfd = new SaveFileDialog();
-		sfd.Title = "Save injected exe as";
-		sfd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
+		sfd.Title = "Save injected exe or pck as";
+		sfd.Filter = "Exe and Pck Files (*.exe, *.pck)|*.exe;*.pck|All Files (*.*)|*.*";
 		if (sfd.ShowDialog() == DialogResult.OK)
 		{
 			Cursor.Current = Cursors.WaitCursor;
