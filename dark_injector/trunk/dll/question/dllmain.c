@@ -14,7 +14,7 @@ DLLIMPORT HGLOBAL decompress_block(void* data, DWORD dataSize)
     
     if (IDYES == MessageBox(GetActiveWindow(), "Continue running exe?", "", MB_YESNO))
     {
-        //for the dbpro exe to run it needs to recieve the data as if it has been decompressed
+        //for the dbpro exe to run it needs to receive the data as if it has been decompressed
         //by the real compress.dll. Since the dbpro exe is not compressed we just need to allocate
         //some memory, copy the already uncompressed data to it then return the ptr to dbpro
         block = GlobalAlloc(GMEM_FIXED, dataSize);
