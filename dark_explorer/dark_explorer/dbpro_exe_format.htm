@@ -19,7 +19,7 @@ text-decoration: underline overline;
 </head>
 <body>
 <h1>Dbpro exe format information</h1>
-<p>v0.6 - 30 July 2006</p>
+<p>v0.7 - 29 October 2006</p>
 <p>Information based on exes produced by dbpro 5.9.</p>
 <p>Darkbasic professional exes consist of a standard win32 exe with files and data appended onto the end. When the dbpro exe is run it creates a dbpdata
 directory in the windows temp dir. If there is an existing dbpdata dir a number is appended to the end an incremented, dbpdata1, dbpdata2 etc. until
@@ -123,19 +123,19 @@ into any of the other types.</p>
 <ol>
 <li>Normal Executable - The default option and by far the most popular, this is the format discussed above.</li>
 <li>Executable with .Pck file - Instead of being appended to the exe the files are placed into a .pck file.</li>
-<li>Executable with compressed data - The files are compressed before being appended to the exe.</li>
 </ol>
+<p>The above types can also be optionally compressed.</p>
 <h3>Normal Executable</h3>
 <p>Almost all dbpro exes you find will be in this format as it's the default option and the most practical.</p>
 <h3>Executable with .Pck file</h3>
 <p>Instead of appending the files to the exe they are stored in a .pck file. The .pck file will have the same name as the program just
 with a .pck extension. Files are stored in the .pck file in the same format as they are appended to the exe. Pck files do
-not have the extra 20 bytes at the end. To identify this type of exe check for a pck file or see if the exe section is the same size
+not have the extra 20 bytes of data at the end. To identify this type of exe check for a pck file or see if the exe section is the same size
 as the exe.</p>
-<h3>Executable with compressed data</h3>
-<p>With this format the attached files are compressed to reduce the size of the exe. Exes in this format consist of the standard exe section
-followed by compress.dll and then the compressed data followed by the 20 bytes of extra data. compress.dll is used by the compiler to compress
-the data at compile time and by the dbpro exe to decompress the data at runtime.<br />
+<h3>Compressed data</h3>
+<p>With this format the attached files are compressed to reduce the size of the exe. Both exes and .pck files can be compressed.<br />
+With compressed data there is first an uncompressed file, compress.dll. This dll contains functions required to decompress the data.
+After compress.dll is the compressed data. With an exe this is followed by the 20 bytes of extra data.<br />
 The two functions exported in compress.dll look like this,</p>
 <pre class="code">
 HGLOBAL decompress_block(void* data, int datalength)
@@ -165,9 +165,10 @@ handle to find the size of the compressed data.</li>
 <li>Write a normal dbpro exe section to disk, followed by the compress.dll you used as a normal attached file. Then write the compressed
 data followed by the extra data.</li>
 </ol>
+<p>Dealing with .pck files is similar just with no exe section or extra data.</p>
 <h2>compress.dll code injection trick</h2>
-<p>We can inject are own compress.dll as the first attached file in a normal dbpro exe. Then when the dbpro exe is run it will call our
-decompress_block function passing it the already decompressed data.<br />
+<p>We can inject are own compress.dll as the first attached file in a normal dbpro exe or .pck file. Then when the dbpro exe is run it will
+call our decompress_block function passing it the already decompressed data.<br />
 A simple C example that shows a message box asking the user if they want to continue running the exe.
 </p>
 <pre class="code">
