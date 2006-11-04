@@ -31,6 +31,8 @@ class ListViewStrings
 	public static readonly string LocationExe = "<exe>";
 	public static readonly string ExeSection = "Exe section";
 	public static readonly string ExtraData = "Compressed or extra data";
+	public static readonly string VirtualDat = "_virtual.dat";
+	public static readonly string CompressDll = "compress.dll";
 }
 
 enum ListViewOrder

@@ -32,10 +32,13 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, ch
     fseek(oldExe, 0, SEEK_SET);
 
     //write exe section
-    buffer = malloc(exeSection);
-    fread(buffer, exeSection, 1, oldExe);
-    fwrite(buffer, exeSection, 1, newExe);
-    free(buffer);
+    if (exeSection > 0)
+    {
+        buffer = malloc(exeSection);
+        fread(buffer, exeSection, 1, oldExe);
+        fwrite(buffer, exeSection, 1, newExe);
+        free(buffer);
+    }
 
     //write compress.dll
     dllLen = 12;
@@ -67,10 +70,13 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, ch
     fwrite(data, compSize, 1, newExe);
     GlobalUnlock((HGLOBAL) data);
 
-    //write extra data
-    fwrite(extraData, 16, 1, newExe);
-    //write exeSection size
-    fwrite(&exeSection, 4, 1, newExe);
+    //write extra data if required
+    if (exeSection > 0)
+    {
+        fwrite(extraData, 16, 1, newExe);
+        //write exeSection size
+        fwrite(&exeSection, 4, 1, newExe);
+    }
 
     //show decompression stats message box
     char msg[255];
@@ -105,10 +111,13 @@ void DLL_EXPORT decompress(char *oldExeName, int exeSection, int dataOffset, cha
     fseek(oldExe, 0, SEEK_SET);
 
     //write exe section
-    buffer = malloc(exeSection);
-    fread(buffer, exeSection, 1, oldExe);
-    fwrite(buffer, exeSection, 1, newExe);
-    free(buffer);
+    if (exeSection > 0)
+    {
+        buffer = malloc(exeSection);
+        fread(buffer, exeSection, 1, oldExe);
+        fwrite(buffer, exeSection, 1, newExe);
+        free(buffer);
+    }
 
     //load compressed data into buffer;
     fseek(oldExe, dataOffset, SEEK_SET);
@@ -128,10 +137,13 @@ void DLL_EXPORT decompress(char *oldExeName, int exeSection, int dataOffset, cha
     fwrite(data, decompSize, 1, newExe);
     GlobalUnlock((HGLOBAL) data);
 
-    //write extra data
-    fwrite(extraData, 16, 1, newExe);
-    //write exeSection size
-    fwrite(&exeSection, 4, 1, newExe);
+    //write extra data if required
+    if (exeSection > 0)
+    {
+        fwrite(extraData, 16, 1, newExe);
+        //write exeSection size
+        fwrite(&exeSection, 4, 1, newExe);
+    }
 
     //show decompression stats message box
     char msg[255];

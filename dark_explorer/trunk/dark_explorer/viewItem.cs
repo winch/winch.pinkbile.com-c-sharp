@@ -70,7 +70,7 @@ class viewItem : Form
 		itemType.Width = 150;
 		itemType.Location = new Point(this.Width - itemType.Width - 15, 10);
 		itemType.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-		itemType.Items.Add("_virtual.dat");
+		itemType.Items.Add(ListViewStrings.VirtualDat);
 		itemType.Items.Add(ListViewStrings.ExtraData);
 		itemType.Items.Add("dll");
 		itemType.Items.Add("Text");
@@ -152,7 +152,7 @@ class viewItem : Form
 			listBox.Visible = true;
 			showDll();
 		}
-		else if (itemType.SelectedIndex == itemType.Items.IndexOf("_virtual.dat"))
+		else if (itemType.SelectedIndex == itemType.Items.IndexOf(ListViewStrings.VirtualDat))
 		{
 			//_virtual.dat
 			textBox.Visible = true;
@@ -556,8 +556,8 @@ class viewItem : Form
 				itemType.SelectedIndex = itemType.Items.IndexOf("Text");
 				break;
 			case ".dat":
-				if (item.SubItems[(int)ListViewOrder.Name].Text == "_virtual.dat")
-					itemType.SelectedIndex = itemType.Items.IndexOf("_virtual.dat");
+				if (item.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.VirtualDat)
+					itemType.SelectedIndex = itemType.Items.IndexOf(ListViewStrings.VirtualDat);
 				else
 					itemType.SelectedIndex = itemType.Items.IndexOf("Hex");
 				break;

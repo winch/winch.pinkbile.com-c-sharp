@@ -45,6 +45,25 @@ class proExe
 		return name;
 	}
 
+	public static bool IsCompressed(ListView contents)
+	{
+		//returns true if the exe or pck is compressed
+		bool compressed = false;
+		//pck
+		if (contents.Items.Count > 1)
+		{
+			if (contents.Items[0].Text == ListViewStrings.CompressDll)
+				compressed = true;
+		}
+		//exe
+		if (contents.Items.Count > 2)
+		{
+			if (contents.Items[1].Text == ListViewStrings.CompressDll)
+				compressed = true;
+		}
+		return compressed;
+	}
+
 	public static void CompressExe(ListView contents, bool dbPro, window win, string oldExe, string newExe, string compressDll)
 	{
 		FileStream fs = null;
@@ -108,6 +127,7 @@ class proExe
 			br = new BinaryReader(fs);
 			SkipExeSection(fs, br);
 			exeSection = (int)fs.Position;
+			//skip compress.dll name
 			dataLength = br.ReadInt32();
 			fs.Seek(dataLength, SeekOrigin.Current);
 			dataLength = br.ReadInt32();
@@ -151,6 +171,13 @@ class proExe
 	private static void SkipExeSection(FileStream fs, BinaryReader br)
 	{
 		//skips over the exe section of an exe
+		fs.Seek(0, SeekOrigin.Begin);
+		if (Encoding.ASCII.GetString(br.ReadBytes(2)) != "MZ")
+		{
+			//no exe signiture
+			fs.Seek(0, SeekOrigin.Begin);
+			return;
+		}
 		//skip dos stub
 		fs.Seek(60, SeekOrigin.Begin);
 		int e_lfanew = br.ReadInt32();
@@ -274,7 +301,7 @@ class proExe
 					bwOut.Write(Encoding.ASCII.GetBytes(name));
 				}
 				//check for _virtual.dat
-				if (lvi.Text == "_virtual.dat")
+				if (lvi.Text == ListViewStrings.VirtualDat)
 				{
 					//size
 					bwOut.Write(lvi.Size);
@@ -397,7 +424,7 @@ class proExe
 					//debugLog.Log(DbcRemoveNull(lvi.Text).PadRight(26, ' ') + " Size :" + lvi.Size.ToString("n0").PadRight(10, ' ') +
 					//			 " Offset :" + lvi.Offset.ToString("n0"));
 					//check for _virtual.dat
-					if (lvi.SubItems[(int)ListViewOrder.Name].Text == "_virtual.dat")
+					if (lvi.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.VirtualDat)
 					{
 						//get display settings
 						win.displayMode = br.ReadInt32();

@@ -115,8 +115,8 @@ class window : Form
 
 		//MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) ,
 		//					   new MenuItem("Show/Hide debug log", mToggleDebug) };
-		MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress),
-							   new MenuItem("Compress Exe", mCompress) };
+		MenuItem[] amiTools = {new MenuItem("Decompress Exe/Pck", mDecompress),
+							   new MenuItem("Compress Exe/Pck", mCompress) };
 		MenuItem[] ami =  { new MenuItem("No display settings", mDisplay),
 							new MenuItem("&Load", mLoad),
 							new MenuItem("&Save", mSave),
@@ -238,7 +238,7 @@ class window : Form
 		}
 		updateAlternatingColours();
 		//check for _virtual.dat
-		if (lvi.Text == "_virtual.dat")
+		if (lvi.Text == ListViewStrings.VirtualDat)
 		{
 			//get display settings from _virtual.dat
 			FileStream fsIn = null;
@@ -340,7 +340,7 @@ class window : Form
 		bool found = false;
 		foreach (ListViewFileItem lvi in contents.Items)
 		{
-			if (lvi.Text == "_virtual.dat")
+			if (lvi.Text == ListViewStrings.VirtualDat)
 				found = true;
 		}
 		if (found == false)
@@ -377,7 +377,7 @@ class window : Form
 				lvi.Size = (int)fi.Length;
 				lvi.SubItems[(int)ListViewOrder.Location].Text = Path.GetFullPath(ofd.FileName);
 				//check for _virtual.dat
-				if (lvi.Text == "_virtual.dat")
+				if (lvi.Text == ListViewStrings.VirtualDat)
 				{
 					//get display settings from _virtual.dat
 					FileStream fsIn = null;
@@ -472,13 +472,12 @@ class window : Form
 	{
 		//decompress loaded exe
 		SaveFileDialog sfd = new SaveFileDialog();
-		sfd.Title = "Save decompressed exe as";
-		sfd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
+		sfd.Title = "Save decompressed exe/pck as";
+		sfd.Filter = "Exe and Pck Files (*.exe, *.pck)|*.exe;*.pck|All Files (*.*)|*.*";
 		//check for compress.dll to ensure exe is compressed.
-		if (contents.Items.Count < 3 || contents.Items[1].Text.ToLower() != "compress.dll")
+		if (proExe.IsCompressed(contents) == false)
 		{
-			MessageBox.Show("Exe is not compressed.", "Error!",
-				MessageBoxButtons.OK, MessageBoxIcon.Error);
+			MessageBox.Show("Exe is not compressed.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			return;
 		}
 		if (sfd.ShowDialog() == DialogResult.OK)
@@ -505,13 +504,13 @@ class window : Form
 		//compress exe
 		//decompress loaded exe
 		SaveFileDialog sfd = new SaveFileDialog();
-		sfd.Title = "Save compressed exe as";
-		sfd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
+		sfd.Title = "Save compressed exe/pck as";
+		sfd.Filter = "Exe or Pck Files (*.exe, *.pck)|*.exe;*.pck|All Files (*.*)|*.*";
 		OpenFileDialog ofd = new OpenFileDialog();
-		ofd.Title = "Select compress.dll";
-		ofd.Filter = "compress.dll|compress.dll|Dll Files (*.dll)|*.dll|All Files (*.*)|*.*";
+		ofd.Title = "Select " + ListViewStrings.CompressDll;
+		ofd.Filter = ListViewStrings.CompressDll + "|" + ListViewStrings.CompressDll + "|Dll Files (*.dll)|*.dll|All Files (*.*)|*.*";
 		//check for compress.dll to ensure exe is not compressed.
-		if (contents.Items.Count > 3 && contents.Items[1].Text.ToLower() == "compress.dll")
+		if (proExe.IsCompressed(contents) == true)
 		{
 			MessageBox.Show("Exe is already compressed.", "Error!",
 				MessageBoxButtons.OK, MessageBoxIcon.Error);
