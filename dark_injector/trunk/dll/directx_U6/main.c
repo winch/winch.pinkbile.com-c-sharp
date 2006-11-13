@@ -11,7 +11,7 @@
 HGLOBAL decompress_block(void* data, DWORD dataSize)
 {
     HGLOBAL block;
-	HINSTANCE dxDll;
+    HINSTANCE dxDll;
     char versionString[255];
     int hasDirectx = 0;
 
@@ -21,7 +21,7 @@ HGLOBAL decompress_block(void* data, DWORD dataSize)
     //    \  \   sub
     //     \  minor
     //      major
-	//plus check for d3dx9_28.dll
+    //plus check for d3dx9_28.dll
     int majorReq = 9;
     int minorReq = 0;
     int subReq = 904;
@@ -108,19 +108,19 @@ HGLOBAL decompress_block(void* data, DWORD dataSize)
     RegCloseKey(hKey);
 
     if (hasDirectx == 1)
-	{
-		//check for d3dx9_28.dll
-		dxDll = LoadLibrary("d3dx9_28.dll");
-		if (dxDll == NULL)
-		{
-			//d3dx9_28.dll not found
-			hasDirectx = 0;
-		}
-		else
-		{
-			FreeLibrary(dxDll);
-		}
-	}
+    {
+        //check for d3dx9_28.dll
+        dxDll = LoadLibrary("d3dx9_28.dll");
+        if (dxDll == NULL)
+        {
+            //d3dx9_28.dll not found
+            hasDirectx = 0;
+        }
+        else
+        {
+            FreeLibrary(dxDll);
+        }
+    }
 
 
     if (hasDirectx == 0)
