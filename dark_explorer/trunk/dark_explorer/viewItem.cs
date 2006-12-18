@@ -53,6 +53,8 @@ class viewItem : Form
 	PictureBox pictureBox;
 	//text box
 	TextBox textBox;
+	//hex text box
+	TextBox hexBox;
 	//dll string table listbox
 	ListBox listBox;
 
@@ -60,7 +62,7 @@ class viewItem : Form
 	{
 		Text = "View item";
 		ShowInTaskbar = false;
-		Size = new Size(450, 450);
+		Size = new Size(590, 450);
 		StartPosition = FormStartPosition.CenterParent;
 
 		//itemType combobox
@@ -102,6 +104,18 @@ class viewItem : Form
 		textBox.Size = pictureBox.Size;
 		textBox.Anchor = pictureBox.Anchor;
 		textBox.Visible = false;
+
+		//hex text box
+		hexBox = new TextBox();
+		hexBox.Parent = this;
+		hexBox.Multiline = true;
+		hexBox.WordWrap = false;
+		hexBox.ScrollBars = ScrollBars.Both;
+		hexBox.Location = pictureBox.Location;
+		hexBox.Size = pictureBox.Size;
+		hexBox.Anchor = pictureBox.Anchor;
+		hexBox.Visible = false;
+		hexBox.Font = new Font("Courier New", hexBox.Font.Size);
 
 		//listbox
 		listBox = new ListBox();
@@ -167,7 +181,7 @@ class viewItem : Form
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Hex"))
 		{
 			//hex
-			textBox.Visible = true;
+			hexBox.Visible = true;
 			showHex();
 		}
 		if (stealFocus)
@@ -175,6 +189,8 @@ class viewItem : Form
 			//steal focues from item type comobox
 			if (textBox.Visible)
 				textBox.Focus();
+			if (hexBox.Visible)
+				hexBox.Focus();
 			if (listBox.Visible)
 				listBox.Focus();
 			if (pictureBox.Visible)
@@ -435,23 +451,39 @@ class viewItem : Form
 	{
 		//display file in hex
 		FileStream fs = null;
-		BinaryReader br = null;
 		try
 		{
+			long fileLen; //length of file
 			if (item.SubItems[(int)ListViewOrder.Location].Text == ListViewStrings.LocationExe)
 			{
 				//internal file
 				fs = new FileStream(exeName, FileMode.Open);
-				br = new BinaryReader(fs);
 				fs.Seek(item.Offset, SeekOrigin.Current);
+				fileLen = item.Size;
 			}
 			else
 			{
 				//external file
 				fs = new FileStream(item.SubItems[(int)ListViewOrder.Location].Text, FileMode.Open);
-				br = new BinaryReader(fs);
+				fileLen = fs.Length;
 			}
-			textBox.Text = "Not done yet.";
+			int addr = 0, count;
+			int lineLength = 16;
+			byte[] buffer = new byte[lineLength];
+			StringBuilder sb = new StringBuilder();
+			while (fileLen > 0)
+			{
+				if (fileLen < lineLength)
+				{
+					//set line length to size of remaining bytes in file
+					lineLength = (int) fileLen;
+				}
+				count = fs.Read(buffer, 0, lineLength);
+				sb.Append(formatHex(addr, buffer, count));
+				addr += lineLength;
+				fileLen -= count;
+			}
+            hexBox.Text = sb.ToString();
 		}
 		catch (Exception ex)
 		{
@@ -459,11 +491,50 @@ class viewItem : Form
 		}
 		finally
 		{
-			if (br != null)
-				br.Close();
 			if (fs != null)
 				fs.Close();
 		}
+	}
+	private string formatHex(int addr, byte[] buffer, int count)
+	{
+		//returns a string formated for use in hex viewer
+		string str = String.Format("{0:d6} |", addr);
+		//hex
+		for (int i = 0; i < buffer.Length; i++)
+		{
+			if (i < count)
+				str += String.Format(" {0:X2}", buffer[i]);
+			else
+			{
+				//pad to end of line
+				str += "   ";
+			}
+		}
+		str += " | ";
+		//ascii
+		for (int i = 0; i < buffer.Length; i++)
+		{
+			if (i < count)
+			{
+				if (buffer[i] > 32)
+				{
+					//show only printable characters
+					str += ((char) buffer[i]).ToString();
+				}
+				else
+				{
+					//display unicode medium white square
+					str += Encoding.Unicode.GetString(new byte[] { 0xfb, 0x25 });
+				}
+			}
+			else
+			{
+				//pad to end of line
+				str += " ";
+			}
+		}
+		str += "\r\n";
+		return str;
 	}
 
 	private void showText()
@@ -585,6 +656,7 @@ class viewItem : Form
 		//hide all containers
 		pictureBox.Visible = false;
 		textBox.Visible = false;
+		hexBox.Visible = false;
 		listBox.Visible = false;
 		showItem();
 		Cursor.Current = Cursors.Default;
