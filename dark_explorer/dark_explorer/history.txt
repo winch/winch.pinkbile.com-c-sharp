@@ -1,6 +1,10 @@
 Version history
 +++++++++++++++
 
+v0.15 18 December 2006
+- Added hex editor style item viewer
+- Allow (de)compression of .pck files
+
 v0.14 14 October 2006
 - Show textbox when viewing extra data in item viewer
 - Correctly steal focus from itemType combobox on viewItem form load

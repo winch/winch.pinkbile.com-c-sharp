@@ -305,7 +305,6 @@ class viewItem : Form
 				//read string table
 				StringBuilder sb = new StringBuilder(255);
 				int s = 1;
-				//while (bad < 5)
 				while (s < 1000)
 				{
 					if (LoadString(hinst, s, sb, 255) > 0)
