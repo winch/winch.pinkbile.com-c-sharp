@@ -152,38 +152,48 @@ class viewItem : Form
 		{
 			//image
 			pictureBox.Visible = true;
+			stealFocusIfRequired();
 			showImage();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Text"))
 		{
 			//text
 			textBox.Visible = true;
+			stealFocusIfRequired();
 			showText();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("dll"))
 		{
 			//dll
 			listBox.Visible = true;
+			stealFocusIfRequired();
 			showDll();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf(ListViewStrings.VirtualDat))
 		{
 			//_virtual.dat
 			textBox.Visible = true;
+			stealFocusIfRequired();
 			showVirtualDat();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf(ListViewStrings.ExtraData))
 		{
 			//extra data
 			textBox.Visible = true;
+			stealFocusIfRequired();
 			showExtraData();
 		}
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("Hex"))
 		{
 			//hex
 			hexBox.Visible = true;
+			stealFocusIfRequired();
 			showHex();
 		}
+	}
+
+	private void stealFocusIfRequired()
+	{
 		if (stealFocus)
 		{
 			//steal focues from item type comobox
