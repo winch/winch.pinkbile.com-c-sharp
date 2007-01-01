@@ -8,10 +8,10 @@
 #endif
 
 //magic "extra data"
-char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+const char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                      0x4E, 0x61, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, char *newExeName, char *compressDll)
+void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, const char *newExeName, const char *compressDll)
 {
     //compress uncompressed dbpro exe
     void* (*comp)(void*, int);
@@ -79,10 +79,11 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, ch
     }
 
     //show decompression stats message box
-    char msg[255];
+    char *msg = malloc(255);
     msg[0] = 0;
     sprintf(msg, "Compress complete in %.2f seconds", seconds);
     MessageBox(GetActiveWindow(), msg, "dark_explorer", 0);
+    free(msg);
 
     FreeLibrary(lib);
     fclose(oldExe);
@@ -90,7 +91,7 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, ch
     fclose(compDll);
 }
 
-void DLL_EXPORT decompress(char *oldExeName, int exeSection, int dataOffset, char *newExeName, char *compressDll)
+void DLL_EXPORT decompress(const char *oldExeName, int exeSection, int dataOffset, const char *newExeName, const char *compressDll)
 {
     // decompress compressed dbpro exe
     void* (*decomp)(void*, int);
@@ -146,10 +147,11 @@ void DLL_EXPORT decompress(char *oldExeName, int exeSection, int dataOffset, cha
     }
 
     //show decompression stats message box
-    char msg[255];
+    char *msg = malloc(255);
     msg[0] = 0;
     sprintf(msg, "Decompress complete in %.2f seconds", seconds);
     MessageBox(GetActiveWindow(), msg, "dark_explorer", 0);
+    free(msg);
 
     FreeLibrary(lib);
     fclose(oldExe);
