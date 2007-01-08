@@ -8,6 +8,7 @@
 #endif
 
 //magic "extra data"
+#define EXTRADATA_LENGHT 16
 const char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                      0x4E, 0x61, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
@@ -21,8 +22,6 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, co
     void *buffer;
     SIZE_T compSize;
     int dataSize, dllLen;
-    long time;
-    float seconds;
     HANDLE lib = LoadLibrary(compressDll);
     comp = (void* (*)(void*, int)) GetProcAddress(lib, "compress_block");
 
@@ -58,10 +57,7 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, co
     fread(buffer, dataSize, 1, oldExe);
 
     //compress data
-    time = GetTickCount();
     void *data = comp(buffer, dataSize);
-    time = GetTickCount() - time;
-    seconds = time / 1000.0;
     free(buffer);
     data = GlobalLock((HGLOBAL) data);
     compSize = GlobalSize((HGLOBAL) data);
@@ -73,17 +69,10 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, co
     //write extra data if required
     if (exeSection > 0)
     {
-        fwrite(extraData, 16, 1, newExe);
+        fwrite(extraData, EXTRADATA_LENGHT, 1, newExe);
         //write exeSection size
         fwrite(&exeSection, 4, 1, newExe);
     }
-
-    //show decompression stats message box
-    char *msg = malloc(255);
-    msg[0] = 0;
-    sprintf(msg, "Compress complete in %.2f seconds", seconds);
-    MessageBox(GetActiveWindow(), msg, "dark_explorer", 0);
-    free(msg);
 
     FreeLibrary(lib);
     fclose(oldExe);
@@ -100,8 +89,6 @@ void DLL_EXPORT decompress(const char *oldExeName, int exeSection, int dataOffse
     HANDLE lib = LoadLibrary(compressDll);  //compress.dll from compressed exe
     SIZE_T decompSize;
     int dataSize;
-    long time;
-    float seconds;
     void *buffer;
 
     decomp = (void* (*)(void*, int)) GetProcAddress(lib, "decompress_block");
@@ -126,10 +113,7 @@ void DLL_EXPORT decompress(const char *oldExeName, int exeSection, int dataOffse
     fread(buffer, dataSize, 1, oldExe);
 
     //decompress data
-    time = GetTickCount();
     void *data = decomp(buffer, dataSize);
-    time = GetTickCount() - time;
-    seconds = time / 1000.0;
     free(buffer);
     data = GlobalLock((HGLOBAL) data);
     decompSize = GlobalSize((HGLOBAL) data);
@@ -141,17 +125,10 @@ void DLL_EXPORT decompress(const char *oldExeName, int exeSection, int dataOffse
     //write extra data if required
     if (exeSection > 0)
     {
-        fwrite(extraData, 16, 1, newExe);
+        fwrite(extraData, EXTRADATA_LENGHT, 1, newExe);
         //write exeSection size
         fwrite(&exeSection, 4, 1, newExe);
     }
-
-    //show decompression stats message box
-    char *msg = malloc(255);
-    msg[0] = 0;
-    sprintf(msg, "Decompress complete in %.2f seconds", seconds);
-    MessageBox(GetActiveWindow(), msg, "dark_explorer", 0);
-    free(msg);
 
     FreeLibrary(lib);
     fclose(oldExe);
