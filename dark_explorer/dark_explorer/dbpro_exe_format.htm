@@ -19,7 +19,7 @@ text-decoration: underline overline;
 </head>
 <body>
 <h1>Darkbasic pro and classic exe format information</h1>
-<p>v0.7 - 02 December 2006</p>
+<p>v0.8 - 25 February 2007</p>
 <p>Information based on exes produced by dbpro 5.9 and dbc 1.13</p>
 <p>Darkbasic exes consist of a standard win32 exe with files and data appended onto the end.</p>
 <p>When the dbpro exe is run it creates a dbpdata directory in the windows temp dir. If there is an
@@ -66,6 +66,8 @@ name
 int datalength
 data
 </pre>
+<p>The following image shows an example .pck file loaded in a hexeditor.</p>
+<p><img src="image/example_data.png" alt="" /></p>
 <p>Continue reading files while namelength is &gt; 0 and &lt; 255 or you reach the end of the file.</p>
 <p>Some code that lists the files in an exe, requires the get_exe_size function above.</p>
 <pre class="code">
@@ -109,7 +111,7 @@ close file 1
 sync
 wait key
 </pre>
-<p>With dbpro exes after the files is 20 bytes of extra data. The last 4 bytes of this extra data is the size of the exe section stored in a 4 byte int. With dbc the extra data is only 4 bytes and contains just the size of the exe section.
+<p>With dbpro exes after the files is 20 bytes of extra data. The last 4 bytes of this extra data is the size of the exe section stored in a 4 byte int. With dbc the extra data is only 4 bytes and contains just the size of the exe section.</p>
 <h2>Dbpro specific information</h2>
 <p>The above code will only let you view the contents of a normal dbpro exe, through the options in the IDE you can instruct the compiler to compile one of several different types of dbpro exe. For all of these types the standard exe section is identical. All types can also contain attached media files. Any media files will have a "media\" prefix on the filename. The dbpro media loading commands automatically check for attached media so you can add and remove media from the exe without problems. It is possible to change a compiled exe of one type into any of the other types.</p>
 <ol>
