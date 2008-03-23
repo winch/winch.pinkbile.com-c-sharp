@@ -1,6 +1,10 @@
 Version history
 +++++++++++++++
 
+v0.16 23 March 2008
+- Use [STAThread] attribute on main() to avoid "DragDrop registration did not succeed." errors on Vista.
+- Option to use LZMA compression when compressing with upx
+
 v0.15 18 December 2006
 - Added hex editor style item viewer
 - Allow (de)compression of .pck files
