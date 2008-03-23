@@ -58,6 +58,7 @@ class window : Form
 	private const int MENU_ABOUT = 14;
 	private const int MENU_EXIT = 15;
 
+	[STAThread]
 	public static void Main()
 	{
 		Application.Run(new window());
