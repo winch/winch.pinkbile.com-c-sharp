@@ -511,7 +511,7 @@ class proExe
 		FileStream fsTemp = null;
 		BinaryWriter bwTemp = null;
 		BinaryReader brTemp = null;
-		if (lvi.SubItems[(int)ListViewOrder.Upx].Text == ListViewStrings.Yes ||
+		if (lvi.SubItems[(int)ListViewOrder.Upx].Text != ListViewStrings.No ||
 			lvi.SubItems[(int)ListViewOrder.NullString].Text == ListViewStrings.Yes)
 		{
 			//upx or null string table
@@ -535,7 +535,7 @@ class proExe
 				bwTemp = null;
 				fsTemp.Close();
 				fsTemp = null;
-				if (lvi.SubItems[(int)ListViewOrder.Upx].Text == ListViewStrings.Yes)
+				if (lvi.SubItems[(int)ListViewOrder.Upx].Text != ListViewStrings.No)
 				{
 					//compress with upx
 					Process upx = new Process();
@@ -544,7 +544,11 @@ class proExe
 					upx.StartInfo.RedirectStandardOutput = true;
 					upx.StartInfo.RedirectStandardError = true;
 					upx.StartInfo.FileName = Application.StartupPath + Path.DirectorySeparatorChar + "upx.exe";
-					upx.StartInfo.Arguments = tempFile;
+					//use lzma compression?
+					if (lvi.SubItems[(int)ListViewOrder.Upx].Text == ListViewStrings.UpxLzma)
+						upx.StartInfo.Arguments += "--lzma " + tempFile;
+					else
+						upx.StartInfo.Arguments = tempFile;
 					upx.Start();
 					upx.WaitForExit();
 					if (upx.StandardOutput.ReadToEnd().IndexOf("Packed 1 file.") == -1)

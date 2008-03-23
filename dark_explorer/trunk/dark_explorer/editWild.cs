@@ -29,7 +29,7 @@ class editWild : Form
 	TextBox name;
 
 	CheckBox attached;
-	CheckBox upx;
+	ComboBox upx;
 	CheckBox nullStr;
 
 	public editWild()
@@ -74,21 +74,31 @@ class editWild : Form
 		attached.Location = new Point(x, y);
 		x += attached.Width;
 
-		//upx checkbox
-		upx = new CheckBox();
-		upx.Parent = this;
-		upx.Text = "Compress with Upx";
-		upx.CheckState = CheckState.Indeterminate;
-		upx.Width += 20;
-		upx.Location = new Point(x, y);
-		x += upx.Width;
-
 		//null string table checkbox
 		nullStr = new CheckBox();
 		nullStr.Parent = this;
 		nullStr.Text = "Null string table";
 		nullStr.CheckState = CheckState.Indeterminate;
 		nullStr.Location = new Point(x, y);
+		nullStr.Visible = false;
+
+		//upx label
+		Label label = new Label();
+		label.Parent = this;
+		label.AutoSize = true;
+		label.Text = "Upx compression:";
+		label.Location = new Point(x, y + 5);
+		x += label.Width + 5;
+
+		//upx combo
+		upx = new ComboBox();
+		upx.Parent = this;
+		upx.DropDownStyle = ComboBoxStyle.DropDownList;
+		upx.Items.Add(ListViewStrings.UnChanged);
+		upx.Items.Add(ListViewStrings.UpxStandard);
+		upx.Items.Add(ListViewStrings.UpxLzma);
+		upx.SelectedIndex = 0;
+		upx.Location = new Point(x, y);
 
 		//Cancel button
 		Button btn = new Button();
@@ -127,11 +137,18 @@ class editWild : Form
 
 	public void EditItems(ICollection items)
 	{
-		//edit item
+		//edit selected items according to results of dialog
 		foreach (ListViewFileItem lvi in items)
 		{
 			setCheckBoxValue(lvi, (int)ListViewOrder.FileType, attached.CheckState);
-			setCheckBoxValue(lvi, (int)ListViewOrder.Upx, upx.CheckState);
+			if (upx.SelectedIndex != 0)
+			{
+				//set upx compression
+				if (upx.SelectedIndex == 1)
+					lvi.SubItems[(int)ListViewOrder.Upx].Text = ListViewStrings.UpxStandard;
+				if (upx.SelectedIndex == 2)
+					lvi.SubItems[(int)ListViewOrder.Upx].Text = ListViewStrings.UpxLzma;
+			}
 			setCheckBoxValue(lvi, (int)ListViewOrder.NullString, nullStr.CheckState);
 			lvi.SubItems[(int)ListViewOrder.Name].Text = name.Text.Replace("%n", lvi.SubItems[(int)ListViewOrder.Name].Text);
 		}

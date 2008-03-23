@@ -26,13 +26,16 @@ using System.Windows.Forms;
 class ListViewStrings
 {
 	//strings used in listview
-	public static readonly string Yes = "Yes";
-	public static readonly string No  = "No";
-	public static readonly string LocationExe = "<exe>";
-	public static readonly string ExeSection = "Exe section";
-	public static readonly string ExtraData = "Compressed or extra data";
-	public static readonly string VirtualDat = "_virtual.dat";
-	public static readonly string CompressDll = "compress.dll";
+	public const string Yes = "Yes";
+	public const string No  = "No";
+	public const string UnChanged = "Unchanged";
+	public const string UpxStandard = "Standard";
+	public const string UpxLzma = "LZMA";
+	public const string LocationExe = "<exe>";
+	public const string ExeSection = "Exe section";
+	public const string ExtraData = "Compressed or extra data";
+	public const string VirtualDat = "_virtual.dat";
+	public const string CompressDll = "compress.dll";
 }
 
 enum ListViewOrder

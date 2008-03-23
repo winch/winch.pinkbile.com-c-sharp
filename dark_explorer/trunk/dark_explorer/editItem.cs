@@ -28,7 +28,7 @@ class editItem : Form
 	TextBox txtBox;
 	CheckBox media;
 	ComboBox type;
-	CheckBox upx;
+	ComboBox upx;
 	CheckBox str;
 	
 	public string FileName
@@ -53,10 +53,17 @@ class editItem : Form
 	{
 		get
 		{
-			if (upx.Checked)
-				return ListViewStrings.Yes;
-			else
-				return ListViewStrings.No;
+			switch (upx.SelectedIndex)
+			{
+				case 0:
+					return ListViewStrings.No;
+				case 1:
+					return ListViewStrings.UpxStandard;
+				case 2:
+					return ListViewStrings.UpxLzma;
+				default:
+					return ListViewStrings.No;
+			}
 		}
 	}
 	public string StringNull
@@ -126,14 +133,34 @@ class editItem : Form
 		else
 			type.SelectedIndex = 1;
 
-		//upx checkbox
-		upx = new CheckBox();
+		//upx label
+		Label label = new Label();
+		label.Parent = this;
+		label.Location = new Point(10,70);
+		label.AutoSize = true;
+		label.Text = "Upx compression:";
+
+		//upx combobox
+		upx = new ComboBox();
 		upx.Parent = this;
-		upx.Text = "Compress with upx";
-		upx.Location = new Point(10, 70);
-		upx.Width += 25;
-		if (useUpx == ListViewStrings.Yes)
-			upx.Checked = true;
+		upx.Location = new Point(105, 70);
+		upx.Width -= 50;
+		upx.DropDownStyle = ComboBoxStyle.DropDownList;
+		upx.Items.Add("None");
+		upx.Items.Add("Standard");
+		upx.Items.Add("LZMA");
+		switch (useUpx)
+		{
+			case ListViewStrings.No:
+				upx.SelectedIndex = 0;
+				break;
+			case ListViewStrings.UpxStandard:
+				upx.SelectedIndex = 1;
+				break;
+			case ListViewStrings.UpxLzma:
+				upx.SelectedIndex = 2;
+				break;
+		}
 
 		//str null checkbox
 		str = new CheckBox();
@@ -142,6 +169,7 @@ class editItem : Form
 		str.Location = new Point(150 ,70);
 		if (nullStrings == ListViewStrings.Yes)
 			str.Checked = true;
+		str.Visible = false;
 	}
 
 	private void media_Click(object sender, System.EventArgs e)
