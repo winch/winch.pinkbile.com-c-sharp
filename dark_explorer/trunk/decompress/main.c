@@ -16,6 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+This dll handles calling functions in compress.dll to (de)compress data.
+Since the exact compress.dll needed isn't known at compile time and
+C# doesn't (easily) support late binding this dll is used.
+*/
+
 #include <windows.h>
 #include <stdio.h>
 
@@ -25,8 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define DLL_EXPORT
 #endif
 
-//magic "extra data"
-#define EXTRADATA_LENGHT 16
+//magic "extra data" found at the end of dbpro exes
+#define EXTRADATA_LENGTH 16
 const char extraData[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                      0x4E, 0x61, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
@@ -87,7 +93,7 @@ void DLL_EXPORT compress(char *oldExeName, int exeSection, int extraDataSize, co
     //write extra data if required
     if (exeSection > 0)
     {
-        fwrite(extraData, EXTRADATA_LENGHT, 1, newExe);
+        fwrite(extraData, EXTRADATA_LENGTH, 1, newExe);
         //write exeSection size
         fwrite(&exeSection, 4, 1, newExe);
     }
@@ -143,7 +149,7 @@ void DLL_EXPORT decompress(const char *oldExeName, int exeSection, int dataOffse
     //write extra data if required
     if (exeSection > 0)
     {
-        fwrite(extraData, EXTRADATA_LENGHT, 1, newExe);
+        fwrite(extraData, EXTRADATA_LENGTH, 1, newExe);
         //write exeSection size
         fwrite(&exeSection, 4, 1, newExe);
     }
