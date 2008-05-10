@@ -1,13 +1,21 @@
+//
+// © the_winch 2008
+// Permission to copy, use, modify, sell and distribute this software is
+// granted provided this notice appears un-modified in all copies.
+// This software is provided as-is without express or implied warranty,
+// and with no claim as to its suitability for any purpose.
+//
+// http://winch.pinkbile.com : thewinch@gmail.com
+
 #include <windows.h>
 #include <stdio.h>
+#include <Wincrypt.h>
 
 #ifdef BUILD_DLL
     #define DLL_EXPORT __declspec(dllexport)
 #else
     #define DLL_EXPORT
 #endif
-
-#include "md5.h"
 
 //functions
 int getSearchPaths(char *SearchPath[]);
@@ -31,9 +39,14 @@ void debug_text(char *text)
 }
 */
 
+HGLOBAL DLL_EXPORT compress_block(void *data, DWORD dataSize)
+{
+    //
+}
+
 HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
 {
-    #define SEARCHCOUNT 3 //number of paths in search array
+    #define SEARCHCOUNT 4 //number of paths in search array
     char *searchPath[SEARCHCOUNT]; // array of paths to search for files
     int internalSize, externalSize, md5;
     void *dataStart = data;
@@ -103,12 +116,17 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5)
     void *buffer;
     FILE *f_in;
     //md5 checksum stuff
-    md5_state_t state;
-	md5_byte_t digest[16];
-	int di;
+    HCRYPTPROV cryptProv;
+    HCRYPTHASH hash;
+    DWORD hashLen = 16;
+    unsigned char hashData[hashLen + 1];
 	char md5SumReq[33];  //required md5
 	md5SumReq[32] = 0;
 	char md5SumFile[33]; //md5 of file
+    if (md5 == 1)
+    {
+        CryptAcquireContext(&cryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
+    }
     //loop through files
     while (nameLen > 0)
     {
@@ -129,13 +147,20 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5)
             //find file in search path
             for (i = 0; i < SEARCHCOUNT; i++)
             {
-                fullName = malloc(strlen(searchPath[i]) + strlen(name) + 1);
-                fullName[0] = 0;
-                sprintf(fullName, "%s%s", searchPath[i], name);
-                f_in = fopen(fullName, "rb");
-                if (f_in != NULL)
+                if (searchPath[i] != NULL)
                 {
-                    break;
+                    fullName = malloc(strlen(searchPath[i]) + strlen(name) + 1);
+                    if (fullName == NULL)
+                    {
+                        return 0;
+                    }
+                    fullName[0] = 0;
+                    sprintf(fullName, "%s%s", searchPath[i], name);
+                    f_in = fopen(fullName, "rb");
+                    if (f_in != NULL)
+                    {
+                        break;
+                    }
                 }
             }
             if (f_in != NULL)
@@ -145,22 +170,31 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5)
                 pos = ftell(f_in);
                 fseek(f_in, 0, SEEK_SET);
                 buffer = malloc(pos);
+                if (buffer == NULL)
+                {
+                    return 0;
+                }
                 fread(buffer, pos, 1, f_in);
                 fclose(f_in);
                 if (md5 == 1)
                 {
                     //check md5
-                    md5_init(&state);
-                    md5_append(&state, (const md5_byte_t *)buffer, pos);
-                    md5_finish(&state, digest);
-                    for (di = 0; di < 16; ++di)
+                    CryptCreateHash(cryptProv, CALG_MD5, 0, 0, &hash);
+                    CryptHashData(hash, buffer, pos, 0);
+                    CryptGetHashParam(hash, HP_HASHVAL, hashData, &hashLen, 0);
+                    CryptDestroyHash(hash);
+                    for (i = 0; i < 16; i++)
                     {
-                        sprintf(md5SumFile + di * 2, "%02x", digest[di]);
+                        sprintf(md5SumFile + i * 2, "%02x", hashData[i]);
                     }
                     if (strcmp(md5SumReq ,md5SumFile) != 0)
                     {
                         //checksums don't match !TODO!
                         md5FailMsg = malloc(strlen(name) + 47);
+                        if (md5FailMsg == NULL)
+                        {
+                            return 0;
+                        }
                         sprintf(md5FailMsg, "%s does not match md5 checksum.\nContinue anyway?", name);
                         i = MessageBox(GetActiveWindow(), md5FailMsg, "Error!", 20);
                         free(md5FailMsg);
@@ -190,6 +224,10 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5)
                 return 0;
             }
         }
+    }
+    if (md5 == 1)
+    {
+        CryptReleaseContext(cryptProv, 0);
     }
     return 1;
 }
@@ -225,6 +263,10 @@ int externalFilesSize(void *data, char *searchPath[], int md5)
             for (i = 0; i < SEARCHCOUNT; i++)
             {
                 fullName = malloc(strlen(searchPath[i]) + strlen(name) + 1);
+                if (fullName == NULL)
+                {
+                    return 0;
+                }
                 fullName[0] = 0;
                 sprintf(fullName, "%s%s", searchPath[i], name);
                 file = OpenFile(fullName, &los, OF_READ);
@@ -246,6 +288,10 @@ int externalFilesSize(void *data, char *searchPath[], int md5)
             {
                 //file not found in searchPath[]
                 dataByte = malloc(255);
+                if (dataByte == NULL)
+                {
+                    return 0;
+                }
                 sprintf(dataByte, "%s not found in search paths.", name);
                 MessageBox(GetActiveWindow(), dataByte, "Error!", 16);
                 free(dataByte);
@@ -294,23 +340,27 @@ int getSearchPaths(char *searchPath[])
     //fills the searchPath array with paths to search for files
     //returns 0 on failure > 0 on success
     char *buffer;
+    char *path;
     DWORD reglen;
     HKEY hKey;
     long ret;
     int i;
     //find location of dbpro dir
-    ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Dark Basic\\Dark Basic Pro\\", 0, KEY_QUERY_VALUE, &hKey);
-    if (ret != ERROR_SUCCESS)
+    buffer = malloc(1024);
+    if (buffer == NULL)
     {
-        MessageBox(GetActiveWindow(), "DarkBASIC pro location not found", "Error!", 16);
         return 0;
     }
-    buffer = malloc(1024);
-    ret = RegQueryValueEx(hKey, "INSTALL-PATH", NULL, NULL, (LPBYTE) buffer, &reglen);
-    if (ret != ERROR_SUCCESS)
+    ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Dark Basic\\Dark Basic Pro\\", 0, KEY_QUERY_VALUE, &hKey);
+    if (ret == ERROR_SUCCESS)
     {
-        MessageBox(GetActiveWindow(), "DarkBASIC pro location not found.", "Error!", 16);
-        return 0;
+        ret = RegQueryValueEx(hKey, "INSTALL-PATH", NULL, NULL, (LPBYTE) buffer, &reglen);
+        if (ret != ERROR_SUCCESS)
+        {
+            //dbpro install dir not found
+            free(buffer);
+            buffer = NULL;
+        }
     }
     RegCloseKey(hKey);
     for (i=0; i < SEARCHCOUNT; i++)
@@ -318,22 +368,69 @@ int getSearchPaths(char *searchPath[])
         switch (i)
         {
             case 0:
-                //plugins
-                searchPath[i] = malloc(strlen(buffer)+21); //"\compiler\plugins\"
-                *searchPath[i] = 0;
-                sprintf(searchPath[i], "%s\\compiler\\plugins\\", buffer);
+                //program directory
+                searchPath[i] = malloc(MAX_PATH);
+                if (searchPath[i] == NULL)
+                {
+                    return 0;
+                }
+                GetModuleFileName(NULL, searchPath[i], MAX_PATH);
+                //strip filename from path
+                path = searchPath[i] + strlen(searchPath[i]);
+                while (*path != '\\')
+                    path --;
+                *++path = 0;
             break;
             case 1:
-                //plugins-user
-                searchPath[i] = malloc(strlen(buffer)+25); //"\plugins-user\"
-                *searchPath[i] = 0;
-                sprintf(searchPath[i], "%s\\compiler\\plugins-user\\", buffer);
+                //plugins
+                if (buffer == NULL)
+                {
+                    searchPath[i] = NULL;
+                }
+                else
+                {
+                    searchPath[i] = malloc(strlen(buffer)+21); //"\compiler\plugins\"
+                    if (searchPath[i] == NULL)
+                    {
+                        return 0;
+                    }
+                    *searchPath[i] = 0;
+                    sprintf(searchPath[i], "%s\\compiler\\plugins\\", buffer);
+                }
             break;
             case 2:
+                //plugins-user
+                if (buffer == NULL)
+                {
+                    searchPath[i] = NULL;
+                }
+                else
+                {
+                    searchPath[i] = malloc(strlen(buffer)+25); //"\plugins-user\"
+                    if (searchPath[i] == NULL)
+                    {
+                        return 0;
+                    }
+                    *searchPath[i] = 0;
+                    sprintf(searchPath[i], "%s\\compiler\\plugins-user\\", buffer);
+                }
+            break;
+            case 3:
                 //effects
-                searchPath[i] = malloc(strlen(buffer) + 20); //"\effects\"
-                *searchPath[i] = 0;
-                sprintf(searchPath[i], "%s\\compiler\\effects\\", buffer);
+                if (buffer == NULL)
+                {
+                    searchPath[i] = NULL;
+                }
+                else
+                {
+                    searchPath[i] = malloc(strlen(buffer) + 20); //"\effects\"
+                    if (searchPath[i] == NULL)
+                    {
+                        return 0;
+                    }
+                    *searchPath[i] = 0;
+                    sprintf(searchPath[i], "%s\\compiler\\effects\\", buffer);
+                }
             break;
         }
     }

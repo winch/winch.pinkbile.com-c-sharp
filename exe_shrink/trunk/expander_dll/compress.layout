@@ -1,13 +1,7 @@
-<?xml version="1.0"?>
-<!DOCTYPE CodeBlocks_layout_file>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<File name="main.c" open="1" top="1">
-		<Cursor position="7754" topLine="234"/>
-	</File>
-	<File name="md5.c" open="1" top="0">
-		<Cursor position="3657" topLine="330"/>
-	</File>
-	<File name="md5.h" open="1" top="0">
-		<Cursor position="2182" topLine="0"/>
+	<ActiveTarget name="All" />
+	<File name="main.c" open="1" top="1" tabpos="1">
+		<Cursor position="10590" topLine="349" />
 	</File>
 </CodeBlocks_layout_file>
