@@ -11,19 +11,17 @@ class window : Form
 
 	public ListView Intern;
 	public ListView Extern;
-	public TextBox Targetexe;
 	public Button InternUp;
 	public Button InternDown;
 	public Button ExternUp;
 	public Button ExternDown;
 	public CheckBox CheckSum;
-	public ComboBox exeType;
 
 	public window()
 	{
 		Text = "Dbpro exe shrinker";
 		Width = 535;
-		Height = 565;
+		Height = 520;
 
 		//internal files
 		GroupBox box = new GroupBox();
@@ -143,33 +141,6 @@ class window : Form
 		CheckSum.Location = new Point(10,430);
 		CheckSum.Width += 415;
 		CheckSum.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
-
-		//filename textbox
-		box = new GroupBox();
-		box.Parent = this;
-		box.Text = "Target exe name and type";
-		box.Location = new Point(10,455);
-		box.Height = 45;
-		box.Width = 510;
-		box.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
-
-		//exe type combobox
-		exeType = new ComboBox();
-		exeType.Parent = box;
-		exeType.Location = new Point(10, 15);
-		exeType.Width = 130;
-		exeType.DropDownStyle = ComboBoxStyle.DropDownList;
-		exeType.Items.Add("New style (compress.dll)");
-		exeType.Items.Add("Old style");
-		exeType.SelectedIndex = 0;
-		exeType.SelectedIndexChanged += new EventHandler(exeType_SelectedIndexChanged);
-
-		Targetexe = new TextBox();
-		Targetexe.Parent = box;
-		Targetexe.Location = new Point(150,15);
-		Targetexe.Width = 350;
-		Targetexe.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
-		Targetexe.Enabled = false;
 
 	}
 
@@ -293,11 +264,20 @@ class window : Form
 	}
 	private void mExternMoveOnClick(object obj, EventArgs ea)
 	{
-		//move item to Extern
+		//move item to Intern
 		foreach (ListViewFileItem items in Extern.SelectedItems)
 		{
 			items.Remove();
-			Intern.Items.Add(items);
+			if (Intern.Items.Count > 0 && Intern.Items[Intern.Items.Count - 1].Text == ListViewStrings.ExtraData)
+			{
+				//insert items before Extra Data
+				Intern.Items.Insert(Intern.Items.Count - 1, items);
+			}
+			else
+			{
+				//insert items at the end since extra data isn't last in list
+				Intern.Items.Add(items);
+			}
 		}
 	}
 
@@ -379,21 +359,6 @@ class window : Form
 			ListViewItem item = Extern.SelectedItems[0];
 			Extern.SelectedItems[0].Remove();
 			Extern.Items.Insert(i+1,item);
-		}
-	}
-
-	private void exeType_SelectedIndexChanged(object sender, EventArgs e)
-	{
-		//exe type changed
-		if (exeType.SelectedIndex == 0)
-		{
-			//new type
-			Targetexe.Enabled = false;
-		}
-		else
-		{
-			//old type
-			Targetexe.Enabled = true;
 		}
 	}
 }

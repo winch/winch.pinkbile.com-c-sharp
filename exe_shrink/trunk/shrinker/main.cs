@@ -28,29 +28,29 @@ class main : window
 		this.Load += new EventHandler(main_Load);
 		Button load = new Button();
 		load.Parent = this;
-		load.Text = "&Load";
-		load.Location = new Point(15 ,510);
+		load.Text = "&Load Exe";
+		load.Location = new Point(15 ,460);
 		load.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		load.Click += new EventHandler(load_Click);
 
 		Button build = new Button();
 		build.Parent = this;
 		build.Text = "&Build";
-		build.Location = new Point(load.Left+load.Width+15,510);
+		build.Location = new Point(load.Left+load.Width+15,460);
 		build.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		build.Click += new EventHandler(build_Click);
 
 		Button about = new Button();
 		about.Parent = this;
 		about.Text = "&About";
-		about.Location = new Point(build.Left+build.Width+15,510);
+		about.Location = new Point(build.Left+build.Width+15,460);
 		about.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		about.Click +=new EventHandler(about_Click);
 
 		Button exit = new Button();
 		exit.Parent = this;
 		exit.Text = "E&xit";
-		exit.Location = new Point(about.Left+about.Width+15,510);
+		exit.Location = new Point(about.Left+about.Width+15,460);
 		exit.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		exit.Click += new EventHandler(exit_Click);
 	}
@@ -104,16 +104,6 @@ class main : window
 			Intern.Items.Clear();
 			Extern.Enabled = true;
 			Extern.Items.Clear();
-			if (exeType.SelectedIndex == 0)
-			{
-				//new type
-				Targetexe.Enabled = false;
-			}
-			else
-			{
-				//old type
-				Targetexe.Enabled = true;
-			}
 			//load exe
 			proExe.LoadExe(Extern, dlg.FileName);
 			//move required items into Intern
@@ -126,8 +116,6 @@ class main : window
 				}
 			}
 			Loaded_ExeName = dlg.FileName;
-			if (Targetexe.Text == "")
-				Targetexe.Text = "mini_"+Path.GetFileName(dlg.FileName);
 			Intern.EndUpdate();
 			Extern.EndUpdate();
 		}
@@ -140,12 +128,6 @@ class main : window
 		if (Loaded_ExeName == "")
 		{
 			MessageBox.Show("No exe loaded!","Error!",MessageBoxButtons.OK,MessageBoxIcon.Warning);
-			return;
-		}
-		if (exeType.SelectedIndex == 1 && Targetexe.Text == "")
-		{
-			//only show for old type
-			MessageBox.Show("No exe name!","Error!",MessageBoxButtons.OK,MessageBoxIcon.Warning);
 			return;
 		}
 		//Check files in Extern exist in Plugins and Plugins_user and effects
@@ -171,14 +153,7 @@ class main : window
 		dlg.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
 		if (dlg.ShowDialog() == DialogResult.OK)
 		{
-			if (exeType.SelectedIndex == 1)
-			{
-				Build.OldBuild(dlg.FileName, this);
-			}
-			else
-			{
-				Build.NewBuild(dlg.FileName, Loaded_ExeName, Intern, Extern, CheckSum.Checked);
-			}
+			Build.BuildExe(dlg.FileName, Loaded_ExeName, Intern, Extern, CheckSum.Checked);
 		}
 		dlg.Dispose();
 	}

@@ -10,10 +10,10 @@ using System.Drawing;
 
 class aboutDialog: Form
 {
-	string Version = "0.7";
-	string Date = "09 March 2006";
+	string Version = "0.8";
+	string Date = "10 May 2008";
 	string Ident = "exe_shrink";
-	int Build = 2;
+	int Build = 3;
 	public aboutDialog()
 	{
 		Text = "About";
