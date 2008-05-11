@@ -17,9 +17,12 @@
 <br />
 <table align="center">
 <tr><td>
-<div>Exe shrink is a runtime style system for darkbasic pro exes.<br />
-Instead of the dbpro dlls being stored in the exe they are sourced from the dbpro installation directory.<br />
-This makes the exes much smaller.</div>
+<div>Exe shrinker is a runtime style system for darkbasic pro exes. Dlls are not stored in the exe but instead sourced from an external location.<br />
+This allows many exes to share the same dlls freeing up disk space.<br />
+Optionally md5 checksums can be used to ensure the sourced dlls are the same as the ones the
+exe was originally compiled with.<br />
+When the exe runs it first looks for dlls in the exe directory then if dbpro is installed
+it checks in the dbpro compiler directory.</div>
 </td></tr>
 </table>
 <br />
@@ -48,7 +51,7 @@ If the checksums do not match the user will be asked if they want to continue ru
 <br />
 <table align="center">
 <tr><td>
-<div>For the target exe type select New style (compress.dll)<br />
+<div>
 Now you can create the shrunk exe. Click the build button and choose where to save it.
 </div>
 </td></tr>
