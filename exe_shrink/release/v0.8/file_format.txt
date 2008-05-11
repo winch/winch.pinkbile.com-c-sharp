@@ -1,0 +1,38 @@
+expander_dll
+============
+
+{
+	int namelength
+	name
+	int datalength
+	filedata
+}
+Null int
+byte use md5 checksum? 0=no, 1=yes
+{
+	byte namelength
+	name
+	checksum
+}
+Null byte
+
+
+expander
+========
+
+long length
+exe filename
+byte num of files
+{
+	long length
+	filename
+	long length
+	filedata
+}
+byte use md5 checksum? 0=no, 1=yes
+byte num of external files
+{
+	long length
+	external filename
+	md5 checksum string
+}
