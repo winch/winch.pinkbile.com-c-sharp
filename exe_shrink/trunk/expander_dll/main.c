@@ -41,7 +41,7 @@ void debug_text(char *text)
 
 HGLOBAL DLL_EXPORT compress_block(void *data, DWORD dataSize)
 {
-    //
+    return NULL;
 }
 
 HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
@@ -57,7 +57,7 @@ HGLOBAL DLL_EXPORT decompress_block(void *data, DWORD dataSize)
     if (getSearchPaths(searchPath) == 0)
     {
         //error filling searchPath array
-        return;
+        return NULL;
     }
 
     //find size of internal files
@@ -109,12 +109,11 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5)
     //returns 0 on failure > 0 on success
     char *dataByte, *fullName, *md5FailMsg;
     char name[255];
-    char md5Sum[33];
     int nameLen = 1;
     int i;
     int pos;
     void *buffer;
-    FILE *f_in;
+    FILE *f_in = NULL;
     //md5 checksum stuff
     HCRYPTPROV cryptProv;
     HCRYPTHASH hash;
