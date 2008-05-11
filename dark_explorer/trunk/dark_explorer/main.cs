@@ -27,6 +27,7 @@ using System;
 using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Collections;
 
 class window : Form
 {
@@ -34,10 +35,7 @@ class window : Form
 	ComboBox exeType;
 	Label exeName;
 	ListView contents;
-	public int displayWidth = -1;
-	public int displayHeight = -1;
-	public int displayDepth = -1;
-	public int displayMode = -1;
+	DisplaySettings displaySettings;
 
 	//position of menu items in contents context menu
 	public const int MENU_DISPLAY = 0;
@@ -54,6 +52,7 @@ class window : Form
 	private const int MENU_TOOLS = 13;
 	private const int MENU_DECOMPRESS = 0;
 	private const int MENU_COMPRESS = 1;
+	private const int MENU_EXTERNALISE = 2;
 	private const int MENU_ABOUT = 14;
 	private const int MENU_EXIT = 15;
 
@@ -110,13 +109,13 @@ class window : Form
 		EventHandler mView = new EventHandler(mViewOnClick);
 		EventHandler mDecompress = new EventHandler(mDecompressOnClick);
 		EventHandler mCompress = new EventHandler(mCompressOnClick);
+		EventHandler mExternalise = new EventHandler(mExternaliseOnClick);
 		EventHandler mAbout = new EventHandler(mAboutOnClick);
 		EventHandler mExit = new EventHandler(mExitOnClick);
 
-		//MenuItem[] amiTools = {new MenuItem("Decompress Exe", mDecompress) ,
-		//					   new MenuItem("Show/Hide debug log", mToggleDebug) };
 		MenuItem[] amiTools = {new MenuItem("Decompress Exe/Pck", mDecompress),
-							   new MenuItem("Compress Exe/Pck", mCompress) };
+							   new MenuItem("Compress Exe/Pck", mCompress),
+							   new MenuItem("Externalise Dlls", mExternalise)};
 		MenuItem[] ami =  { new MenuItem("No display settings", mDisplay),
 							new MenuItem("&Load", mLoad),
 							new MenuItem("&Save", mSave),
@@ -135,6 +134,7 @@ class window : Form
 							new MenuItem("&About", mAbout),
 							new MenuItem("E&xit", mExit)
 						  };
+
 		contents.ContextMenu = new ContextMenu(ami);
 		contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = false;
 		contents.ContextMenu.MenuItems[MENU_SAVE].Enabled = false;
@@ -147,9 +147,12 @@ class window : Form
 
 		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_DECOMPRESS].Enabled = false;
 		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_COMPRESS].Enabled = false;
+		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_EXTERNALISE].Enabled = false;
 		this.ContextMenu = contents.ContextMenu;
 
-		//double click edits item
+		displaySettings = new DisplaySettings();
+
+		//double click item action
 		contents.ItemActivate += mView;
 		contents.SelectedIndexChanged += new EventHandler(contents_SelectedIndexChanged);
 
@@ -197,18 +200,18 @@ class window : Form
 	{
 		//change display setting
 		displayDialog dd = new displayDialog();
-		dd.displayWidth = displayWidth;
-		dd.displayHeight = displayHeight;
-		dd.displayDepth = displayDepth;
-		dd.displayMode = displayMode;
+		dd.displayWidth = displaySettings.Width;
+		dd.displayHeight = displaySettings.Height;
+		dd.displayDepth = displaySettings.Depth;
+		dd.displayMode = (int)displaySettings.Mode;
 		if (dd.ShowDialog() == DialogResult.OK)
 		{
-			displayWidth = dd.displayWidth;
-			displayHeight = dd.displayHeight;
-			displayDepth = dd.displayDepth;
-			displayMode = dd.displayMode;
+			displaySettings.Width = dd.displayWidth;
+			displaySettings.Height = dd.displayHeight;
+			displaySettings.Depth = dd.displayDepth;
+			displaySettings.Mode = (DisplayMode) dd.displayMode;
 			contents.ContextMenu.MenuItems[MENU_DISPLAY].Text =
-				proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
+				proExe.getDisplayString(displaySettings);
 		}
 	}
 
@@ -247,12 +250,12 @@ class window : Form
 			{
 				fsIn = new FileStream(fileName, FileMode.Open);
 				brIn = new BinaryReader(fsIn);
-				displayMode = brIn.ReadInt32();
-				displayWidth = brIn.ReadInt32();
-				displayHeight = brIn.ReadInt32();
-				displayDepth = brIn.ReadInt32();
+				displaySettings.Mode = (DisplayMode) brIn.ReadInt32();
+				displaySettings.Width = brIn.ReadInt32();
+				displaySettings.Height = brIn.ReadInt32();
+				displaySettings.Depth = brIn.ReadInt32();
 				contents.ContextMenu.MenuItems[MENU_DISPLAY].Text =
-					proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
+					proExe.getDisplayString(displaySettings);
 				contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = true;
 			}
 			catch (Exception ex)
@@ -345,10 +348,10 @@ class window : Form
 		}
 		if (found == false)
 		{
-			displayDepth = -1;
-			displayWidth = -1;
-			displayHeight = -1;
-			displayMode = -1;
+			displaySettings.Depth = -1;
+			displaySettings.Width = -1;
+			displaySettings.Height = -1;
+			displaySettings.Mode = DisplayMode.Hidden;
 			contents.ContextMenu.MenuItems[MENU_DISPLAY].Text = "No display settings";
 			contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = false;
 		}
@@ -386,12 +389,12 @@ class window : Form
 					{
 						fsIn = new FileStream(ofd.FileName, FileMode.Open);
 						brIn = new BinaryReader(fsIn);
-						displayMode = brIn.ReadInt32();
-						displayWidth = brIn.ReadInt32();
-						displayHeight = brIn.ReadInt32();
-						displayDepth = brIn.ReadInt32();
+						displaySettings.Mode = (DisplayMode) brIn.ReadInt32();
+						displaySettings.Width = brIn.ReadInt32();
+						displaySettings.Height = brIn.ReadInt32();
+						displaySettings.Depth = brIn.ReadInt32();
 						contents.ContextMenu.MenuItems[MENU_DISPLAY].Text =
-							proExe.getDisplayString(displayWidth, displayHeight, displayDepth, displayMode);
+							proExe.getDisplayString(displaySettings);
 						contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = true;
 					}
 					catch (Exception ex)
@@ -493,7 +496,7 @@ class window : Form
 			bool dbPro = false;
 			if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
 				dbPro = true;
-			proExe.DecompressExe(contents, dbPro, this, exeName.Text, sfd.FileName);
+			proExe.DecompressExe(contents.Items, dbPro, displaySettings, exeName.Text, sfd.FileName);
 			Cursor.Current = Cursors.Default;
 		}
 		sfd.Dispose();
@@ -531,10 +534,59 @@ class window : Form
 				bool dbPro = false;
 				if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
 					dbPro = true;
-				proExe.CompressExe(contents, dbPro, this, exeName.Text, sfd.FileName, ofd.FileName);
+				proExe.CompressExe(contents.Items, dbPro, displaySettings, exeName.Text, sfd.FileName, ofd.FileName);
 				Cursor.Current = Cursors.Default;
 			}
 		}
+		sfd.Dispose();
+	}
+
+	private void mExternaliseOnClick(object sender, EventArgs e)
+	{
+		//Externalise dlls
+		//Moves dlls from within the exe to the exe directory
+		//Similar to the ExternaliseDLLS=Yes dbpro compiler option discussed here
+		//http://forum.thegamecreators.com/?m=forum_view&t=129081&b=18
+		
+		//can't externalise compressed exes
+		if (proExe.IsCompressed(contents) == true)
+		{
+			MessageBox.Show("Exe is already compressed.", "Error!",
+				MessageBoxButtons.OK, MessageBoxIcon.Error);
+			return;
+		}
+
+		//don't externalise .pck files or dbc exes
+		if (contents.Items.Count < 2 || contents.Items[1].Text != ListViewStrings.VirtualDat)
+		{
+			MessageBox.Show("Exe is a .pck or dbc exe", "Error!",
+				MessageBoxButtons.OK, MessageBoxIcon.Error);
+			return;
+		}
+
+		SaveFileDialog sfd = new SaveFileDialog();
+		sfd.Title = "Save externalised Exe as";
+		sfd.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
+		if (sfd.ShowDialog() == DialogResult.OK)
+		{
+			String directory = Path.GetDirectoryName(sfd.FileName);
+			ArrayList files = new ArrayList();
+			foreach (ListViewFileItem lvi in contents.Items)
+			{
+				if (lvi.Text.EndsWith(".dll"))
+				{
+					//save dll in directory
+					proExe.ExtractFile(lvi, exeName.Text, directory + Path.DirectorySeparatorChar + lvi.Text);
+				}
+				else
+				{
+					//not a dll, add it to list of files to save in exe
+					files.Add(lvi);
+				}
+			}
+			proExe.SaveExe(files, sfd.FileName, exeName.Text, true, displaySettings);
+		}
+
 		sfd.Dispose();
 	}
 
@@ -554,19 +606,20 @@ class window : Form
 	private void LoadExe(string filename)
 	{
 		Cursor.Current = Cursors.WaitCursor;
-		displayDepth = -1;
-		displayWidth = -1;
-		displayHeight = -1;
-		displayMode = -1;
+		displaySettings.Depth = -1;
+		displaySettings.Width = -1;
+		displaySettings.Height = -1;
+		displaySettings.Mode = DisplayMode.Hidden;
 		contents.BeginUpdate();
 		contents.Items.Clear();
 		contents.ContextMenu.MenuItems[MENU_DISPLAY].Text = "No display settings";
 		contents.ContextMenu.MenuItems[MENU_DISPLAY].Enabled = false;
-		proExe.LoadExe(contents, filename, this);
+		displaySettings = proExe.LoadExe(contents, filename, this);
 		exeName.Text = filename;
 		contents.ContextMenu.MenuItems[MENU_SAVE].Enabled = true;
 		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_DECOMPRESS].Enabled = true;
 		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_COMPRESS].Enabled = true;
+		contents.ContextMenu.MenuItems[MENU_TOOLS].MenuItems[MENU_EXTERNALISE].Enabled = true;
 		updateAlternatingColours();
 		contents.EndUpdate();
 		//work out exeType
@@ -604,7 +657,7 @@ class window : Form
 				bool dbPro = false;
 				if (exeType.SelectedIndex == exeType.Items.IndexOf("DbPro"))
 					dbPro = true;
-				proExe.SaveExe(contents, sfd.FileName, exeName.Text, dbPro, this);
+				proExe.SaveExe(contents.Items, sfd.FileName, exeName.Text, dbPro, displaySettings);
 				if (exeName.Text == "")
 					exeName.Text = sfd.FileName;
 				Cursor.Current = Cursors.Default;

@@ -1,6 +1,13 @@
 Version history
 +++++++++++++++
 
+v0.17 11 May 2008
+- Added Exteralise dlls tool. Saves exe witho dlls and saves the dlls as seperate files in
+  exe directory. Similar to the ExternaliseDLLS=Yes dbpro compiler option discussed here
+  http://forum.thegamecreators.com/?m=forum_view&t=129081&b=18
+  This option only works with dbpro exes v6.8 and later.
+- Switched license from gpl v2 or later to gpl v3 or later.
+
 v0.16 23 March 2008
 - Use [STAThread] attribute on main() to avoid "DragDrop registration did not succeed." errors on Vista.
 - Option to use LZMA compression when compressing with upx

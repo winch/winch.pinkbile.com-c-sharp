@@ -119,6 +119,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "main.resx"
+                    DependentUpon = "main.cs"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "proExe.cs"
                     SubType = "Code"
                     BuildAction = "Compile"

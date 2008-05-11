@@ -20,11 +20,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 using System;
+using System.Collections;
 using System.Windows.Forms;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+
+enum DisplayMode
+{
+	Hidden = 0,
+	Windowed = 1,
+	WindowedDesktop = 2,
+	FullscreenExclusive = 3,
+	WindowedFullscreen = 4
+}
+
+struct DisplaySettings
+{
+	public int Width;
+	public int Height;
+	public int Depth;
+	public DisplayMode Mode;
+}
 
 class proExe
 {
@@ -63,14 +81,14 @@ class proExe
 		return compressed;
 	}
 
-	public static void CompressExe(ListView contents, bool dbPro, window win, string oldExe, string newExe, string compressDll)
+	public static void CompressExe(IList contents, bool dbPro, DisplaySettings settings, string oldExe, string newExe, string compressDll)
 	{
 		FileStream fs = null;
 		BinaryReader br = null;
 		int exeSection = 0, extraData = 0;
 		string tempExe = Path.GetTempFileName();
 		//save exe
-		SaveExe(contents, tempExe, oldExe, dbPro, win);
+		SaveExe(contents, tempExe, oldExe, dbPro, settings);
 		try
 		{
 			fs = new FileStream(tempExe, FileMode.Open);
@@ -78,9 +96,10 @@ class proExe
 			SkipExeSection(fs, br);
 			exeSection = (int)fs.Position;
 			//get size of extra data
-			if (contents.Items[contents.Items.Count - 1].SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.ExtraData)
+			ListViewFileItem lvi = (ListViewFileItem) contents[contents.Count - 1];
+			if (lvi.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.ExtraData)
 			{
-				ListViewFileItem lvi = (ListViewFileItem)contents.Items[contents.Items.Count - 1];
+				lvi = (ListViewFileItem)contents[contents.Count - 1];
 				extraData = lvi.Size;
 			}
 		}
@@ -109,7 +128,7 @@ class proExe
 	[DllImport("comp.dll", EntryPoint="compress")]
 	private static extern void CompressDll(string fileName, int exeSection, int extraData, string newExe, string compressDll);
 
-	public static void DecompressExe(ListView contents, bool dbPro, window win, string oldExe, string newExe)
+	public static void DecompressExe(ICollection contents, bool dbPro, DisplaySettings settings, string oldExe, string newExe)
 	{
 		FileStream fs = null;
 		BinaryReader br = null;
@@ -119,7 +138,7 @@ class proExe
 		string compressDll = Path.GetTempFileName(); 
 		string tempExe = Path.GetTempFileName();
 		//save exe
-		SaveExe(contents, tempExe, oldExe, dbPro, win);
+		SaveExe(contents, tempExe, oldExe, dbPro, settings);
 		try
 		{
 			fs = new FileStream(tempExe, FileMode.Open);
@@ -244,7 +263,7 @@ class proExe
 		}
 	}
 
-	public static void SaveExe(ListView contents, string fileName, string oldName, bool dbPro, window win)
+	public static void SaveExe(ICollection contents, string fileName, string oldName, bool dbPro, DisplaySettings settings)
 	{
 		FileStream fsExe = null;   //old dbpro exe
 		BinaryReader brExe = null;
@@ -273,7 +292,7 @@ class proExe
 			//open new exe
 			fsOut = new FileStream(fileName, FileMode.Create);
 			bwOut = new BinaryWriter(fsOut);
-			foreach (ListViewFileItem lvi in contents.Items)
+			foreach (ListViewFileItem lvi in contents)
 			{
 				if (lvi.SubItems[(int)ListViewOrder.Location].Text == ListViewStrings.LocationExe)
 				{
@@ -305,10 +324,10 @@ class proExe
 					//size
 					bwOut.Write(lvi.Size);
 					//write display settings
-					bwOut.Write(win.displayMode);
-					bwOut.Write(win.displayWidth);
-					bwOut.Write(win.displayHeight);
-					bwOut.Write(win.displayDepth);
+					bwOut.Write((int) settings.Mode);
+					bwOut.Write(settings.Width);
+					bwOut.Write(settings.Height);
+					bwOut.Write(settings.Depth);
 					//write data
 					fsFile.Seek(16, SeekOrigin.Current);
 					bwOut.Write(brFile.ReadBytes(lvi.Size - 16));
@@ -364,9 +383,10 @@ class proExe
 		}
 	}
 
-	public static void LoadExe(ListView contents, string fileName, window win)
+	public static DisplaySettings LoadExe(ListView contents, string fileName, window win)
 	{
 		//debugLog.StartSection("LoadExe");
+		DisplaySettings settings = new DisplaySettings();
 		int exeSectionSize = 0, extraDataSize = 0;
 		FileStream fs = null;
 		BinaryReader br = null;
@@ -398,7 +418,7 @@ class proExe
 				if (lvi.Size == (int)fs.Length)
 				{
 					//debugLog.Log("Exe has no appended data");
-					return;
+					return settings;
 				}
 			}
 			else
@@ -426,15 +446,12 @@ class proExe
 					if (lvi.SubItems[(int)ListViewOrder.Name].Text == ListViewStrings.VirtualDat)
 					{
 						//get display settings
-						win.displayMode = br.ReadInt32();
-						int Width = br.ReadInt32();
-						int Height = br.ReadInt32();
-						int Depth = br.ReadInt32();
-						win.displayWidth = Width;
-						win.displayHeight = Height;
-						win.displayDepth = Depth;
+						settings.Mode = (DisplayMode) br.ReadInt32();
+						settings.Width =  br.ReadInt32();
+						settings.Height = br.ReadInt32();
+						settings.Depth = br.ReadInt32();
 						contents.ContextMenu.MenuItems[window.MENU_DISPLAY].Text =
-							proExe.getDisplayString(Width, Height, Depth, win.displayMode);
+							proExe.getDisplayString(settings);
 						contents.ContextMenu.MenuItems[window.MENU_DISPLAY].Enabled = true;
 						fs.Seek(-16, SeekOrigin.Current);
 					}
@@ -477,12 +494,12 @@ class proExe
 			if (fs != null)
 				fs.Close();
 		}
-		//debugLog.StopSection();
+		return settings;
 	}
-	public static string getDisplayString(int width, int height, int depth, int mode)
+	public static string getDisplayString(DisplaySettings settings)
 	{
-		string displaystring = width.ToString() + "x" + height.ToString() + "x" + depth.ToString();
-		switch (mode)
+		string displaystring = settings.Width.ToString() + "x" + settings.Height.ToString() + "x" + settings.Depth.ToString();
+		switch ((int) settings.Mode)
 		{
 			case 0:
 				displaystring += " hidden";
