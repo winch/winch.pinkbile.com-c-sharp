@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="All" />
+	<File name="compress_block.c" open="1" top="0" tabpos="2">
+		<Cursor position="359" topLine="0" />
+	</File>
+	<File name="compress_block.h" open="1" top="0" tabpos="3">
+		<Cursor position="469" topLine="0" />
+	</File>
+	<File name="decompress_block.c" open="1" top="0" tabpos="4">
+		<Cursor position="480" topLine="0" />
+	</File>
+	<File name="decompress_block.h" open="1" top="0" tabpos="5">
+		<Cursor position="443" topLine="0" />
+	</File>
 	<File name="main.c" open="1" top="1" tabpos="1">
-		<Cursor position="1175" topLine="23" />
+		<Cursor position="401" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

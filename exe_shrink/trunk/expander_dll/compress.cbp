@@ -23,8 +23,21 @@
 			<Add alias="All" targets="default;" />
 		</VirtualTargets>
 		<Compiler>
+			<Add option="-Os" />
+			<Add option="-Wall" />
 			<Add option="-DBUILD_DLL" />
 		</Compiler>
+		<Linker>
+			<Add option="-s" />
+		</Linker>
+		<Unit filename="compress_block.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="compress_block.h" />
+		<Unit filename="decompress_block.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="decompress_block.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
