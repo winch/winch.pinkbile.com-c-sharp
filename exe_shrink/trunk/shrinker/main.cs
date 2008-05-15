@@ -29,28 +29,28 @@ class main : window
 		Button load = new Button();
 		load.Parent = this;
 		load.Text = "&Load Exe";
-		load.Location = new Point(15 ,460);
+		load.Location = new Point(15, this.Height - (load.Height * 2) - 10);
 		load.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		load.Click += new EventHandler(load_Click);
 
 		Button build = new Button();
 		build.Parent = this;
 		build.Text = "&Build";
-		build.Location = new Point(load.Left+load.Width+15,460);
+		build.Location = new Point(load.Left+load.Width+15, this.Height - (build.Height * 2) - 10);
 		build.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		build.Click += new EventHandler(build_Click);
 
 		Button about = new Button();
 		about.Parent = this;
 		about.Text = "&About";
-		about.Location = new Point(build.Left+build.Width+15,460);
+		about.Location = new Point(build.Left+build.Width+15, this.Height - (about.Height * 2) - 10);
 		about.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		about.Click +=new EventHandler(about_Click);
 
 		Button exit = new Button();
 		exit.Parent = this;
 		exit.Text = "E&xit";
-		exit.Location = new Point(about.Left+about.Width+15,460);
+		exit.Location = new Point(about.Left+about.Width+15, this.Height - (exit.Height * 2) - 10);
 		exit.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
 		exit.Click += new EventHandler(exit_Click);
 	}
@@ -153,7 +153,7 @@ class main : window
 		dlg.Filter = "Exe Files (*.exe)|*.exe|All Files (*.*)|*.*";
 		if (dlg.ShowDialog() == DialogResult.OK)
 		{
-			Build.BuildExe(dlg.FileName, Loaded_ExeName, Intern, Extern, CheckSum.Checked);
+			Build.BuildExe(dlg.FileName, Loaded_ExeName, Intern, Extern, CheckSum.Checked, CopyDlls.Checked);
 		}
 		dlg.Dispose();
 	}

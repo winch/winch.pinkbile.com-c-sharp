@@ -10,8 +10,8 @@ using System.Drawing;
 
 class aboutDialog: Form
 {
-	string Version = "0.8";
-	string Date = "11 May 2008";
+	string Version = "0.9";
+	string Date = "xx May 2008";
 	string Ident = "exe_shrink";
 	int Build = 3;
 	public aboutDialog()
@@ -39,7 +39,7 @@ class aboutDialog: Form
 		email.Width = version.Width;
 		email.Height = 20;
 		email.TextAlign = ContentAlignment.TopCenter;
-		email.Text = "dbp@pinkbile.com";
+		email.Text = "thewinch@gmail.com";
 		email.LinkClicked += new LinkLabelLinkClickedEventHandler(email_LinkClicked);
 
 		LinkLabel web = new LinkLabel();
@@ -130,6 +130,6 @@ class aboutDialog: Form
 
 	private void email_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 	{
-		System.Diagnostics.Process.Start("mailto:dbp@pinkbile.com");
+		System.Diagnostics.Process.Start("mailto:thewinch@gmail.com");
 	}
 }

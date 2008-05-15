@@ -9,14 +9,18 @@ using System.IO;
 
 class Build
 {
-	public static void BuildExe(string newExe, string oldExe, ListView Intern, ListView Extern, bool checkSums)
+	public static void BuildExe(string newExe, string oldExe, ListView Intern,
+								ListView Extern, bool checkSums, bool copyDlls)
 	{
 		//build a new style exe with compress.dll
 		int exeSection;
+		string newExeDir = Path.GetDirectoryName(newExe);  //new exe directory
 		FileStream fsIn = null;
 		BinaryReader brIn = null;
 		FileStream fsOut = null;
 		BinaryWriter bwOut = null;
+		FileStream fsDll = null;
+		BinaryWriter bwDll = null;
 		try
 		{
 			fsOut = new FileStream(newExe, FileMode.Create);
@@ -77,8 +81,8 @@ class Build
 					//name
 					bwOut.Write((byte) lvi.Text.Length);
 					bwOut.Write(Encoding.ASCII.GetBytes(lvi.Text));
-					//checksums
-					if (checkSums == true)
+					//checksums and copy dlls
+					if (checkSums || copyDlls)
 					{
 						string checksum;
 						if (lvi.SubItems[1].Text == ListViewStrings.LocationExe)
@@ -87,14 +91,28 @@ class Build
 							fsIn = new FileStream(lvi.SubItems[1].Text, FileMode.Open);
 						brIn = new BinaryReader(fsIn);
 						fsIn.Seek(lvi.Offset, SeekOrigin.Begin);
-						System.Security.Cryptography.MD5CryptoServiceProvider md5 =
-							new System.Security.Cryptography.MD5CryptoServiceProvider();
-						byte[] result = md5.ComputeHash(brIn.ReadBytes(lvi.Size));
-						checksum = BitConverter.ToString(result).Replace("-","").ToLower();
+						byte[] fileData = brIn.ReadBytes(lvi.Size);
 						brIn.Close();
 						fsIn.Close();
-						//write md5 checksum
-						bwOut.Write(Encoding.ASCII.GetBytes(checksum));
+						if (checkSums)
+						{
+							//generate and write checksum
+							System.Security.Cryptography.MD5CryptoServiceProvider md5 =
+								new System.Security.Cryptography.MD5CryptoServiceProvider();
+							byte[] result = md5.ComputeHash(fileData);
+							checksum = BitConverter.ToString(result).Replace("-","").ToLower();
+							//write md5 checksum
+							bwOut.Write(Encoding.ASCII.GetBytes(checksum));
+						}
+						if (copyDlls)
+						{
+							//write file to exe dir
+							fsDll = new FileStream(newExeDir + Path.DirectorySeparatorChar + lvi.Text, FileMode.Create);
+							bwDll = new BinaryWriter(fsDll);
+							bwDll.Write(fileData);
+							bwDll.Close();
+							fsDll.Close();
+						}
 					}
 				}
 			}
@@ -119,6 +137,11 @@ class Build
 			{
 				bwOut.Close();
 				fsOut.Close();
+			}
+			if (fsDll != null)
+			{
+				bwDll.Close();
+				fsDll.Close();
 			}
 		}
 	}

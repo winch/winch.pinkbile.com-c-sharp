@@ -16,6 +16,7 @@ class window : Form
 	public Button ExternUp;
 	public Button ExternDown;
 	public CheckBox CheckSum;
+	public CheckBox CopyDlls;
 
 	public window()
 	{
@@ -23,23 +24,26 @@ class window : Form
 		Width = 535;
 		Height = 520;
 
+		int y = 10;
+
 		//internal files
 		GroupBox box = new GroupBox();
 		box.Parent = this;
 		box.Text = "Internal files (build into tiny exe)";
-		box.Location = new Point(10,10);
+		box.Location = new Point(10, y);
 		box.Width = 510;
 		box.Height = 200;
 		box.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+		y += box.Height + 10;
 
 		Intern = new ListView();
 		Intern.Parent = box;
-		Intern.Location = new Point(10,15);
+		Intern.Location = new Point(10, 15);
 		Intern.Width = 450;
 		Intern.Height = 175;
 		Intern.View = View.Details;
-		Intern.Columns.Add("Name",155,HorizontalAlignment.Left);
-		Intern.Columns.Add("Location",290,HorizontalAlignment.Left);
+		Intern.Columns.Add("Name", 155, HorizontalAlignment.Left);
+		Intern.Columns.Add("Location", 290, HorizontalAlignment.Left);
 		Intern.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 		Intern.SelectedIndexChanged += new EventHandler(Intern_SelectedIndexChanged);
 		Intern.Enabled = false;
@@ -48,7 +52,7 @@ class window : Form
 		InternUp = new Button();
 		InternUp.Parent = box;
 		InternUp.Text = "/\\";
-		InternUp.Location = new Point(470,15);
+		InternUp.Location = new Point(470, 15);
 		InternUp.Width = 30;
 		InternUp.Height = 60;
 		InternUp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -58,7 +62,7 @@ class window : Form
 		InternDown = new Button();
 		InternDown.Parent = box;
 		InternDown.Text = "\\/";
-		InternDown.Location = new Point(470,80);
+		InternDown.Location = new Point(470, 80);
 		InternDown.Width = 30;
 		InternDown.Height = 60;
 		InternDown.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -69,14 +73,15 @@ class window : Form
 		box = new GroupBox();
 		box.Parent = this;
 		box.Text = "External files (sourced from dbpro compiler dir)";
-		box.Location = new Point(10,220);
+		box.Location = new Point(10, y);
 		box.Width = 510;
 		box.Height = 210;
 		box.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+		y += box.Height + 5;
 
 		Extern = new ListView();
 		Extern.Parent = box;
-		Extern.Location = new Point(10,15);
+		Extern.Location = new Point(10, 15);
 		Extern.Width = 450;
 		Extern.Height = 185;
 		Extern.View = View.Details;
@@ -90,7 +95,7 @@ class window : Form
 		ExternUp = new Button();
 		ExternUp.Parent = box;
 		ExternUp.Text = "/\\";
-		ExternUp.Location = new Point(470,15);
+		ExternUp.Location = new Point(470, 15);
 		ExternUp.Width = 30;
 		ExternUp.Height = 60;
 		ExternUp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -100,7 +105,7 @@ class window : Form
 		ExternDown = new Button();
 		ExternDown.Parent = box;
 		ExternDown.Text = "\\/";
-		ExternDown.Location = new Point(470,80);
+		ExternDown.Location = new Point(470, 80);
 		ExternDown.Width = 30;
 		ExternDown.Height = 60;
 		ExternDown.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -137,10 +142,17 @@ class window : Form
 		CheckSum = new CheckBox();
 		CheckSum.Parent = this;
 		CheckSum.Text = "Include checksums for external files";
-		//CheckSum.Text += " (checksums generated from files in dbpro compiler dir not exe)";
-		CheckSum.Location = new Point(10,430);
-		CheckSum.Width += 415;
+		CheckSum.Location = new Point(10, y);
+		CheckSum.Width = 210;
 		CheckSum.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
+
+		//checksum checkbox
+		CopyDlls = new CheckBox();
+		CopyDlls.Parent = this;
+		CopyDlls.Text = "Write external files to build directory";
+		CopyDlls.Width = 210;
+		CopyDlls.Location = new Point(this.Width - CopyDlls.Width - 10, y);
+		CopyDlls.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
 
 	}
 
