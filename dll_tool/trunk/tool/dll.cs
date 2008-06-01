@@ -105,16 +105,14 @@ class dll
 		Cursor.Current = Cursors.WaitCursor;
 		//disable build button to prevent building twice
 		win.build.Enabled = false;
-		//find .corflags 0x00000001 and insert .vtfixup after it
+		//find .corflags 0x00000002 and insert .vtfixup after it
 		int i;
 		win.lb.BeginUpdate();
 		int slot = 1; //current slot number
 		for (i = 0; i < win.lb.Items.Count; i++)
 		{
-			if (win.lb.Items[i].ToString().StartsWith(".corflags 0x00000001"))
+			if (win.lb.Items[i].ToString().StartsWith(".corflags 0x00000002"))
 			{
-				//.corflags 0x00000001 found, change to 0x00000002
-                win.lb.Items[i] = ".corflags 0x00000002";				
 				//create VTableFixup table with enough slots for exported methods
 				foreach (ListViewItem lvi in win.exportBox.Items)
 				{
