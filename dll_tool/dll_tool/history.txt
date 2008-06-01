@@ -1,6 +1,10 @@
 version history
 +++++++++++++++
 
+v0.16 01 June 2008
+- Fix VTableFixup table bug introduced in previous versions so exported methods
+  actually get exported.
+
 v0.15 05 September 2006
 - Use the correct ilAsm and ilDasm versions according to the combo boxes.
 
