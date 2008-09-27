@@ -4,3 +4,4 @@
 3 - v0.13 05 August 2006
 4 - v0.14 02 September 2006
 5 - v0.15 05 September 2006
+6 - v0.16 01 June 2008
