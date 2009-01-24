@@ -5,7 +5,7 @@
 // This software is provided as-is without express or implied warranty,
 // and with no claim as to its suitability for any purpose.
 //
-// http://winch.pinkbile.com : dbp@pinkbile.com
+// http://winch.pinkbile.com : thewinch@gmail.com
 
 #include <windows.h>
 #include <stdio.h>
@@ -71,9 +71,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR CmdLine, i
 
     if(!RegisterClass(&wndclass))
     {
-		MessageBox(NULL, "Could not register window.", "Error!",MB_ICONEXCLAMATION | MB_OK);
-		return -1;
-	}
+        MessageBox(NULL, "Could not register window.", "Error!",MB_ICONEXCLAMATION | MB_OK);
+        return -1;
+    }
 
     //open patch file
     buffer = malloc(512);
@@ -91,8 +91,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR CmdLine, i
     //check there is actually data appended to patch
     if (dataStart >= patchLength)
     {
-       MessageBox(NULL, "No patch data.", "Error!",MB_ICONEXCLAMATION | MB_OK);
-	   return -1;
+        MessageBox(NULL, "No patch data.", "Error!",MB_ICONEXCLAMATION | MB_OK);
+        return -1;
     }
 
     d_hwnd = GetDesktopWindow();
@@ -259,7 +259,7 @@ void doPatch(HWND hwnd)
     int oldlendata;    // lenght from oldexe for filedata
 
     //md5 checksum stuff
-	char hex_output[32 + 1]; //generated hash
+    char hex_output[32 + 1]; //generated hash
 
     //disable patch button
     EnableWindow(btnPatch, FALSE);
@@ -459,38 +459,38 @@ void doPatch(HWND hwnd)
 
 int findHead(FILE *file)
 {
-  //finds the end of exe which is start of attache files in pro exe and patch info in patch
-  //skip dos stub
-  fseek(file, 60, SEEK_SET);
-  int e_lfannew;
-  fread(&e_lfannew, 1, 4, file);
-  fseek(file, e_lfannew + 6, SEEK_SET);
-  //IMAGE_FILE_HEADER
-  short NumberOfSections;
-  fread(&NumberOfSections, 1, 2, file);
-  fseek(file, 240, SEEK_CUR);
-  //end of IMAGE_OPTIONAL_HEADER
-  //section directories
-  int Size = 0; // size of section
-  int Pos = 0;  // position of section
-  int i;
-  for (i=0; i<NumberOfSections; i++)
-  {
-      fseek(file, 16, SEEK_CUR);
-      fread(&Size, 1, 4, file);
-      fread(&Pos, 1, 4, file);
-      fseek(file, 16, SEEK_CUR);
-  }
-  //end of section directories
-  return (Pos + Size);
+    //finds the end of exe which is start of attache files in pro exe and patch info in patch
+    //skip dos stub
+    fseek(file, 60, SEEK_SET);
+    int e_lfannew;
+    fread(&e_lfannew, 1, 4, file);
+    fseek(file, e_lfannew + 6, SEEK_SET);
+    //IMAGE_FILE_HEADER
+    short NumberOfSections;
+    fread(&NumberOfSections, 1, 2, file);
+    fseek(file, 240, SEEK_CUR);
+    //end of IMAGE_OPTIONAL_HEADER
+    //section directories
+    int Size = 0; // size of section
+    int Pos = 0;  // position of section
+    int i;
+    for (i=0; i<NumberOfSections; i++)
+    {
+        fseek(file, 16, SEEK_CUR);
+        fread(&Size, 1, 4, file);
+        fread(&Pos, 1, 4, file);
+        fseek(file, 16, SEEK_CUR);
+    }
+    //end of section directories
+    return (Pos + Size);
 }
 
 int getByte(FILE *file)
 {
-  //reads a byte from file
-  unsigned char c;
-  fread(&c,1,1,file);
-  return((int) c);
+    //reads a byte from file
+    unsigned char c;
+    fread(&c,1,1,file);
+    return((int) c);
 }
 
 char *getName(FILE *file)
@@ -508,62 +508,61 @@ char *getName(FILE *file)
 
 void getProExe(HWND hwnd)
 {
-      //Show an open file dialog to locate the dbpro exe to be patched
-      int i;
-      char *filter,*filterpos,*filepos,*file;
-      filter = malloc((strlen(filename)*2)+3);
-      file = malloc(255);
-      *file = 0x0;
-      *filter = 0x0;
-      filterpos = filter;
-      filepos = filename;
-      for (i=0; i<strlen(filename); i++)
-      {
-            *filterpos = *filepos;
-            filterpos ++;
-            filepos ++;
-      }
-      *filterpos = 0x0;
-      filterpos ++;
-      filepos = filename;
-      for (i=0; i<strlen(filename); i++)
-      {
-            *filterpos = *filepos;
-            filterpos ++;
-            filepos ++;
-      }
-      *filterpos = 0x0;
-      filterpos ++;
-      *filterpos = 0x0;
+    //Show an open file dialog to locate the dbpro exe to be patched
+    int i;
+    char *filter,*filterpos,*filepos,*file;
+    filter = malloc((strlen(filename)*2)+3);
+    file = malloc(255);
+    *file = 0x0;
+    *filter = 0x0;
+    filterpos = filter;
+    filepos = filename;
+    for (i=0; i<strlen(filename); i++)
+    {
+        *filterpos = *filepos;
+        filterpos ++;
+        filepos ++;
+    }
+    *filterpos = 0x0;
+    filterpos ++;
+    filepos = filename;
+    for (i=0; i<strlen(filename); i++)
+    {
+        *filterpos = *filepos;
+        filterpos ++;
+        filepos ++;
+    }
+    *filterpos = 0x0;
+    filterpos ++;
+    *filterpos = 0x0;
 
-      OPENFILENAME ofn;
-      ZeroMemory(&ofn, sizeof(OPENFILENAME));
-      ofn.lStructSize = sizeof(ofn);
-      ofn.hwndOwner = hwnd;
-      ofn.lpstrFile = 0x0;
-      ofn.lpstrTitle = "Select File to Patch";
-      ofn.lpstrFilter = filter;
-      ofn.nMaxFile = MAX_PATH;
-      ofn.nMaxFileTitle = MAX_PATH;
-      ofn.lpstrFile = file;
-      ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
-      if (GetOpenFileName(&ofn))
-      {
-            //return filename
-            free(&ofn);
-            free(&filter);
-            SetWindowText(editExe,file);
-            EnableWindow(btnPatch, TRUE);
-            proexe = file;
-            return;
-      }
-      else
-      {
-            //return nothing
-            free(&ofn);
-            free(&filter);
-            free(&file);
-            return;
-      }
+    OPENFILENAME ofn;
+    ZeroMemory(&ofn, sizeof(OPENFILENAME));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = 0x0;
+    ofn.lpstrTitle = "Select File to Patch";
+    ofn.lpstrFilter = filter;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.nMaxFileTitle = MAX_PATH;
+    ofn.lpstrFile = file;
+    ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+    if (GetOpenFileName(&ofn))
+    {
+        //return filename
+        free(&ofn);
+        free(&filter);
+        SetWindowText(editExe,file);
+        EnableWindow(btnPatch, TRUE);
+        proexe = file;
+        return;
+    }
+    else
+    {
+        //return nothing
+        free(&ofn);
+        free(&filter);
+        free(&file);
+        return;
+    }
 }
-

@@ -1,4 +1,4 @@
-To compile your own patcher you need dev-c++ from http://www.bloodshed.net/
+To compile your own patcher you need codeblocks from http://www.codeblocks.org/
 
 After you compile run shrink.bat which will reduce the size of the exe and rename it to patcher.dat
 Now just move patcher.dat into the same dir as builder.exe and build a patch.
