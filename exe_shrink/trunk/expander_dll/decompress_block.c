@@ -133,9 +133,9 @@ int writeExternalFiles(void *data, HGLOBAL block, char *searchPath[], int md5)
     HCRYPTHASH hash;
     DWORD hashLen = 16;
     unsigned char hashData[hashLen + 1];
-	char md5SumReq[33];  //required md5
-	md5SumReq[32] = 0;
-	char md5SumFile[33]; //md5 of file
+    char md5SumReq[33];  //required md5
+    md5SumReq[32] = 0;
+    char md5SumFile[33]; //md5 of file
     if (md5 == 1)
     {
         CryptAcquireContext(&cryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
