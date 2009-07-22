@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 This dll handles calling functions in compress.dll to (de)compress data.
 Since the exact compress.dll needed isn't known at compile time and
 C# doesn't (easily) support late binding this dll is used.
+
+This dll is also used to generate the dependancy list of a dbpro TPC dll
+for the same late binding reason as above.
 */
 
 #include <windows.h>
@@ -159,6 +162,36 @@ void DLL_EXPORT decompress(const char *oldExeName, int exeSection, int dataOffse
     fclose(newExe);
 }
 
+char* DLL_EXPORT getDepString(int num, char *fileName)
+{
+    const char* dep;
+    char* dep_copy;
+    const char* (*getDep)(int);
+    HANDLE lib = LoadLibrary(fileName);
+    getDep = (const char* (*)(int)) GetProcAddress(lib, "?GetDependencyID@@YAPBDH@Z");
+    dep = getDep(num);
+    dep_copy = malloc(strlen(dep));
+    dep_copy[0] = 0;
+    strcat(dep_copy, dep);
+    FreeLibrary(lib);
+    return dep_copy;
+}
+
+int DLL_EXPORT getDepCount(char *fileName)
+{
+    //get count of dependancies
+    int count = 0;
+    int (*depCount)(void);
+    HANDLE lib = LoadLibrary(fileName);
+    depCount = (int (*)(void)) GetProcAddress(lib, "?GetNumDependencies@@YAHXZ");
+    if (depCount != NULL)
+    {
+        count = depCount();
+    }
+    FreeLibrary(lib);
+    return count;
+}
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     switch (fdwReason)
@@ -182,3 +215,4 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     }
     return TRUE; // succesful
 }
+

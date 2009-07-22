@@ -1,6 +1,6 @@
 /*
 dark_explorer
-Copyright (C) 2005,2006,2007,2008 the_winch
+Copyright (C) 2005,2006,2007,2008,2009 the_winch
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -54,8 +54,10 @@ class viewItem : Form
 	TextBox textBox;
 	//hex text box
 	TextBox hexBox;
+	//dll dependancy listbox
+	ListBox depBox;
 	//dll string table listbox
-	ListBox listBox;
+	ListBox exportBox;
 
 	public viewItem()
 	{
@@ -116,13 +118,25 @@ class viewItem : Form
 		hexBox.Visible = false;
 		hexBox.Font = new Font("Courier New", hexBox.Font.Size);
 
-		//listbox
-		listBox = new ListBox();
-		listBox.Parent = this;
-		listBox.Location = pictureBox.Location;
-		listBox.Size = pictureBox.Size;
-		listBox.Anchor = pictureBox.Anchor;
-		listBox.Visible = false;
+		//dll dependancy listbox
+		depBox = new ListBox();
+		depBox.Parent = this;
+		depBox.Left = pictureBox.Left;
+		depBox.Top = pictureBox.Top;
+		depBox.Width = pictureBox.Width;
+		depBox.Height = 90;
+		depBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+		depBox.Visible = false;
+
+		//dll export listbox
+		exportBox = new ListBox();
+		exportBox.Parent = this;
+		exportBox.Left = pictureBox.Left;
+		exportBox.Top = depBox.Top + depBox.Height + 10;
+		exportBox.Width = pictureBox.Width;
+		exportBox.Height = pictureBox.Height - depBox.Height - 10;
+		exportBox.Anchor = pictureBox.Anchor;
+		exportBox.Visible = false;
 
 		this.Load += new System.EventHandler(viewItem_Load);
 		this.Activated += new System.EventHandler(viewItem_Activate);
@@ -164,7 +178,8 @@ class viewItem : Form
 		else if (itemType.SelectedIndex == itemType.Items.IndexOf("dll"))
 		{
 			//dll
-			listBox.Visible = true;
+			depBox.Visible = true;
+			exportBox.Visible = true;
 			stealFocusIfRequired();
 			showDll();
 		}
@@ -200,8 +215,8 @@ class viewItem : Form
 				textBox.Focus();
 			if (hexBox.Visible)
 				hexBox.Focus();
-			if (listBox.Visible)
-				listBox.Focus();
+			if (exportBox.Visible)
+				exportBox.Focus();
 			if (pictureBox.Visible)
 				pictureBox.Focus();
 			stealFocus = false;
@@ -286,13 +301,17 @@ class viewItem : Form
 		FileStream fsOut = null;
 		BinaryWriter bwOut = null;
 		string fileName = "";
-		listBox.Items.Clear();
-		listBox.BeginUpdate();
+		bool isTempFile = false;
+		depBox.Items.Clear();
+		depBox.BeginUpdate();
+		exportBox.Items.Clear();
+		exportBox.BeginUpdate();
 		try
 		{
 			if (item.SubItems[(int)ListViewOrder.Location].Text ==ListViewStrings.LocationExe)
 			{
 				//internal file
+				isTempFile = true;
 				fileName = Path.GetTempFileName();
 				fsOut = new FileStream(fileName, FileMode.Create);
 				bwOut = new BinaryWriter(fsOut);
@@ -302,13 +321,22 @@ class viewItem : Form
 				bwOut.Write(brIn.ReadBytes(item.Size));
 				bwOut.Close();
 				fsOut.Close();
-				hinst = LoadLibrary(fileName);
+				brIn.Close();
+				fsIn.Close();
 			}
 			else
 			{
 				//external file
-				hinst = LoadLibrary(item.SubItems[(int)ListViewOrder.Location].Text);
+				fileName = item.SubItems[(int)ListViewOrder.Location].Text;
 			}
+			//get dependencies
+			int depCount = getDepCount(fileName);
+			for (int i = 0; i < depCount; i++)
+			{
+				depBox.Items.Add(getDepString(i, fileName));
+			}
+			//get export list
+			hinst = LoadLibrary(fileName);
 			if (hinst != 0)
 			{
 				//read string table
@@ -318,7 +346,7 @@ class viewItem : Form
 				{
 					if (LoadString(hinst, s, sb, 255) > 0)
 					{
-						listBox.Items.Add(stringTableToText(sb.ToString()));
+						exportBox.Items.Add(stringTableToText(sb.ToString()));
 					}
 					s ++;
 				}
@@ -331,7 +359,7 @@ class viewItem : Form
 		finally
 		{
 			FreeLibrary(hinst);
-			if (File.Exists(fileName))
+			if (isTempFile && File.Exists(fileName))
 				File.Delete(fileName);
 			if (brIn != null)
 				brIn.Close();
@@ -342,7 +370,8 @@ class viewItem : Form
 			if (fsOut != null)
 				fsOut.Close();
 		}
-		listBox.EndUpdate();
+		depBox.EndUpdate();
+		exportBox.EndUpdate();
 	}
 
 	private void showExtraData()
@@ -665,10 +694,19 @@ class viewItem : Form
 		pictureBox.Visible = false;
 		textBox.Visible = false;
 		hexBox.Visible = false;
-		listBox.Visible = false;
+		depBox.Visible = false;
+		exportBox.Visible = false;
 		showItem();
 		Cursor.Current = Cursors.Default;
 	}
+
+	//get number of dependencies
+	[DllImport("comp.dll", EntryPoint="getDepCount")]
+	private static extern int getDepCount(string fileName);
+
+	//get an indevidual dependency
+	[DllImport("comp.dll", EntryPoint="getDepString")]
+	private static extern string getDepString(int number, string fileName);
 
 	//winapi functions required for string table loading
 	[DllImport("user32.dll", EntryPoint="LoadStringA")]
