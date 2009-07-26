@@ -54,10 +54,12 @@ class viewItem : Form
 	TextBox textBox;
 	//hex text box
 	TextBox hexBox;
-	//dll dependancy listbox
+	//dll dependancy listbox and label
 	ListBox depBox;
-	//dll string table listbox
+	Label depBoxLabel;
+	//dll string table listbox and label
 	ListBox exportBox;
+	Label exportBoxLabel;
 
 	public viewItem()
 	{
@@ -122,21 +124,37 @@ class viewItem : Form
 		depBox = new ListBox();
 		depBox.Parent = this;
 		depBox.Left = pictureBox.Left;
-		depBox.Top = pictureBox.Top;
+		depBox.Top = pictureBox.Top + 15;
 		depBox.Width = pictureBox.Width;
 		depBox.Height = 90;
 		depBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 		depBox.Visible = false;
 
+		depBoxLabel = new Label();
+		depBoxLabel.Parent = this;
+		depBoxLabel.Left = pictureBox.Left;
+		depBoxLabel.Top = pictureBox.Top - 5;
+		depBoxLabel.Text = "Dependencies";
+		depBoxLabel.AutoSize = true;
+		depBoxLabel.Visible = false;
+
 		//dll export listbox
 		exportBox = new ListBox();
 		exportBox.Parent = this;
 		exportBox.Left = pictureBox.Left;
-		exportBox.Top = depBox.Top + depBox.Height + 10;
+		exportBox.Top = depBox.Top + depBox.Height + 20;
 		exportBox.Width = pictureBox.Width;
-		exportBox.Height = pictureBox.Height - depBox.Height - 10;
+		exportBox.Height = pictureBox.Height - depBox.Height - 30;
 		exportBox.Anchor = pictureBox.Anchor;
 		exportBox.Visible = false;
+
+		exportBoxLabel = new Label();
+		exportBoxLabel.Parent = this;
+		exportBoxLabel.Left = pictureBox.Left;
+		exportBoxLabel.Top = depBox.Top + depBox.Height + 4;
+		exportBoxLabel.Text = "Exports";
+		exportBoxLabel.AutoSize = true;
+		exportBoxLabel.Visible = false;
 
 		this.Load += new System.EventHandler(viewItem_Load);
 		this.Activated += new System.EventHandler(viewItem_Activate);
@@ -179,7 +197,9 @@ class viewItem : Form
 		{
 			//dll
 			depBox.Visible = true;
+			depBoxLabel.Visible = true;
 			exportBox.Visible = true;
+			exportBoxLabel.Visible = true;
 			stealFocusIfRequired();
 			showDll();
 		}
@@ -333,7 +353,9 @@ class viewItem : Form
 			int depCount = getDepCount(fileName);
 			for (int i = 0; i < depCount; i++)
 			{
-				depBox.Items.Add(getDepString(i, fileName));
+				StringBuilder dep = new StringBuilder(255);
+				getDepString(i, fileName, dep, 255);
+				depBox.Items.Add(dep.ToString());
 			}
 			//get export list
 			hinst = LoadLibrary(fileName);
@@ -695,7 +717,9 @@ class viewItem : Form
 		textBox.Visible = false;
 		hexBox.Visible = false;
 		depBox.Visible = false;
+		depBoxLabel.Visible = false;
 		exportBox.Visible = false;
+		exportBoxLabel.Visible = false;
 		showItem();
 		Cursor.Current = Cursors.Default;
 	}
@@ -706,7 +730,7 @@ class viewItem : Form
 
 	//get an indevidual dependency
 	[DllImport("comp.dll", EntryPoint="getDepString")]
-	private static extern string getDepString(int number, string fileName);
+	static extern int getDepString(int number, string fileName, StringBuilder buffer, int bufferMax);
 
 	//winapi functions required for string table loading
 	[DllImport("user32.dll", EntryPoint="LoadStringA")]

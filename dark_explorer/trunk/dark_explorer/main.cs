@@ -64,7 +64,7 @@ class window : Form
 	public window()
 	{
 		Text = "dark_explorer";
-		Size = new Size(600,600);
+		Size = new Size(600,605);
 
 		contents = new ListView();
 		contents.Parent = this;

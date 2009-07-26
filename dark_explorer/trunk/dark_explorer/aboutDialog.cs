@@ -29,10 +29,10 @@ using System.Threading;
 
 class aboutDialog: Form
 {
-	string Version = "0.16";
-	string Date = "11 May 2008";
+	string Version = "0.18";
+	string Date = "26 July 2009";
 	string Ident = "dark_explorer";
-	int Build = 16;
+	int Build = 17;
 	Button btnUpdate;
 	ProgressBar progress;
 	public aboutDialog()
@@ -43,7 +43,7 @@ class aboutDialog: Form
 		MaximizeBox   = false;
 		MinimizeBox   = false;
 		ShowInTaskbar = false;
-		Size = new Size(200,270);
+		Size = new Size(200,275);
 		StartPosition = FormStartPosition.CenterParent;
 
 		Label version = new Label();

@@ -1,6 +1,6 @@
 /*
 dark_explorer
-Copyright (C) 2005,2006,2007,2008 the_winch
+Copyright (C) 2005,2006,2007,2008,2009 the_winch
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -162,19 +162,25 @@ void DLL_EXPORT decompress(const char *oldExeName, int exeSection, int dataOffse
     fclose(newExe);
 }
 
-char* DLL_EXPORT getDepString(int num, char *fileName)
+int DLL_EXPORT getDepString(int num, char *fileName, char *buffer, int bufferLen)
 {
+    int count = 0;
     const char* dep;
-    char* dep_copy;
     const char* (*getDep)(int);
     HANDLE lib = LoadLibrary(fileName);
     getDep = (const char* (*)(int)) GetProcAddress(lib, "?GetDependencyID@@YAPBDH@Z");
-    dep = getDep(num);
-    dep_copy = malloc(strlen(dep));
-    dep_copy[0] = 0;
-    strcat(dep_copy, dep);
+    if (getDep != NULL)
+    {
+        dep = getDep(num);
+        if (strlen(dep) < bufferLen)
+        {
+            //copy dependency string to buffer
+            memcpy(buffer, dep, strlen(dep) + 1);
+            count = strlen(dep);
+        }
+    }
     FreeLibrary(lib);
-    return dep_copy;
+    return count;
 }
 
 int DLL_EXPORT getDepCount(char *fileName)
