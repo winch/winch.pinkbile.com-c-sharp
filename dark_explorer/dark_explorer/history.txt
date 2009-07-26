@@ -1,8 +1,11 @@
 Version history
 +++++++++++++++
 
+v0.18 26 July 2009
+- Add TPC dll dependecies to dll viewer
+
 v0.17 11 May 2008
-- Added Exteralise dlls tool. Saves exe witho dlls and saves the dlls as seperate files in
+- Added Exteralise dlls tool. Saves exe without dlls and saves the dlls as seperate files in
   exe directory. Similar to the ExternaliseDLLS=Yes dbpro compiler option discussed here
   http://forum.thegamecreators.com/?m=forum_view&t=129081&b=18
   This option only works with dbpro exes v6.8 and later.
