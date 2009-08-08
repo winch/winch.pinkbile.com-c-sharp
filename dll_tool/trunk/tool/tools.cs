@@ -46,22 +46,34 @@ sealed class tools
 		RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\.NETFramework");
 		if (reg != null)
 		{
-			tool = new ilTool();
-			tool.Path = (string)reg.GetValue("sdkInstallRootv1.1") + "bin\\ildasm.exe";
-			tool.Version = "v1.1";
-			IlDasm.Add(tool);
-			tool = new ilTool();
-			tool.Path = (string)reg.GetValue("sdkInstallRootv2.0") + "bin\\ildasm.exe";
-			tool.Version = "v2.0";
-			IlDasm.Add(tool);
+			if (reg.GetValue("sdkInstallRootv1.1") != null)
+			{
+				tool = new ilTool();
+				tool.Path = (string)reg.GetValue("sdkInstallRootv1.1") + "bin\\ildasm.exe";
+				tool.Version = "v1.1";
+				IlDasm.Add(tool);
+			}
+			if (reg.GetValue("sdkInstallRootv2.0") != null)
+			{
+				tool = new ilTool();
+				tool.Path = (string)reg.GetValue("sdkInstallRootv2.0") + "bin\\ildasm.exe";
+				System.Windows.Forms.MessageBox.Show(tool.Path);
+				tool.Version = "v2.0";
+				IlDasm.Add(tool);
+			}
 			installRoot = (string)reg.GetValue("InstallRoot");
 			reg.Close();
+			//add custom
+			tool = new ilTool();
+			tool.Path = null;
+			tool.Version = "Custom";
+			IlDasm.Add(tool);
 		}
 		//find ilasm
 		if (installRoot != null)
 		{
 			string[] dirs = Directory.GetDirectories(installRoot);
-			//search install root for directories than contail ilasm.exe
+			//search install root for directories than contain ilasm.exe
 			foreach (string str in dirs)
 			{
 				if (File.Exists(str + Path.DirectorySeparatorChar + "ilasm.exe"))
@@ -80,6 +92,11 @@ sealed class tools
 				}
 			}
 		}
+		//custom
+		tool = new ilTool();
+		tool.Path = null;
+		tool.Version = "Custom";
+		IlAsm.Add(tool);
 	}
 }
 

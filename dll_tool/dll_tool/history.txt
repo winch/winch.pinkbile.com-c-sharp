@@ -1,6 +1,10 @@
 version history
 +++++++++++++++
 
+v0.17
+- Don't add ildasm version to the dropdown list if the registry value is missing.
+- Add custom options to ilasm and ildasm list that allows selection of ildasm or ilasm via open file dialog.
+
 v0.16 01 June 2008
 - Fix VTableFixup table bug introduced in previous versions so exported methods
   actually get exported.

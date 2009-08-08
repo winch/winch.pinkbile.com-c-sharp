@@ -1,7 +1,7 @@
 dll_tool - use .net dlls in dbpro
 ++++++++
 
-dbp@pinkbile.com
+thewinch@gmail.com
 http://winch.pinkbile.com/
 
 requires .Net SDK

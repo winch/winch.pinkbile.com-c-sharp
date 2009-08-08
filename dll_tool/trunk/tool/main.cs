@@ -37,8 +37,8 @@ class main: Form
 	public string TEMP = Path.GetTempPath();
 
 	public tools Tools;
-	public ilTool ilAsm;
-	public ilTool ilDasm;
+	public ilTool ilAsm = null;
+	public ilTool ilDasm = null;
 
 	public string dllName;
 
@@ -73,16 +73,21 @@ class main: Form
 		if (Tools.IlAsm.Count == 0)
 		{
 			MessageBox.Show("ilasm.exe not found.\nInstall .Net SDK.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			Application.Exit();
 		}
 		if (Tools.IlDasm.Count == 0)
 		{
 			MessageBox.Show("ildasm.exe not found.\nInstall .Net SDK.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Application.Exit();
 		}
-		ilAsm = (ilTool) Tools.IlAsm[Tools.IlAsm.Count - 1];
-		ilDasm = (ilTool) Tools.IlDasm[Tools.IlDasm.Count - 1];
+		if (Tools.IlAsm.Count > 0)
+            ilAsm = (ilTool) Tools.IlAsm[Tools.IlAsm.Count - 1];
+		if (Tools.IlDasm.Count > 0)
+			ilDasm = (ilTool) Tools.IlDasm[Tools.IlDasm.Count - 1];
 
+		//don't select "Custom" version if other versions exist
+		if (Tools.IlAsm.Count > 1)
+			ilAsm = (ilTool) Tools.IlAsm[Tools.IlAsm.Count - 2];
+		if (Tools.IlDasm.Count > 1)
+			ilDasm = (ilTool) Tools.IlDasm[Tools.IlDasm.Count - 2];
 
 		//load button
 		Button load = new Button();
@@ -157,6 +162,9 @@ class main: Form
 		foreach(ilTool iltool in Tools.IlAsm)
 			ilAsmVersion.Items.Add(iltool.Version);
 		ilAsmVersion.SelectedIndex = ilAsmVersion.Items.Count - 1;
+		//don't select custom
+		if (ilAsmVersion.Items.Count > 1)
+			ilAsmVersion.SelectedIndex = ilAsmVersion.Items.Count - 2;
 		ilAsmVersion.SelectedIndexChanged += new EventHandler(ilAsmVersion_SelectedIndexChanged);
 
 		//ildasm label
@@ -175,6 +183,9 @@ class main: Form
 		foreach(ilTool iltool in Tools.IlDasm)
 			ilDasmVersion.Items.Add(iltool.Version);
 		ilDasmVersion.SelectedIndex = ilDasmVersion.Items.Count - 1;
+		//don't select "custom";
+		if (ilDasmVersion.Items.Count > 1)
+			ilDasmVersion.SelectedIndex = ilDasmVersion.Items.Count - 2;
 		ilDasmVersion.SelectedIndexChanged += new EventHandler(ilDasmVersion_SelectedIndexChanged);
 
 		//exports type combobox
@@ -343,6 +354,27 @@ class main: Form
 	private void load_Click(object sender, EventArgs e)
 	{
 		//load dll
+		//check for ildasm
+		if (ilDasm == null)
+		{
+			MessageBox.Show("No ildasm.exe selected", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			return;
+		}
+		//check for custom ildasm
+		if (ilDasm.Path == null)
+		{
+			OpenFileDialog ilofd = new OpenFileDialog();
+			ilofd.Filter = "Ildasm.exe|ildasm.exe|Exe files (*.exe)|*.exe|All files (*.*)|*.*";
+			if (ilofd.ShowDialog() == DialogResult.OK)
+			{
+				ilDasm.Path = ilofd.FileName;
+			}
+			else
+			{
+				MessageBox.Show("No ildasm.exe selected", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+		}
 		OpenFileDialog ofd = new OpenFileDialog();
 		ofd.Filter = "Dll files (*.dll)|*.dll|All files (*.*)|*.*";
 		if (ofd.ShowDialog() == DialogResult.OK)
@@ -393,10 +425,30 @@ class main: Form
 	private void build_Click(object sender, EventArgs e)
 	{
 		//build dll
+		if (ilAsm == null)
+		{
+			MessageBox.Show("No ilasm.exe selected", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			return;
+		}
 		if (exportBox.Items.Count == 0)
 		{
 			MessageBox.Show("No methods to export!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			return;
+		}
+		//custom ilasm
+		if (ilAsm.Path == null)
+		{
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "Ilasm.exe|ilasm.exe|Exe files (*.exe)|*.exe|All files (*.*)|*.*";
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				ilAsm.Path = ofd.FileName;
+			}
+			else
+			{
+				MessageBox.Show("No ilasm.exe selected", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
 		}
 		SaveFileDialog sfd = new SaveFileDialog();
 		sfd.Filter = "Dll files (*.dll)|*.dll";
