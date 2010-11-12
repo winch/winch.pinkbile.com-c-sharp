@@ -1,40 +1,39 @@
-<?xml version="1.0"?>
-<!DOCTYPE CodeBlocks_project_file>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_project_file>
-	<FileVersion major="1" minor="1"/>
+	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Win32 Application"/>
-		<Option makefile="Makefile"/>
-		<Option makefile_is_custom="0"/>
-		<Option compiler="0"/>
+		<Option title="Win32 Application" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
 		<Build>
 			<Target title="default">
-				<Option output="C:\Documents and Settings\David\Desktop\source\c#\patch_tool\trunk\run_gui\patcher.exe"/>
-				<Option working_dir="."/>
-				<Option object_output=".objs"/>
-				<Option deps_output=".deps"/>
-				<Option type="0"/>
-				<Option compiler="0"/>
-				<Option projectResourceIncludeDirsRelation="0"/>
+				<Option output=".\patcher.exe" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectResourceIncludeDirsRelation="0" />
 			</Target>
 		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="default;" />
+		</VirtualTargets>
 		<Compiler>
-			<Add option="-Os"/>
+			<Add option="-Os" />
 		</Compiler>
 		<Linker>
-			<Add option="-s"/>
-			<Add library="gdi32"/>
-			<Add library="user32"/>
-			<Add library="kernel32"/>
+			<Add option="-s" />
+			<Add library="gdi32" />
+			<Add library="user32" />
+			<Add library="kernel32" />
 		</Linker>
 		<Unit filename="main.c">
-			<Option compilerVar="CC"/>
-			<Option target="default"/>
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="resource.rc">
-			<Option compilerVar="WINDRES"/>
-			<Option objectName="resource.res"/>
-			<Option target="default"/>
+			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

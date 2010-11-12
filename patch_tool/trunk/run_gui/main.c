@@ -275,7 +275,6 @@ void doPatch(HWND hwnd)
         fread(buffer,1,oldlen,f_oldexe);
         fclose(f_oldexe);
         getMd5(hex_output, buffer, oldlen);
-        MessageBox(GetActiveWindow(), hex_output, "", 0);
         free(buffer);
         //check checksums match
         if (strcmp(hex_output,checksum) != 0)
