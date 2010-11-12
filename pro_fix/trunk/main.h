@@ -1,0 +1,2 @@
+
+void errorMsg(char* errorTxt);
